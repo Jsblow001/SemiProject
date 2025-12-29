@@ -47,7 +47,7 @@ public abstract class AbstractController implements InterCommand {
 	public void setViewPage(String viewPage) {
 		this.viewPage = viewPage;
 	}
-	/*
+	
 	// 로그인 유무를 검사해서 로그인 했으면 true 를 리턴해주고
     // 로그인 안했으면 false 를 리턴해주도록 한다.
     public boolean checkLogin(HttpServletRequest request) {
@@ -63,7 +63,7 @@ public abstract class AbstractController implements InterCommand {
        
        
     } // end of public boolean checkLogin(HttpServletRequest request) {} --------------------------
-	*/
+	
 }
 
 
