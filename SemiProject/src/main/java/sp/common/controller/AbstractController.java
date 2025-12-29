@@ -1,5 +1,7 @@
-package common.controller;
+package sp.common.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 public abstract class AbstractController implements InterCommand {
 
@@ -45,6 +47,19 @@ public abstract class AbstractController implements InterCommand {
 		this.viewPage = viewPage;
 	}
 	
+	// 로그인 유무를 검사해서 로그인 했으면 true 를 리턴해주고
+    // 로그인 안했으면 false 를 리턴해주도록 한다.
+    public boolean checkLogin(HttpServletRequest request) {
+       HttpSession session = request.getSession();
+       MemberDTO loginuser = (MemberDTO)session.getAttribute("loginuser");
+    
+       if(loginuser != null) { //로그인
+          return true;
+       }
+       else { //로그아웃
+          return false;
+       }
+    } // end of public boolean checkLogin(HttpServletRequest request) {} --------------------------
 	
 }
 
