@@ -6,8 +6,8 @@ import java.util.List;
 import sp.common.controller.AbstractController;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import product.model.ProductDAO;
-import product.model.ProductDAO_imple;
+import ih.product.model.ProductDAO;
+import ih.product.model.ProductDAO_imple;
 
 public class IndexController extends AbstractController {
 
