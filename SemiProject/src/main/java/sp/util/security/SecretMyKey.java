@@ -1,4 +1,4 @@
-package util.security;
+package sp.util.security;
 
 public class SecretMyKey {
 	

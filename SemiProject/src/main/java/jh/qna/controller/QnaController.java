@@ -2,7 +2,7 @@ package jh.qna.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import common.controller.AbstractController;
+import sp.common.controller.AbstractController;
 
 public class QnaController extends AbstractController {
 

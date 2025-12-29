@@ -1,8 +1,8 @@
-package error.controller;
+package sp.error.controller;
 
-import common.controller.AbstractController;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import sp.common.controller.AbstractController;
 
 public class ErrorController extends AbstractController {
 

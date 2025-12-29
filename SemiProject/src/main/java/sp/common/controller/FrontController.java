@@ -1,4 +1,4 @@
-package common.controller;
+package sp.common.controller;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletConfig;

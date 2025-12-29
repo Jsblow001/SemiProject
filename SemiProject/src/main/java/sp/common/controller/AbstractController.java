@@ -1,4 +1,4 @@
-package common.controller;
+package sp.common.controller;
 
 
 public abstract class AbstractController implements InterCommand {
