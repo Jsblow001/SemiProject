@@ -100,7 +100,7 @@ body {
 <body>
 
 <!--  고정 헤더 -->
-<jsp:include page="/header.jsp" />
+<jsp:include page="../header.jsp" />
 
 <div class="login-wrap">
     <div class="login-title">CARIN ADMIN</div>
@@ -138,7 +138,7 @@ body {
 </div>
 
 <!--  고정 푸터 -->
-<jsp:include page="/footer.jsp" />
+<jsp:include page="../footer.jsp" />
 
 </body>
 </html>

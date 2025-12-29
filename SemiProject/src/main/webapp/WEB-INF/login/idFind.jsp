@@ -124,7 +124,7 @@ function validateForm() {
 <body>
 
 <!-- 헤더 -->
-<jsp:include page="/header.jsp" />
+<jsp:include page="../header.jsp" />
 
 <div class="login-wrap">
 
@@ -186,7 +186,7 @@ function validateForm() {
 </div>
 
 <!-- 푸터 -->
-<jsp:include page="/footer.jsp" />
+<jsp:include page="../footer.jsp" />
 
 </body>
 </html>

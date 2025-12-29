@@ -30,7 +30,7 @@ public class AdminController extends AbstractController {
         // 관리자 계정이 아니면 접근 불가
         if (!"admin".equals(loginuser.getUserid())) {
             request.setAttribute("message", "관리자만 접근할 수 있는 페이지입니다.");
-            request.setAttribute("loc", request.getContextPath() + "/index.up");
+            request.setAttribute("loc", request.getContextPath() + "/index.sp");
 
             super.setRedirect(false);
             super.setViewPage("/WEB-INF/msg.jsp");
