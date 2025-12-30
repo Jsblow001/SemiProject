@@ -1,4 +1,4 @@
-package hankyung.member.model;
+package hk.member.model;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,7 +10,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
-import hankyung.member.domain.MemberDTO;
+import hk.member.domain.MemberDTO;
 import sp.util.security.AES256;
 import sp.util.security.SecretMyKey;
 import sp.util.security.Sha256;

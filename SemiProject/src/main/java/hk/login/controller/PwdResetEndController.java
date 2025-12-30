@@ -1,11 +1,11 @@
-package hankyung.login.controller;
+package hk.login.controller;
 
 import sp.common.controller.AbstractController;
+import hk.member.model.MemberDAO;
+import hk.member.model.MemberDAO_imple;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import hankyung.member.model.MemberDAO;
-import hankyung.member.model.MemberDAO_imple;
 
 public class PwdResetEndController extends AbstractController {
 

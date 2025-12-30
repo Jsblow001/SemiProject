@@ -1,10 +1,10 @@
-package hankyung.login.controller;
+package hk.login.controller;
 
 import sp.common.controller.AbstractController;
+import hk.member.model.MemberDAO;
+import hk.member.model.MemberDAO_imple;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import hankyung.member.model.MemberDAO;
-import hankyung.member.model.MemberDAO_imple;
 
 /*
  * [IdFindController]
@@ -24,7 +24,7 @@ public class IdFindController extends AbstractController {
         if ("GET".equalsIgnoreCase(request.getMethod())) {
 
             super.setRedirect(false);
-            super.setViewPage("/WEB-INF/login/idFind.jsp");
+            super.setViewPage("/WEB-INF/hk_login/idFind.jsp");
             return;
         }
 
@@ -43,6 +43,6 @@ public class IdFindController extends AbstractController {
         request.setAttribute("email", email);
 
         super.setRedirect(false);
-        super.setViewPage("/WEB-INF/login/idFind.jsp");
+        super.setViewPage("/WEB-INF/hk_login/idFind.jsp");
     }
 }

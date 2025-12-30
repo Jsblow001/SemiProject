@@ -1,4 +1,4 @@
-package hankyung.login.controller;
+package hk.login.controller;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,9 +7,9 @@ import sp.common.controller.AbstractController;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import hankyung.member.domain.MemberDTO;
-import hankyung.member.model.MemberDAO;
-import hankyung.member.model.MemberDAO_imple;
+import hk.member.domain.MemberDTO;
+import hk.member.model.MemberDAO;
+import hk.member.model.MemberDAO_imple;
 
 public class LoginController extends AbstractController {
 
@@ -32,12 +32,12 @@ public class LoginController extends AbstractController {
 			// 관리자 로그인 화면
 			if ("admin".equals(mode)) {
 				super.setRedirect(false);
-				super.setViewPage("/WEB-INF/login/adminLogin.jsp");
+				super.setViewPage("/WEB-INF/hk_login/adminLogin.jsp");
 			}
 			// 일반 로그인 화면
 			else {
 				super.setRedirect(false);
-				super.setViewPage("/WEB-INF/login/login.jsp");
+				super.setViewPage("/WEB-INF/hk_login/login.jsp");
 			}
 			return;
 		}
@@ -64,7 +64,7 @@ public class LoginController extends AbstractController {
 				request.setAttribute("loc", request.getContextPath() + "/login.sp");
 
 				super.setRedirect(false);
-				super.setViewPage("/msg.jsp");
+				super.setViewPage("/WEB-INF/msg.jsp");
 			}
 			else {
 
@@ -73,7 +73,7 @@ public class LoginController extends AbstractController {
 					request.setAttribute("loc", request.getContextPath() + "/login.sp");
 
 					super.setRedirect(false);
-					super.setViewPage("/msg.jsp");
+					super.setViewPage("/WEB-INF/msg.jsp");
 					return;
 				}
 
@@ -82,7 +82,7 @@ public class LoginController extends AbstractController {
 					request.setAttribute("loc", request.getContextPath() + "/login.sp");
 
 					super.setRedirect(false);
-					super.setViewPage("/msg.jsp");
+					super.setViewPage("/WEB-INF/msg.jsp");
 					return;
 				}
 

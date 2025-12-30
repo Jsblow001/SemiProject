@@ -1,4 +1,4 @@
-package hankyung.mail.controller;
+package hk.mail.controller;
 
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;

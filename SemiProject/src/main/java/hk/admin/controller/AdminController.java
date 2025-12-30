@@ -1,10 +1,10 @@
-package hankyung.admin.controller;
+package hk.admin.controller;
 
 import sp.common.controller.AbstractController;
+import hk.member.domain.MemberDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import hankyung.member.domain.MemberDTO;
 
 public class AdminController extends AbstractController {
 
@@ -42,6 +42,6 @@ public class AdminController extends AbstractController {
         // 관리자 메인 페이지 보여주기 (껍데기)
         // ===============================
         super.setRedirect(false);
-        super.setViewPage("/WEB-INF/admin/adminIndex.jsp");
+        super.setViewPage("/WEB-INF/hk_admin/adminIndex.jsp");
     }
 }

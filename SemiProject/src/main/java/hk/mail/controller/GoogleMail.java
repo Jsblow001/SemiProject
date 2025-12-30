@@ -1,4 +1,4 @@
-package hankyung.mail.controller;
+package hk.mail.controller;
 
 import java.util.Properties;
 import javax.mail.*;

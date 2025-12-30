@@ -1,4 +1,4 @@
-package hankyung.login.controller;
+package hk.login.controller;
 
 import java.util.Random;
 
@@ -6,9 +6,9 @@ import sp.common.controller.AbstractController;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import hankyung.mail.controller.GoogleMail;
-import hankyung.member.model.MemberDAO;
-import hankyung.member.model.MemberDAO_imple;
+import hk.mail.controller.GoogleMail;
+import hk.member.model.MemberDAO;
+import hk.member.model.MemberDAO_imple;
 
 public class PwdFindController extends AbstractController {
 
@@ -25,7 +25,7 @@ public class PwdFindController extends AbstractController {
         if ("GET".equalsIgnoreCase(method)) {
 
             super.setRedirect(false);
-            super.setViewPage("/WEB-INF/login/pwdFind.jsp");
+            super.setViewPage("/WEB-INF/hk_login/pwdFind.jsp");
             return;
         }
 
@@ -81,7 +81,7 @@ public class PwdFindController extends AbstractController {
             request.setAttribute("sendMailSuccess", sendMailSuccess);
 
             super.setRedirect(false);
-            super.setViewPage("/WEB-INF/login/pwdFind.jsp");
+            super.setViewPage("/WEB-INF/hk_login/pwdFind.jsp");
         }
     }
 }

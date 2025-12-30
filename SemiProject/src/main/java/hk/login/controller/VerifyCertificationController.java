@@ -1,4 +1,4 @@
-package hankyung.login.controller;
+package hk.login.controller;
 
 import sp.common.controller.AbstractController;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,4 +1,4 @@
-package hankyung.login.controller;
+package hk.login.controller;
 
 import sp.common.controller.AbstractController;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,6 +25,6 @@ public class PwdResetController extends AbstractController {
         }
 
         super.setRedirect(false);
-        super.setViewPage("/WEB-INF/login/pwdReset.jsp");
+        super.setViewPage("/WEB-INF/hk_login/pwdReset.jsp");
     }
 }

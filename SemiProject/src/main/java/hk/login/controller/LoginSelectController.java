@@ -1,4 +1,4 @@
-package hankyung.login.controller;
+package hk.login.controller;
 
 import sp.common.controller.AbstractController;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +16,6 @@ public class LoginSelectController extends AbstractController {
 
         // 로그인 선택 화면으로 이동
         super.setRedirect(false); // forward
-        super.setViewPage("/WEB-INF/login/loginSelect.jsp");
+        super.setViewPage("/WEB-INF/hk_login/loginSelect.jsp");
     }
 }

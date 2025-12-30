@@ -1,11 +1,11 @@
-package hankyung.member.controller;
+package hk.member.controller;
 
 import sp.common.controller.AbstractController;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import hankyung.member.domain.MemberDTO;
-import hankyung.member.model.MemberDAO;
-import hankyung.member.model.MemberDAO_imple;
+import hk.member.domain.MemberDTO;
+import hk.member.model.MemberDAO;
+import hk.member.model.MemberDAO_imple;
 
 /*
  * [RegisterController]
@@ -29,7 +29,7 @@ public class RegisterController extends AbstractController {
 
             // forward 방식으로 회원가입 JSP 이동
             super.setRedirect(false);
-            super.setViewPage("/WEB-INF/member/register.jsp");
+            super.setViewPage("/WEB-INF/hk_member/register.jsp");
             return;
         }
 

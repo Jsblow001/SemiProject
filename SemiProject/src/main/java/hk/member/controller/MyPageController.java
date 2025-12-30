@@ -1,4 +1,4 @@
-package hankyung.member.controller;
+package hk.member.controller;
 
 import sp.common.controller.AbstractController;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,12 +23,12 @@ public class MyPageController extends AbstractController {
 
             // 로그인 안 된 상태 → 로그인 선택 페이지로 forward
             super.setRedirect(false); // forward 방식
-            super.setViewPage("/WEB-INF/login/loginSelect.jsp");
+            super.setViewPage("/WEB-INF/hk_login/loginSelect.jsp");
             return; // 메서드 종료
         }
 
         // 로그인 된 상태 → 마이페이지 이동
         super.setRedirect(false);
-        super.setViewPage("/WEB-INF/member/mypage.jsp");
+        super.setViewPage("/WEB-INF/hk_member/mypage.jsp");
     }
 }

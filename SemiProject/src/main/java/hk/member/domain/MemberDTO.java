@@ -1,4 +1,4 @@
-package hankyung.member.domain;
+package hk.member.domain;
 
 public class MemberDTO {
 	

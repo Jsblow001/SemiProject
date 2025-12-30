@@ -1,9 +1,9 @@
-package hankyung.member.model;
+package hk.member.model;
 
 import java.sql.SQLException;
 import java.util.Map;
 
-import hankyung.member.domain.MemberDTO;
+import hk.member.domain.MemberDTO;
 
 /*
  * [MemberDAO]
