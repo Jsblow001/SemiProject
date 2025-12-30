@@ -10,7 +10,7 @@ public class AdminController extends AbstractController {
 
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
+    	System.out.println("메롱2");
         // ===============================
         // 관리자 로그인 여부 체크
         // ===============================
@@ -19,8 +19,9 @@ public class AdminController extends AbstractController {
 
         // 로그인 안 했으면 접근 불가
         if (loginuser == null) {
+        	System.out.println("메롱");
             request.setAttribute("message", "관리자 로그인이 필요합니다.");
-            request.setAttribute("loc", request.getContextPath() + "/login.up?mode=admin");
+            request.setAttribute("loc", request.getContextPath() + "/login.sp?mode=admin");
 
             super.setRedirect(false);
             super.setViewPage("/WEB-INF/msg.jsp");

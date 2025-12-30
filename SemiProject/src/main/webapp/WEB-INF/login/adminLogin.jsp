@@ -118,7 +118,7 @@ body {
         <div class="form-group">
             <input type="password"
                    class="form-control"
-                   name="pwd"
+                   name="passwd"
                    placeholder="비밀번호">
         </div>
 
