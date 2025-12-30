@@ -109,35 +109,44 @@
 
     <!-- 메뉴 영역 -->
     <div class="menu-list">
-        <div class="menu-item">
-            <span>적립금</span>
-            <span>0원</span>
-        </div>
 
-        <div class="menu-item">
-            <span>쿠폰</span>
-            <span>1개</span>
-        </div>
-
-        <div class="menu-item" onclick="location.href='<%= request.getContextPath() %>/member/edit.sp'">
-            <span>회원정보</span>
-            <span>+</span>
-        </div>
-
-        <div class="menu-item">
-            <span>주문내역</span>
-            <span>+</span>
-        </div>
-
-        <div class="menu-item">
-            <span>관심상품</span>
-            <span>+</span>
-        </div>
-
-        <div class="menu-item" onclick="location.href='<%= request.getContextPath() %>/logout.sp'">
-            <span>로그아웃</span>
-        </div>
+    <div class="menu-item">
+        <span>적립금</span>
+        <span>0원</span>
     </div>
+
+    <div class="menu-item">
+        <span>쿠폰</span>
+        <span>1개</span>
+    </div>
+
+    <!-- 회원정보 수정 -->
+     <form name="editFrm" method="get" action="<%= request.getContextPath() %>/edit.sp"
+	          style="margin:0;">
+	    <div class="menu-item">	   
+		
+				<input type="hidden" name="userid" value="${sessionScope.loginuser.userid}">
+		        <button type="submit" class="menu-item" style="all:unset; width:100%; cursor:pointer;">
+		            <span>회원정보</span>		            
+		        </button>	   
+		        	<span>+</span> 	    
+	    </div>
+	
+	    <div class="menu-item">
+	        <span>주문내역</span>
+	        <span>+</span>
+	    </div>
+	
+	    <div class="menu-item">
+	        <span>관심상품</span>
+	        <span>+</span>
+	    </div>
+	
+	    <div class="menu-item" onclick="location.href='<%= request.getContextPath() %>/logout.sp'">
+	        <span>로그아웃</span>
+	    </div>
+	</form>
+</div>
 
 </div>
 

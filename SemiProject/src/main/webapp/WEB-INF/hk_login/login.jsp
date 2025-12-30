@@ -19,6 +19,9 @@
 <!-- jQuery -->
 <script src="<%=ctxPath%>/js/jquery-3.7.1.min.js"></script>
 
+<!-- 직접 만든 js -->
+<script src="<%=ctxPath%>/js/hk_login/login.js"></script>
+
 <style>
 body {
     font-family: 'Poppins', sans-serif !important;
@@ -153,8 +156,7 @@ body {
 <jsp:include page="../footer.jsp" />
 
 
-<!-- JS 분리 -->
-<script src="<%=ctxPath%>/js/login.js"></script>
+
 
 </body>
 </html>

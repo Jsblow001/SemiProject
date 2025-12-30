@@ -26,7 +26,6 @@ public class MemberEditController extends AbstractController {
 			}
 			else {
 				// 로그인한 사용자가 다른 사용자의 정보를 수정하려고 시도하는 경우
-				// http://localhost:9090/MyMVC/member/coinPurchaseTypeChoice.up?userid=eomjh
 				String message = "다른 사용자의 정보 변경은 불가합니다.";
 				String loc = "javascript:history.back()";
 				
@@ -39,7 +38,6 @@ public class MemberEditController extends AbstractController {
 		}
 		else {
 			// 로그인 안했으면
-			// http://localhost:9090/MyMVC/member/memberEdit.up?userid=leehk
 			String message = "회원정보를 수정하기 위해서는 먼저 로그인하셔야 합니다.";
 			String loc = "javascript:history.back()";
 			
