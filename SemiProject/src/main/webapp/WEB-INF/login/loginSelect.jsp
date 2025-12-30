@@ -167,7 +167,7 @@ footer,
 <body>
 
 <!-- 고정 헤더 -->
-<jsp:include page="/header.jsp" />
+<jsp:include page="../header.jsp" />
 
 <!-- 콘텐츠 -->
 <div class="login-select-bg">
@@ -196,7 +196,7 @@ footer,
 </div>
 
 <!-- 고정 푸터 -->
-<jsp:include page="/footer.jsp" />
+<jsp:include page="../footer.jsp" />
 
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>

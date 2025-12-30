@@ -3,7 +3,7 @@
     String ctxPath = request.getContextPath();
 %>
 
-<jsp:include page="/header.jsp" />
+<jsp:include page="../header.jsp" />
 
 <link rel="stylesheet" as="style" crossorigin
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
@@ -153,4 +153,4 @@ function checkId() {
     </form>
 </div>
 
-<jsp:include page="/footer.jsp" />
+<jsp:include page="../footer.jsp" />

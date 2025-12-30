@@ -88,7 +88,7 @@ function validateReset() {
 
 <body>
 
-<jsp:include page="/header.jsp" />
+<jsp:include page="../header.jsp" />
 
 <div class="reset-wrap">
 
@@ -113,7 +113,7 @@ function validateReset() {
 
 </div>
 
-<jsp:include page="/footer.jsp" />
+<jsp:include page="../footer.jsp" />
 
 </body>
 </html>
