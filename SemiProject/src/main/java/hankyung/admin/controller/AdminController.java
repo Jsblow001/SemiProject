@@ -10,7 +10,7 @@ public class AdminController extends AbstractController {
 
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
-    	System.out.println("메롱2");
+    	
         // ===============================
         // 관리자 로그인 여부 체크
         // ===============================
