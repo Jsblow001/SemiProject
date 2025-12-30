@@ -54,6 +54,6 @@ public class PwdResetEndController extends AbstractController {
         }
 
         super.setRedirect(false);
-        super.setViewPage("/msg.jsp");
+        super.setViewPage("/WEB-INF/msg.jsp");
     }
 }

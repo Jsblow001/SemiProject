@@ -49,6 +49,7 @@ public class RegisterController extends AbstractController {
             String detailaddress = request.getParameter("detailaddress");
             String extraaddress  = request.getParameter("extraaddress");
             String birthday      = request.getParameter("birthday");
+            String gender        = request.getParameter("gender");
 
             // DTO에 값 세팅
             MemberDTO member = new MemberDTO();
@@ -62,6 +63,7 @@ public class RegisterController extends AbstractController {
             member.setDetailaddress(detailaddress);
             member.setExtraaddress(extraaddress);
             member.setBirthday(birthday);
+            member.setGender(gender);
 
             // DAO 호출 → DB insert
             int n = mdao.registerMember(member);
@@ -82,7 +84,7 @@ public class RegisterController extends AbstractController {
 
             // msg.jsp로 이동
             super.setRedirect(false);
-            super.setViewPage("/msg.jsp");
+            super.setViewPage("/WEB-INF/msg.jsp");
         }
     }
 }
