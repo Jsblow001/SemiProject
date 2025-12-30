@@ -18,13 +18,38 @@
     <style>
         body {
             font-family: 'Poppins', 'Pretendard', sans-serif !important;
-            background-color: #FBFAF8 !important; /* 카린 특유의 밝은 베이지 배경 */
+            background-color: #FBFAF8 !important;
         }
         
-        /* 마이페이지 전용 스타일 */
         .mypage-container {
-            margin-top: 150px; /* 헤더가 fixed-top이므로 여백 충분히 확보 */
+            margin-top: 150px; 
             margin-bottom: 100px;
+        }
+        
+        /* 등급 및 포인트 요약 박스 */
+        .summary-box {
+            background: #fff;
+            padding: 40px 30px;
+            border: 1px solid #eee;
+            margin-bottom: 40px;
+            border-radius: 5px;
+        }
+
+        /* 스케치 이미지 기반 등급 원형 스타일 */
+        .grade-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 2px solid #5D4037;
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #5D4037;
+            font-size: 14px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            margin: 0 auto;
         }
         
         .btn-mypage-card {
@@ -35,6 +60,7 @@
             text-decoration: none !important;
             transition: all 0.3s ease;
             height: 100%;
+            border-radius: 5px;
         }
         .btn-mypage-card:hover {
             border-color: #5D4037;
@@ -44,75 +70,78 @@
         .card-icon { font-size: 30px; margin-bottom: 15px; }
         .card-title { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 5px; }
         .card-desc { font-size: 12px; color: #999; }
-        
-        .summary-box {
-            background: #fff;
-            padding: 30px;
-            border: 1px solid #eee;
-            margin-bottom: 40px;
-        }
     </style>
 </head>
 <body>
 
-    <jsp:include page="/header.jsp" />
+    <%-- 상단 헤더 인클루드 --%>
+    <jsp:include page="../header.jsp" />
 
     <div class="container mypage-container">
         
+        <%-- 사용자 요약 정보 영역 (등급 테이블 연동) --%>
         <div class="summary-box row align-items-center mx-0">
-            <div class="col-md-6 border-right">
-                <h2 style="font-size: 24px; font-weight: 500; letter-spacing: 1px;">MY PAGE</h2>
-                <p class="text-muted mb-0" style="font-size: 14px;">
-                    안녕하세요, <span style="color: #5D4037; font-weight: 600;">${sessionScope.loginuser.name}</span>님 반가워요!
+            <div class="col-md-6 border-right py-2">
+                <h2 style="font-size: 26px; font-weight: 500; letter-spacing: 1px; color: #333;">MY PAGE</h2>
+                <p class="text-muted mb-0" style="font-size: 15px; margin-top: 10px;">
+                    반갑습니다, <span style="color: #5D4037; font-weight: 700; font-size: 18px;">${sessionScope.loginuser.name}</span>님!
+                    <br>
+                    현재 고객님은 <span style="color: #5D4037; font-weight: 600;">${sessionScope.loginuser.grade_name}</span> 등급입니다.
                 </p>
             </div>
-            <div class="col-md-6 d-flex justify-content-around align-items-center">
+            
+            <div class="col-md-6 d-flex justify-content-around align-items-center py-2">
+                <%-- 포인트 표시 --%>
                 <div class="text-center">
-                    <div style="font-size: 12px; color: #888; margin-bottom: 5px;">COIN</div>
-                    <div style="font-weight: 600; font-size: 18px; color: #5D4037;">
-                        <fmt:formatNumber value="${sessionScope.loginuser.coin}" pattern="#,###" />원
+                    <div style="font-size: 12px; color: #888; margin-bottom: 8px; letter-spacing: 1px;">MEMBERSHIP</div>
+                    <div class="grade-circle">
+                        ${sessionScope.loginuser.grade_name}
                     </div>
                 </div>
+
+                <%-- 회원 등급 원형 표시 (이미지 반영) --%>
                 <div class="text-center border-left pl-5">
-                    <div style="font-size: 12px; color: #888; margin-bottom: 5px;">POINT</div>
-                    <div style="font-weight: 600; font-size: 18px; color: #5D4037;">
-                        <fmt:formatNumber value="${sessionScope.loginuser.point}" pattern="#,###" />P
+                    <div style="font-size: 12px; color: #888; margin-bottom: 8px; letter-spacing: 1px;">AVAILABLE POINT</div>
+                    <div style="font-weight: 600; font-size: 22px; color: #5D4037;">
+                        <fmt:formatNumber value="${sessionScope.loginuser.point}" pattern="#,###" /> <span style="font-size: 16px;">P</span>
                     </div>
                 </div>
             </div>
         </div>
 
+        <%-- 메뉴 카드 영역 --%>
         <div class="row text-center mb-5">
             <div class="col-md-3 mb-4">
                 <a href="<%= ctxPath %>/shop/orderList.sp" class="btn-mypage-card">
                     <div class="card-icon">📦</div>
                     <div class="card-title">주문내역</div>
-                    <div class="card-desc">고객님의 주문 현황</div>
+                    <div class="card-desc">최근 주문 현황 확인</div>
                 </a>
             </div>
             <div class="col-md-3 mb-4">
-                <a href="<%= ctxPath %>/member/memberedit.sp" class="btn-mypage-card">
+                <a href="<%= ctxPath %>/member/memberEdit.sp" class="btn-mypage-card">
                     <div class="card-icon">👤</div>
                     <div class="card-title">정보수정</div>
-                    <div class="card-desc">개인정보를 안전하게 관리</div>
+                    <div class="card-desc">내 정보 및 비밀번호 변경</div>
                 </a>
             </div>
             <div class="col-md-3 mb-4">
                 <a href="<%= ctxPath %>/shop/wishlist.sp" class="btn-mypage-card">
                     <div class="card-icon">🖤</div>
                     <div class="card-title">위시리스트</div>
-                    <div class="card-desc">관심 상품 목록</div>
+                    <div class="card-desc">담아둔 관심 상품</div>
                 </a>
             </div>
             <div class="col-md-3 mb-4">
                 <a href="<%= ctxPath %>/customer/qnaList.sp" class="btn-mypage-card">
                     <div class="card-icon">💬</div>
                     <div class="card-title">나의문의</div>
-                    <div class="card-desc">1:1 상담 및 상품 문의</div>
+                    <div class="card-desc">1:1 문의 내역 확인</div>
                 </a>
             </div>
         </div>
 
+        <%-- 최근 주문 정보 테이블 --%>
         <div class="mt-5">
             <div class="d-flex justify-content-between align-items-end mb-3">
                 <h4 style="font-size: 18px; font-weight: 600; margin: 0; color: #333;">최근 주문 정보</h4>
@@ -136,7 +165,8 @@
         </div>
     </div>
 
-    <jsp:include page="/footer.jsp" />
+    <%-- 하단 푸터 인클루드 --%>
+    <jsp:include page="../footer.jsp" />
 
 </body>
 </html>
