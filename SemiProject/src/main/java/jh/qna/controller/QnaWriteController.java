@@ -5,7 +5,7 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.util.UUID;
 
-import hankyung.member.domain.MemberDTO;
+import hk.member.domain.MemberDTO;
 import sp.common.controller.AbstractController;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServletRequest;
