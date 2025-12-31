@@ -137,7 +137,7 @@ public class MemberDAO_imple implements MemberDAO {
                        + "   POSTCODE, ADDRESS, DETAILADDRESS, EXTRAADDRESS, "
                        + "   GENDER, BIRTHDAY, POINT, "
                        + "   STATUS, REGISTERDAY, LASTPWDCHANGEDATE, GRADE_CODE) "
-                       + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1, SYSDATE, SYSDATE, NULL) ";
+                       + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1, SYSDATE, SYSDATE, 1) ";
 
             pstmt = conn.prepareStatement(sql);
 

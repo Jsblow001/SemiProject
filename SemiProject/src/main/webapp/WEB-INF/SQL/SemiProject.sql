@@ -7,7 +7,7 @@ select * from tbl_member;
 
 ------- 회원등급 테이블 --------
 create table tbl_grade
-(grade_code   varchar2(1)  default 1    not null  -- 등급코드 (1:일반, 2:실버, 3:골드 등)
+(grade_code   varchar2(1)               not null  -- 등급코드 (1:일반, 2:실버, 3:골드 등)
 ,grade_name   varchar2(30)              not null  -- 등급명
 ,min_amount   number default 0          not null  -- 최소구매금액 (승급 기준)
 ,save_rate    number(3,2) default 0.01      -- 적립률 (예: 0.01 은 1%, 0.05 는 5%)
@@ -32,7 +32,7 @@ create table tbl_member
 ,registerday        date default sysdate            -- 가입일자 
 ,lastpwdchangedate  date default sysdate            -- 마지막으로 암호를 변경한 날짜  
 ,status             number(1) default 1 not null    -- 회원탈퇴유무   1: 사용가능(가입중) / 0:사용불능(탈퇴)
-,grade_code         varchar2(1)                     -- 등급 코드 1, 2, 3 ....
+,grade_code         varchar2(1)dEFAULT '1' NOT NULL -- 등급 코드 1, 2, 3 ....
 ,constraint PK_tbl_member_userid primary key(member_id)
 ,constraint UQ_tbl_member_email  unique(email)
 ,constraint CK_tbl_member_gender check( gender in('1','2') )
