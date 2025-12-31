@@ -42,6 +42,6 @@ public class AdminController extends AbstractController {
         // 관리자 메인 페이지 보여주기 (껍데기)
         // ===============================
         super.setRedirect(false);
-        super.setViewPage("/WEB-INF/hk_admin/adminIndex.jsp");
+        super.setViewPage("/WEB-INF/js_admin/adminIndex.jsp");
     }
 }
