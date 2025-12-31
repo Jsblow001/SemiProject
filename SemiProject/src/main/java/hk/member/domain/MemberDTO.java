@@ -14,14 +14,13 @@ public class MemberDTO {
 	private String extraaddress;       // 참고항목
 	private String gender;             // 성별   남자:1  / 여자:2
 	private String birthday;           // 생년월일  
-	private int coin;                  // 코인액
 	private int point;                 // 포인트 
 	private String registerday;        // 가입일자 
 	private String lastpwdchangedate;  // 마지막으로 암호를 변경한 날짜  
 	private int status;                // 회원탈퇴유무   1: 사용가능(가입중) / 0:사용불능(탈퇴) 
 	private int idle;                  // 휴면유무      0 : 활동중  /  1 : 휴면중
 	                                   // 마지막으로 로그인 한 날짜시간이 현재시각으로 부터 1년이 지났으면 휴면으로 지정 
-	   
+	private String gradecode;   
 	// ============================================================== //
 
 	// only select 용 
@@ -110,13 +109,6 @@ public class MemberDTO {
 		this.birthday = birthday;
 	}
 
-	public int getCoin() {
-		return coin;
-	}
-	public void setCoin(int coin) {
-		this.coin = coin;
-	}
-
 	public int getPoint() {
 		return point;
 	}
@@ -157,5 +149,12 @@ public class MemberDTO {
 	}
 	public void setRequirePwdChange(boolean requirePwdChange) {
 		this.requirePwdChange = requirePwdChange;
+	}
+	
+	public String getGradecode() {
+		return gradecode;
+	}
+	public void setGradecode(String gradecode) {
+		this.gradecode = gradecode;
 	}
 }

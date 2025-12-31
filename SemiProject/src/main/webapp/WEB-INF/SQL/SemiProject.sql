@@ -471,3 +471,8 @@ from TBL_PRODUCT;
 SELECT pimage FROM tbl_product WHERE product_id = 4;
 
 commit;
+
+
+
+select *
+from tbl_member;

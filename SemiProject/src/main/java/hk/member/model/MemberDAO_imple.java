@@ -62,6 +62,7 @@ public class MemberDAO_imple implements MemberDAO {
         }
     }
 
+    
     // ======================================================
     // 로그인 처리
     // ======================================================
@@ -105,6 +106,7 @@ public class MemberDAO_imple implements MemberDAO {
         return member;
     }
 
+    
     // ======================================================
     // 회원가입
     // ======================================================
@@ -148,6 +150,7 @@ public class MemberDAO_imple implements MemberDAO {
         return result;
     }
 
+    
     // ======================================================
     // 아이디 찾기
     // ======================================================
@@ -183,6 +186,7 @@ public class MemberDAO_imple implements MemberDAO {
         return userid;
     }
 
+    
     // ======================================================
     // 비밀번호 찾기 (회원 존재 여부)
     // ======================================================
@@ -215,6 +219,7 @@ public class MemberDAO_imple implements MemberDAO {
         return isExist;
     }
 
+    
     // ======================================================
     // 비밀번호 찾기 후 비밀번호 업데이트
     // ======================================================
@@ -245,6 +250,47 @@ public class MemberDAO_imple implements MemberDAO {
 
         return result;
     }
+
+    
+    
+    // ===============================
+    // 회원정보 수정
+    // ===============================
+    @Override
+    public int updateMember(MemberDTO member) throws SQLException {
+
+        int result = 0;
+
+        try {
+            conn = ds.getConnection();
+
+            String sql = " UPDATE tbl_member SET "
+                       + "       name   = ?, "
+                       + "       passwd = ?, "
+                       + "       email  = ?, "
+                       + "       mobile = ? "
+                       + " WHERE MEMBER_ID = ? ";
+
+            pstmt = conn.prepareStatement(sql);
+
+            pstmt.setString(1, member.getName());
+            pstmt.setString(2, Sha256.encrypt(member.getPasswd()));  // 비밀번호 암호화
+            pstmt.setString(3, aes.encrypt(member.getEmail()));     // 이메일 암호화
+            pstmt.setString(4, aes.encrypt(member.getMobile()));    // 휴대폰 암호화
+            pstmt.setString(5, member.getUserid());
+
+            result = pstmt.executeUpdate();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            close();
+        }
+
+        return result;
+    }
+
 
     // ======================================================
     // 이하 기능 미구현 (다음 단계)

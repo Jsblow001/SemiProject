@@ -26,4 +26,7 @@ public interface MemberDAO {
 
     // 비밀번호 찾기 후 비밀번호 업데이트
 	boolean updatePassword(String userid, String encryptPasswd) throws SQLException;
+
+	// 회원정보 수정
+	int updateMember(MemberDTO member) throws SQLException;
 }
