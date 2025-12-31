@@ -4,7 +4,8 @@ import sp.common.controller.AbstractController;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import js.member.domain.MemberDTO;
+
+import hk.member.domain.MemberDTO;
 import js.member.model.MemberDAO;
 import js.member.model.MemberDAO_imple;
 import sp.util.security.Sha256;
@@ -29,7 +30,7 @@ public class MemberEditEndController extends AbstractController {
             }
 
             // 1. 데이터 받아오기 (member_id로 통일)
-            String member_id = request.getParameter("member_id");
+            String userid = request.getParameter("userid");
             String name = request.getParameter("name");
             String email = request.getParameter("email");
             String mobile = request.getParameter("mobile");
@@ -54,7 +55,7 @@ public class MemberEditEndController extends AbstractController {
 
             // 3. DTO 객체 생성 및 데이터 담기
             MemberDTO member = new MemberDTO();
-            member.setMember_id(member_id); // DTO 필드명과 일치
+            member.setUserid(userid); // DTO 필드명과 일치
             member.setName(name);
             member.setEmail(email);
             member.setMobile(mobile);
@@ -66,7 +67,7 @@ public class MemberEditEndController extends AbstractController {
             member.setBirthday(birthday);
             
             if (new_passwd != null && !new_passwd.trim().isEmpty()) {
-                member.setPasswd(Sha256.encrypt(new_passwd)); 
+                member.setPasswd(new_passwd); 
             } else {
                 member.setPasswd(null); 
             }
@@ -88,18 +89,18 @@ public class MemberEditEndController extends AbstractController {
                 loginuser.setBirthday(birthday);
 
                 request.setAttribute("message", "회원정보 수정이 완료되었습니다.");
-                request.setAttribute("loc", request.getContextPath() + "/member/mypage.sp");
+                request.setAttribute("loc", request.getContextPath() + "/mypage.sp");
             } else {
                 request.setAttribute("message", "정보 수정에 실패했습니다.");
                 request.setAttribute("loc", "javascript:history.back()");
             }
 
-            request.getRequestDispatcher("/msg.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/msg.jsp").forward(request, response);
             
         } else {
             request.setAttribute("message", "비정상적인 접근입니다.");
             request.setAttribute("loc", request.getContextPath() + "/index.sp");
-            request.getRequestDispatcher("/msg.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/msg.jsp").forward(request, response);
         }
     }
 }

@@ -5,7 +5,12 @@ import java.util.Map;
 import javax.naming.*;
 import javax.sql.DataSource;
 
-import js.member.domain.MemberDTO;
+
+import hk.member.domain.MemberDTO;
+
+import sp.util.security.AES256;
+import sp.util.security.SecretMyKey;
+import sp.util.security.Sha256;
 
 public class MemberDAO_imple implements MemberDAO {
 
@@ -13,13 +18,15 @@ public class MemberDAO_imple implements MemberDAO {
 	private Connection conn;
 	private PreparedStatement pstmt;
 	private ResultSet rs;
+	private AES256 aes;
 	
 	public MemberDAO_imple() {
         try {
             Context initContext = new InitialContext();
             Context envContext  = (Context)initContext.lookup("java:/comp/env");
-            ds = (DataSource)envContext.lookup("jdbc/myoracle"); // context.xml의 name과 일치해야 함
-        } catch (NamingException e) {
+            ds = (DataSource)envContext.lookup("SemiProject"); // context.xml의 name과 일치해야 함
+            aes = new AES256(SecretMyKey.KEY);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -54,24 +61,26 @@ public class MemberDAO_imple implements MemberDAO {
 
 	        pstmt = conn.prepareStatement(sql);
 	        pstmt.setString(1, member.getName());
-	        pstmt.setString(2, member.getEmail());
-	        pstmt.setString(3, member.getMobile());
+	        pstmt.setString(2, aes.encrypt(member.getEmail()) );
+	        pstmt.setString(3, member.getMobile() != null ? aes.encrypt(member.getMobile()) : null);	
 	        pstmt.setString(4, member.getPostcode());
 	        pstmt.setString(5, member.getAddress());
 	        pstmt.setString(6, member.getDetailaddress());
 	        pstmt.setString(7, member.getExtraaddress());
-	        pstmt.setString(8, member.getGender());
+	        pstmt.setString(8, member.getGender() != null ? member.getGender() : null);
 	        pstmt.setString(9, member.getBirthday());
 
 	        if (member.getPasswd() != null && !member.getPasswd().trim().isEmpty()) {
-	            pstmt.setString(10, member.getPasswd()); // SHA-256 암호화 권장
-	            pstmt.setString(11, member.getMember_id());
+	            pstmt.setString(10, Sha256.encrypt(member.getPasswd()) ); // SHA-256 암호화 권장
+	            pstmt.setString(11, member.getUserid());
 	        } else {
-	            pstmt.setString(10, member.getMember_id());
+	            pstmt.setString(10, member.getUserid());
 	        }
 
 	        result = pstmt.executeUpdate();
-	    } finally {
+	    } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
 	        close();
 	    }
 	    return result;

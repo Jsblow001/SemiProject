@@ -1,6 +1,6 @@
 package sp.common.controller;
 
-import hankyung.member.domain.MemberDTO;
+import hk.member.domain.MemberDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 

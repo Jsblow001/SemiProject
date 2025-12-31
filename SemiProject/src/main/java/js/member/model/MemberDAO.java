@@ -1,8 +1,7 @@
 package js.member.model;
 
 import java.sql.SQLException;
-
-import js.member.domain.MemberDTO;
+import hk.member.domain.MemberDTO;
 
 public interface MemberDAO {
 

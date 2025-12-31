@@ -29,6 +29,7 @@ public class MyPageController extends AbstractController {
 
         // 로그인 된 상태 → 마이페이지 이동
         super.setRedirect(false);
-        super.setViewPage("/WEB-INF/member/mypage.jsp");
+        super.setViewPage("/WEB-INF/js_member/mypage.jsp");
+
     }
 }

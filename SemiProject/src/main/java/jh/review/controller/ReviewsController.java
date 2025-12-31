@@ -12,7 +12,7 @@ public class ReviewsController extends AbstractController {
         // 나중에 DB 연결 시 여기서 데이터 세팅
         // request.setAttribute("reviewList", list);
 
-        super.setViewPage("/WEB-INF/views/reviews.jsp");
+        super.setViewPage("/WEB-INF/jh_views/reviews.jsp");
         super.setRedirect(false); // forward
     }
 }
