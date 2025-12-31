@@ -19,7 +19,7 @@ public class AdminController extends AbstractController {
 
         // 로그인 안 했으면 접근 불가
         if (loginuser == null) {
-        	System.out.println("메롱");
+     
             request.setAttribute("message", "관리자 로그인이 필요합니다.");
             request.setAttribute("loc", request.getContextPath() + "/login.sp?mode=admin");
 
