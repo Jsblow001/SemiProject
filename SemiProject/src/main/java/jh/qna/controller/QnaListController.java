@@ -29,6 +29,6 @@ public class QnaListController extends AbstractController {
         request.setAttribute("totalPages", 1);
 
         super.setRedirect(false);
-        super.setViewPage("/WEB-INF/jh_views/qna_page.jsp");  // 네 파일 위치에 맞춰
+        super.setViewPage("/WEB-INF/jh_views/qna_page.jsp"); 
     }
 }

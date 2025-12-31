@@ -34,7 +34,7 @@
 <br><br>
 <a href="<%= request.getContextPath() %>/reviews.sp">Reviews</a>
 <a href="<%= request.getContextPath() %>/notice.sp">Notice</a>
-<a href="<%= request.getContextPath() %>/qna.sp">QnA</a>
+<a href="<%= request.getContextPath() %>/qnaList.sp">QnA</a>
 <%-- 임시 review, notice, qna 이동 버튼 --%>
     
     <!-- Navbar Start -->
