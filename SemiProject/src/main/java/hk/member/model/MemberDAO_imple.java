@@ -74,11 +74,24 @@ public class MemberDAO_imple implements MemberDAO {
         try {
             conn = ds.getConnection();
 
-            String sql = " SELECT MEMBER_ID, NAME, EMAIL, STATUS, REGISTERDAY "
-                       + " FROM TBL_MEMBER "
-                       + " WHERE STATUS = 1 "
-                       + "   AND MEMBER_ID = ? "
-                       + "   AND PASSWD = ? ";
+            String sql = " SELECT M.member_id, "
+            		+ "       M.name, "
+            		+ "       M.email, "
+            		+ "       M.mobile, "
+            		+ "       M.postcode, "
+            		+ "       M.address, "
+            		+ "       M.detailaddress, "
+            		+ "       M.extraaddress, "
+            		+ "       M.gender, "
+            		+ "       M.birthday, "
+            		+ "       M.point, "
+            		+ "       M.status, "
+            		+ "       M.registerday, "
+            		+ "       M.grade_code, "
+            		+ "       G.grade_name "
+            		+ " FROM tbl_member M "
+            		+ " JOIN tbl_grade G ON M.grade_code = G.grade_code "
+            		+ " WHERE M.member_id = ? AND M.passwd = ? AND M.status = 1 ";
 
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, paraMap.get("userid"));
@@ -89,12 +102,13 @@ public class MemberDAO_imple implements MemberDAO {
             if (rs.next()) {
                 member = new MemberDTO();
 
-                member.setUserid(rs.getString("MEMBER_ID"));
-                member.setName(rs.getString("NAME"));
-                member.setEmail(aes.decrypt(rs.getString("EMAIL")));
-                member.setStatus(rs.getInt("STATUS"));
-                member.setRegisterday(rs.getString("REGISTERDAY"));
-                member.setIdle(0);
+                member.setUserid(rs.getString("member_id"));
+                member.setName(rs.getString("name"));
+                member.setEmail(aes.decrypt(rs.getString("email")));
+                member.setStatus(rs.getInt("status"));
+                member.setRegisterday(rs.getString("registerday"));
+                member.setGrade_name(rs.getString("grade_name"));; // ★ 카멜케이스
+
             }
 
         } catch (Exception e) {

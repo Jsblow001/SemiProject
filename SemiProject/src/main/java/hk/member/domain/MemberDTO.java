@@ -20,7 +20,9 @@ public class MemberDTO {
 	private int status;                // 회원탈퇴유무   1: 사용가능(가입중) / 0:사용불능(탈퇴) 
 	private int idle;                  // 휴면유무      0 : 활동중  /  1 : 휴면중
 	                                   // 마지막으로 로그인 한 날짜시간이 현재시각으로 부터 1년이 지났으면 휴면으로 지정 
-	private String gradecode;   
+	private String grade_code;		   // 등급코드   
+	private String grade_name;		   // 등급이름
+	private double save_rate;		   // 적립률
 	// ============================================================== //
 
 	// only select 용 
@@ -150,11 +152,24 @@ public class MemberDTO {
 	public void setRequirePwdChange(boolean requirePwdChange) {
 		this.requirePwdChange = requirePwdChange;
 	}
+	public String getGrade_code() {
+		return grade_code;
+	}
+	public void setGrade_code(String grade_code) {
+		this.grade_code = grade_code;
+	}
+	public String getGrade_name() {
+		return grade_name;
+	}
+	public void setGrade_name(String grade_name) {
+		this.grade_name = grade_name;
+	}
+	public double getSave_rate() {
+		return save_rate;
+	}
+	public void setSave_rate(double save_rate) {
+		this.save_rate = save_rate;
+	}
 	
-	public String getGradecode() {
-		return gradecode;
-	}
-	public void setGradecode(String gradecode) {
-		this.gradecode = gradecode;
-	}
+	
 }

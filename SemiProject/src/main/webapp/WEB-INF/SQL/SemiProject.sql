@@ -3,18 +3,17 @@ show user;
 select *
 from tab;
 
+select * from tbl_member;
 
 ------- 회원등급 테이블 --------
 create table tbl_grade
-(grade_code   varchar2(1)         not null  -- 등급코드 (1:일반, 2:실버, 3:골드 등)
-,grade_name   varchar2(30)        not null  -- 등급명
-,min_amount   number default 0    not null  -- 최소구매금액 (승급 기준)
+(grade_code   varchar2(1)  default 1    not null  -- 등급코드 (1:일반, 2:실버, 3:골드 등)
+,grade_name   varchar2(30)              not null  -- 등급명
+,min_amount   number default 0          not null  -- 최소구매금액 (승급 기준)
 ,save_rate    number(3,2) default 0.01      -- 적립률 (예: 0.01 은 1%, 0.05 는 5%)
 ,constraint PK_tbl_grade_code primary key(grade_code)
 );
 -- Table tbl_grade 이(가) 생성되었습니다.
-
-
 
 ------- 회원 테이블 --------
 create table tbl_member
@@ -476,3 +475,8 @@ commit;
 
 select *
 from tbl_member;
+
+
+
+
+    
