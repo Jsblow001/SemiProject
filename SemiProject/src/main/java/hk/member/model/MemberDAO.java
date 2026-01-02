@@ -29,4 +29,7 @@ public interface MemberDAO {
 
 	// 회원정보 수정
 	int updateMember(MemberDTO member) throws SQLException;
+
+	// 회원가입 內 이메일 중복검사 
+	boolean isUseridExists(String userid) throws SQLException;
 }

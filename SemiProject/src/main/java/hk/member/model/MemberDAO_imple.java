@@ -166,6 +166,36 @@ public class MemberDAO_imple implements MemberDAO {
 
     
     // ======================================================
+    // 이메일 중복검사 
+    // ======================================================
+	@Override
+	public boolean isUseridExists(String userid) throws SQLException {
+		  boolean result = false;
+
+		    try {
+		        conn = ds.getConnection();
+
+		        String sql = "select count(*) from tbl_member where member_id = ?";
+
+		        pstmt = conn.prepareStatement(sql);
+		        pstmt.setString(1, userid);
+
+		        rs = pstmt.executeQuery();
+
+		        if(rs.next()) {
+		            result = rs.getInt(1) > 0;
+		        }
+		    } catch (Exception e) {
+	            e.printStackTrace();
+		    } finally {
+		        close();
+		    }
+
+		    return result;
+	}
+
+    
+    // ======================================================
     // 아이디 찾기
     // ======================================================
     @Override
@@ -304,6 +334,10 @@ public class MemberDAO_imple implements MemberDAO {
 
         return result;
     }
+
+
+
+	
 
 
     // ======================================================

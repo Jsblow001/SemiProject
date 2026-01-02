@@ -8,6 +8,7 @@
 <link rel="stylesheet" as="style" crossorigin
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script src="<%=ctxPath%>/js/jquery-3.7.1.min.js"></script>
 
 <style>
     body { background-color:#fff; font-family:'Pretendard', sans-serif; color:#333; }
@@ -19,9 +20,17 @@
     .form-control { border-radius:0; border:1px solid #ddd; padding:12px; }
     .btn-black { background:#000; color:#fff; border-radius:0; padding:16px; width:100%; font-weight:bold; }
     .btn-post { background:#f8f8f8; border:1px solid #ddd; border-radius:0; font-size:13px; }
+    
 </style>
 
 <script>
+/* ================================
+전역 변수
+================================ */
+
+let isIdChecked = false; // 아이디 중복검사 여부
+
+
 /* ================================
    다음 우편번호
    ================================ */
@@ -48,6 +57,11 @@ function goRegister() {
         return;
     }
 
+    if(!isIdChecked){
+        alert("아이디 중복확인을 해주세요.");
+        return;
+    }
+    
     if (frm.passwd.value.trim() === "") {
         alert("비밀번호를 입력하세요.");
         frm.passwd.focus();
@@ -80,17 +94,48 @@ function goRegister() {
     frm.submit();
 }
 
+
 /* ================================
-   아이디 중복확인 (임시)
-   ================================ */
+아이디 중복확인 (AJAX)
+================================ */
 function checkId() {
-    if (document.registerFrm.userid.value.trim() === "") {
-        alert("아이디를 입력하세요.");
-        document.registerFrm.userid.focus();
-        return;
-    }
-    alert("아이디 중복확인 기능은 추후 구현");
+
+ const userid = $("#userid").val().trim();
+
+ if(userid === ""){
+     alert("아이디를 입력하세요.");
+     $("#userid").focus();
+     return;
+ }
+
+ // 아이디 규칙: 영문+숫자 4~12자
+ const regExp = /^[a-zA-Z0-9]{4,12}$/;
+ if(!regExp.test(userid)){
+     alert("아이디는 영문자와 숫자 4~12자만 가능합니다.");
+     return;
+ }
+
+ $.ajax({
+     url: "<%=ctxPath%>/idCheck.sp",
+     type: "get",
+     data: { userid: userid },
+     dataType: "json",
+     success: function(json){
+         if(json.isExists){
+             alert("이미 사용 중인 아이디입니다.");
+             isIdChecked = false;
+         }
+         else{
+             alert("사용 가능한 아이디입니다.");
+             isIdChecked = true;
+         }
+     },
+     error: function(){
+         alert("아이디 중복검사 실패");
+     }
+ });
 }
+
 </script>
 
 <div class="register-container">
@@ -103,7 +148,7 @@ function checkId() {
 
         <label class="form-label">아이디 *</label>
         <div class="input-group mb-3">
-            <input type="text" name="userid" class="form-control" placeholder="아이디">
+            <input type="text" id="userid" name="userid" class="form-control" placeholder="아이디">
             <div class="input-group-append">
                 <button type="button" class="btn btn-post" onclick="checkId()">중복확인</button>
             </div>
