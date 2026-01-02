@@ -65,7 +65,7 @@ public class ProductRegisterEndController extends AbstractController {
 
         if(n == 1) {
             message = "상품 등록을 성공하였습니다.";
-            loc = request.getContextPath() + "/product/productList.sp"; // 상품목록 페이지로 이동
+            loc = request.getContextPath() + "/admin/allproductList.sp"; // 상품목록 페이지로 이동
         } else {
             message = "상품 등록에 실패하였습니다.";
             loc = "javascript:history.back()"; // 이전 등록 폼으로 가기

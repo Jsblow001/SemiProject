@@ -466,7 +466,8 @@ VALUES (4, '40001', '콜라보');
 COMMIT;
 
 select *
-from TBL_PRODUCT;
+from TBL_PRODUCT
+order by stock_date desc;
 
 SELECT pimage FROM tbl_product WHERE product_id = 4;
 

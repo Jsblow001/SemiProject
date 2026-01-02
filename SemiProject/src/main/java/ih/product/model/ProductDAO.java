@@ -17,6 +17,18 @@ public interface ProductDAO {
 
 	// 상품 상세 정보를 가져오는 메서드
 	ProductDTO selectOneProduct(String productId) throws SQLException;
+
+	// 관리자전용 - 등록된 상품 리스트
+	//List<ProductDTO> selectAllProduct() throws SQLException;
+	List<ProductDTO> selectAllProduct(String category) throws SQLException;
+	
+	// 관리자전용 - 상품 수정
+	int updateProduct(ProductDTO pdto) throws SQLException;
+		
+	// 관리자전용 - 상품 삭제
+	int deleteProduct(String productId) throws SQLException;
+
+	
     
     // 카테고리 리스트 가져오기 메서드 (상품 등록 폼용)
     // List<CategoryDTO> selectCategoryList() throws SQLException;
