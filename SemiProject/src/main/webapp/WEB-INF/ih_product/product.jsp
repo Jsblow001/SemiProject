@@ -4,18 +4,40 @@
 
 <% String ctxPath = request.getContextPath(); %>
 
-<script type="text/javascript" src="<%= ctxPath%>/js/product/product.js"></script>
+<script type="text/javascript" src="<%= ctxPath%>/js/ih_product/product.js"></script>
 
 <style>
+    /* 상품 아이템 호버 효과 */
     .product-item { transition: transform 0.2s; border-radius: 10px; overflow: hidden; }
     .product-item:hover { transform: translateY(-8px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }
-    .product-img img { transition: transform 0.5s; }
+    
+    /* 1. 이미지 박스 설정 (비율 고정) */
+    .product-img {
+        width: 100%;
+        aspect-ratio: 4 / 5; 
+        overflow: hidden;
+        background-color: #ffffff; /* 공백 부분을 흰색으로 설정 (원하시면 #f8f9fa 등 설정 가능) */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px !important; /* 사진이 테두리에 너무 붙지 않게 여백 추가 */
+    }
+
+    /* 2. 이미지 정렬: 잘리지 않고 전체 다 보이기 */
+    .product-img img { 
+        width: 100%;
+        height: 100%;
+        /* cover 대신 contain을 사용합니다 */
+        object-fit: contain; 
+        transition: transform 0.5s; 
+    }
+    
     .product-item:hover .product-img img { transform: scale(1.08); }
     .text-decoration-none { text-decoration: none !important; }
     
     /* 버튼 스타일 */
-    .btn-wish, .btn-cart { border: none; background: none; }
-    .btn-wish:hover i { font-weight: 900; } /* 마우스 올리면 꽉 찬 하트 느낌 */
+    .btn-wish, .btn-cart { border: none; background: none; transition: all 0.2s; }
+    .btn-wish:hover i { font-weight: 900; } 
     .btn-cart:hover i { color: #f39c12; }
 </style>
 
