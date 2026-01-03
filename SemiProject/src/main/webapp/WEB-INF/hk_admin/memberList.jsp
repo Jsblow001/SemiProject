@@ -1,42 +1,100 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <% String ctxPath = request.getContextPath(); %>
-<%-- 
-    관리자 헤더 (아직 미구현 상태라 주석 처리)
-    나중에 헤더 완성되면 주석만 해제하면 됨
---%>
-<%-- <jsp:include page="" /> --%>
+
 
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <title>관리자 | 회원관리</title>
+<meta charset="UTF-8">
+<title>관리자 | 회원관리</title>
 
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #fff;
-        }
-        h3 {
-            margin-bottom: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: center;
-        }
-        th {
-            background-color: #f5f5f5;
-        }
-    </style>
+    body {
+        font-family: 'Pretendard', Arial, sans-serif;
+        background-color: #f7f6f3;
+        color: #333;
+    }
+
+    .container {
+        width: 1100px;
+        margin: 60px auto;
+        background-color: #fff;
+        padding: 40px;
+        border-radius: 4px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+
+    /* ===== 상단 타이틀 영역 ===== */
+    h3 {
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: -0.3px;
+        color: #2f2b2a;
+        margin-bottom: 0;
+    }
+
+    /* 상단 버튼 */
+    .container > div a {
+        background-color: #3e3a39 !important;
+        transition: background-color 0.2s ease;
+    }
+
+    .container > div a:hover {
+        background-color: #2f2b2a !important;
+    }
+
+    /* ===== 테이블 ===== */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 30px;
+        font-size: 14px;
+    }
+
+    thead th {
+        background-color: #f2f1ee;
+        font-weight: 600;
+        color: #555;
+        padding: 14px 10px;
+        border-bottom: 2px solid #ddd;
+    }
+
+    tbody td {
+        padding: 14px 10px;
+        border-bottom: 1px solid #eee;
+        color: #444;
+    }
+
+    tbody tr:hover {
+        background-color: #faf9f7;
+    }
+
+    /* 상태 컬럼 강조 */
+    tbody td:last-child {
+        font-weight: 600;
+    }
+
+    /* 탈퇴 회원 */
+    tbody tr td:last-child:contains("탈퇴") {
+        color: #b71c1c;
+    }
+
+    /* 회원 없을 때 */
+    tbody tr td[colspan] {
+        padding: 30px 0;
+        color: #777;
+        font-size: 14px;
+    }
+</style>
+
 </head>
 
 <body>
+
+<!--  고정 헤더 -->
+<jsp:include page="../header.jsp" />
+
 
 <div class="container">
 
@@ -122,8 +180,8 @@
 
 </div>
 
-<%-- 관리자 푸터 (나중에 필요하면) --%>
-<%-- <jsp:include page="" /> --%>
+<%-- 고정 푸터 --%>
+<jsp:include page="../footer.jsp" />
 
 </body>
 </html>

@@ -13,50 +13,163 @@
 
 <style>
     body {
-        font-family: Arial, sans-serif;
-        background-color: #fff;
-    }
-    .wrap {
-        width: 1000px;
-        margin: 40px auto;
-    }
-    h2 {
-        margin-bottom: 30px;
-    }
-    .card-area {
-        display: flex;
-        gap: 20px;
-        margin-bottom: 40px;
-    }
-    .card {
-        flex: 1;
-        border: 1px solid #ddd;
-        padding: 20px;
-        text-align: center;
-    }
-    .card h3 {
-        margin-bottom: 10px;
-    }
-    .card p {
-        font-size: 26px;
-        font-weight: bold;
-    }
-    .btn-area a {
-        display: inline-block;
-        margin-right: 15px;
-        padding: 12px 20px;
-        border: 1px solid #333;
-        text-decoration: none;
+        font-family: 'Pretendard', Arial, sans-serif;
+        background-color: #f7f6f3;
         color: #333;
     }
+
+    .wrap {
+        width: 1100px;
+        margin: 60px auto;
+    }
+
+    h2 {
+        font-family: 'Pretendard', Arial, sans-serif;
+	    font-size: 23px !important;    
+	    font-weight: 700;
+	    letter-spacing: -0.3px;
+	    color: #2f2b2a;
+	    margin-bottom: 40px;
+    }
+
+    /* ===== 대시보드 전체 ===== */
+    .dashboard {
+        display: flex;
+        gap: 30px;
+        margin-bottom: 50px;
+    }
+
+    /* ===== 메인 카드 ===== */
+    .card-area.main-cards {
+        flex: 4;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+
+    .card {
+        background-color: #fff;
+        border-radius: 4px;
+        padding: 25px 20px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        transition: transform 0.15s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-4px);
+    }
+
+    .card h3 {
+        font-size: 14px;
+        color: #777;
+        margin-bottom: 15px;
+        font-weight: 500;
+    }
+
+    .card p {
+        font-size: 30px;
+        font-weight: 700;
+        color: #3e3a39;
+    }
+
+    /* ===== 사이드 카드 ===== */
+    .side-card {
+        flex: 1;
+        background-color: #fff;
+        border-radius: 4px;
+        padding: 30px 25px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        border-left: 5px solid #a1887f;
+    }
+
+    .side-card h3 {
+        font-size: 15px;
+        margin-bottom: 20px;
+        color: #6d4c41;
+        font-weight: 600;
+    }
+
+    .side-card p {
+        font-size: 36px;
+        font-weight: 800;
+        color: #4e342e;
+    }
+
+    /* ===== 검색 영역 ===== */
+    .search-area {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 4px;
+        margin-bottom: 40px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .search-area h3 {
+        margin-bottom: 20px;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .search-area form {
+        display: flex;
+        gap: 10px;
+    }
+
+    .search-area select,
+    .search-area input {
+        padding: 10px 12px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        font-size: 14px;
+    }
+
+    .search-area input {
+        flex: 1;
+    }
+
+    .search-area button {
+        padding: 10px 18px;
+        border: none;
+        background-color: #6d4c41;
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: 3px;
+    }
+
+    .search-area button:hover {
+        background-color: #5d4037;
+    }
+
+    /* ===== 하단 버튼 ===== */
+    .btn-area a {
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: #3e3a39;
+        color: #fff;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        border-radius: 3px;
+    }
+
+    .btn-area a:hover {
+        background-color: #2f2b2a;
+    }
 </style>
+
 </head>
 
 <body>
 
+<!--  고정 헤더 -->
+<jsp:include page="../header.jsp" />
+
 <div class="wrap">
 
-    <h2>회원관리 대시보드</h2>
+    <h2 class="font-weight-bold mb-4 text-dark">회원관리 대시보드</h2>
 
     <%-- ===============================
          회원 요약 카드 영역
@@ -129,8 +242,9 @@
 
 </div>
 
+<%-- 고정 푸터 --%>
+<jsp:include page="../footer.jsp" />
+
 </body>
 </html>
 
-<%-- 관리자 푸터 --%>
-<%-- <jsp:include page="../adminFooter.jsp" /> --%>
