@@ -36,7 +36,7 @@ public class ProductDAO_imple implements ProductDAO {
         }
     }
 
- // 카테고리 번호를 받아 해당 카테고리 상품만 조회
+    // 카테고리 번호를 받아 해당 카테고리 상품만 조회
     @Override
     public List<ProductDTO> selectProductByCategory(String categoryId) throws SQLException {
         
@@ -155,7 +155,95 @@ public class ProductDAO_imple implements ProductDAO {
             }
         } finally { close(); }
         return productList;
-    }
+    } // end of public List<ProductDTO> selectProductAll() throws SQLException ----
+    
+    // 관리자전용 - 등록된 상품 리스트
+    @Override
+    public List<ProductDTO> selectAllProduct(String category) throws SQLException {
+        List<ProductDTO> productList = new ArrayList<>();
+        try {
+            conn = ds.getConnection();
+            
+            String sql = " SELECT * FROM tbl_product ";
+            
+            if(category != null && !category.isEmpty()) {
+                sql += " WHERE fk_category_id = ? ";
+            }
+            
+            sql += " ORDER BY product_id DESC ";
+            
+            pstmt = conn.prepareStatement(sql);
+            
+            if(category != null && !category.isEmpty()) {
+                pstmt.setString(1, category);
+            }
+            
+            rs = pstmt.executeQuery();
+            
+            while(rs.next()) {
+                ProductDTO pdto = new ProductDTO();
+                pdto.setProduct_id(rs.getInt("product_id"));
+                pdto.setProduct_name(rs.getString("product_name"));
+                pdto.setFk_category_id(rs.getInt("fk_category_id"));
+                pdto.setPimage(rs.getString("pimage"));
+                pdto.setSale_price(rs.getInt("sale_price"));
+                pdto.setStock(rs.getInt("stock"));
+
+                productList.add(pdto);
+            }
+        } finally {
+            close();
+        }
+        return productList;
+    } // end of public List<ProductDTO> selectAllProduct(String category) throws SQLException ----
+    
+    // 관리자전용 - 상품 수정
+    @Override
+    public int updateProduct(ProductDTO pdto) throws SQLException {
+        int result = 0;
+        try {
+        	conn = ds.getConnection();
+            
+            String sql = " UPDATE tbl_product SET fk_category_id = ?, "
+                       + " product_name = ?, sale_price = ?, stock = ?, "
+                       + " product_description = ?, pimage = ? " // 추가됨
+                       + " WHERE product_id = ? ";
+         
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setInt(1, pdto.getFk_category_id());
+	        pstmt.setString(2, pdto.getProduct_name());
+	        pstmt.setInt(3, pdto.getSale_price());
+	        pstmt.setInt(4, pdto.getStock());
+	        pstmt.setString(5, pdto.getProduct_description()); // 추가됨
+	        pstmt.setString(6, pdto.getPimage());
+	        pstmt.setInt(7, pdto.getProduct_id());
+	         
+	        result = pstmt.executeUpdate();
+        } finally {
+            close();
+        }
+        return result;
+    } // end of public int updateProduct(ProductDTO pdto) throws SQLException ----
+    
+    // 관리자전용 - 상품 삭제
+    @Override
+    public int deleteProduct(String productId) throws SQLException {
+        int result = 0;
+        try {
+            conn = ds.getConnection();
+            
+            // 상품 테이블에서 해당 ID 삭제
+            String sql = " DELETE FROM tbl_product WHERE product_id = ? ";
+            
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, productId);
+            
+            result = pstmt.executeUpdate();
+        } finally {
+            close();
+        }
+        return result;
+    } // end of  public int deleteProduct(String productId) throws SQLException ----
 
     
     

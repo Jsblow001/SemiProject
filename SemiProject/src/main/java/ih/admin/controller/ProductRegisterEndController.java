@@ -13,12 +13,12 @@ public class ProductRegisterEndController extends AbstractController {
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
         
-        // 1. 저장 경로 설정
+        // 저장 경로 설정
         String uploadDir = request.getServletContext().getRealPath("/img");
         File dir = new File(uploadDir);
         if(!dir.exists()) dir.mkdirs(); 
 
-        // 2. 파일 데이터 처리 
+        // 파일 데이터 처리 
         Part pimagePart = request.getPart("pimage"); 
         String originalFileName = pimagePart.getSubmittedFileName(); 
         String savedFileName = "";
@@ -28,7 +28,7 @@ public class ProductRegisterEndController extends AbstractController {
             pimagePart.write(uploadDir + File.separator + savedFileName);
         }
 
-        // 3. 데이터 읽기
+        // 데이터 읽기
         String product_name = request.getParameter("product_name");
         int fk_category_id = Integer.parseInt(request.getParameter("fk_category_id"));
         int sale_price = Integer.parseInt(request.getParameter("sale_price"));
@@ -44,7 +44,7 @@ public class ProductRegisterEndController extends AbstractController {
         int fk_spec_id = Integer.parseInt(request.getParameter("fk_spec_id")); // JSP에서 넘어온 값 사용
         String product_description = request.getParameter("product_description");
 
-        // 4. DTO에 담기
+        // DTO
         ProductDTO pdto = new ProductDTO();
         pdto.setProduct_name(product_name);
         pdto.setFk_category_id(fk_category_id);
@@ -55,17 +55,17 @@ public class ProductRegisterEndController extends AbstractController {
         pdto.setProduct_description(product_description);
         pdto.setPimage(savedFileName); 
 
-        // 5. DB Insert 로직 (DAO 호출)
+        // DB Insert (DAO 호출)
         ProductDAO pdao = new ProductDAO_imple();
         int n = pdao.productInsert(pdto);
 
-        // 6. 결과 처리 (Alert 메시지 띄우기)
+        // 결과 처리 (Alert 메시지 띄우기)
         String message = "";
         String loc = "";
 
         if(n == 1) {
             message = "상품 등록을 성공하였습니다.";
-            loc = request.getContextPath() + "/product/productList.sp"; // 상품목록 페이지로 이동
+            loc = request.getContextPath() + "/admin/allproductList.sp"; // 상품목록 페이지로 이동
         } else {
             message = "상품 등록에 실패하였습니다.";
             loc = "javascript:history.back()"; // 이전 등록 폼으로 가기
