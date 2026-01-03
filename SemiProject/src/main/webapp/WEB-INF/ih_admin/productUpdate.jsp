@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<jsp:include page="../header.jsp" />
+<jsp:include page="../header2.jsp" />
 
 <div class="container mt-5" style="max-width: 800px;">
     <h2 class="text-center mb-4 font-weight-bold">상품 정보 수정</h2>
@@ -59,4 +59,4 @@
     </form>
 </div>
 
-<jsp:include page="../footer.jsp" />
+<jsp:include page="../footer2.jsp" />

@@ -30,17 +30,16 @@
             --light-bg: #EFEBE9;    /* 연한 베이지 브라운 */
         }
 
-        /* [추가] 헤더 상단 고정 스타일 */
+        /* 헤더 상단 고정 스타일 */
         .fixed-top-header {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             z-index: 2000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); /* 스크롤 시 하단과 구분되는 그림자 */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
         }
 
-        /* 헤더 고정으로 인해 가려지는 본문 영역 확보 */
         body {
             padding-top: 105px; /* 공지바(35px) + 내비바(70px) 합산 높이 */
         }
@@ -52,7 +51,7 @@
 		}
 		.announcement-item {
 		    height: 35px;
-		    line-height: 35px; /* 텍스트 수직 중앙 정렬 */
+		    line-height: 35px; 
 		    text-align: center;
 		    text-decoration: none !important;
 		}
@@ -62,12 +61,12 @@
 		    display: block; 
 		}
 		.navbar-nav {
-		    list-style: none; /* 리스트 점 제거 */
+		    list-style: none;
 		}
 		.nav-item.dropdown {
 		    list-style: none;
 		}
-        /* 2. 내비게이션 바 및 로고 정중앙 고정 */
+        /* 내비게이션 바 및 로고 정중앙 고정 */
         .center-logo {
             position: absolute;
             left: 50%;

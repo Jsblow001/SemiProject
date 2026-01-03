@@ -13,7 +13,7 @@ public class ProductDTO {
     private String stock_date;          // 입고일자
     private int point;                  // 포인트
     
-    // 조인해서 가져올 데이터 (대표 이미지 등)
+    // 조인해서 가져올 데이터
     private String pimage;              // 상품 이미지 파일명
     private String category_name;       // 카테고리 이름 
     private String spec_name;           // 스텍 이름

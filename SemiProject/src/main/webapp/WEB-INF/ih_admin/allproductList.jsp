@@ -5,25 +5,25 @@
 <jsp:include page="../header2.jsp" />
 
 <style>
-    /* 1. 이미지 높이 및 크기 고정 */
+    /* 이미지 높이 및 크기 고정 */
     .admin-prod-img {
         width: 70px;
         height: 70px;
-        object-fit: cover; /* 이미지 비율 유지하며 꽉 채움 */
+        object-fit: cover; 
         border-radius: 8px;
         transition: transform 0.2s;
     }
     .admin-prod-img:hover {
         transform: scale(1.1);
     }
-    
-    /* 2. 테이블 행 높이 및 중앙 정렬 */
+   
+    /* 테이블 행 높이 및 중앙 정렬 */
     .table td {
         vertical-align: middle !important;
         height: 90px;
     }
 
-    /* 3. 카테고리 필터 버튼 스타일 */
+    /* 카테고리 필터 버튼 스타일 */
     .filter-container {
         display: flex;
         justify-content: center;
@@ -40,7 +40,7 @@
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
     
-    /* 4. 테이블 커스텀 */
+    /* 테이블 커스텀 */
     .table-container {
         background: white;
         padding: 20px;

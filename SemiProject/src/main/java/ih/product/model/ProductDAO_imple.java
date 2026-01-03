@@ -155,7 +155,7 @@ public class ProductDAO_imple implements ProductDAO {
             }
         } finally { close(); }
         return productList;
-    }
+    } // end of public List<ProductDTO> selectProductAll() throws SQLException ----
     
     // 관리자전용 - 등록된 상품 리스트
     @Override
@@ -195,7 +195,7 @@ public class ProductDAO_imple implements ProductDAO {
             close();
         }
         return productList;
-    }
+    } // end of public List<ProductDTO> selectAllProduct(String category) throws SQLException ----
     
     // 관리자전용 - 상품 수정
     @Override
@@ -223,8 +223,8 @@ public class ProductDAO_imple implements ProductDAO {
             close();
         }
         return result;
-    }
-
+    } // end of public int updateProduct(ProductDTO pdto) throws SQLException ----
+    
     // 관리자전용 - 상품 삭제
     @Override
     public int deleteProduct(String productId) throws SQLException {
@@ -243,7 +243,7 @@ public class ProductDAO_imple implements ProductDAO {
             close();
         }
         return result;
-    }
+    } // end of  public int deleteProduct(String productId) throws SQLException ----
 
     
     

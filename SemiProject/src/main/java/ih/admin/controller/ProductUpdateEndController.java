@@ -9,7 +9,7 @@ import ih.product.domain.ProductDTO;
 import ih.product.model.*;
 import java.io.File;
 
-// 파일을 처리하기 위한 설정 (이게 있어야 getPart가 작동합니다)
+// 파일을 처리하기 위한 설정
 @MultipartConfig(
     fileSizeThreshold = 1024 * 1024 * 1, // 1MB
     maxFileSize = 1024 * 1024 * 10,      // 10MB
@@ -26,7 +26,7 @@ public class ProductUpdateEndController extends AbstractController {
             return;
         }
 
-        // 1. 일반 텍스트 데이터 받기
+        // 일반 텍스트 데이터 받기
         int product_id = Integer.parseInt(request.getParameter("product_id"));
         int fk_category_id = Integer.parseInt(request.getParameter("fk_category_id"));
         String product_name = request.getParameter("product_name");
@@ -35,11 +35,11 @@ public class ProductUpdateEndController extends AbstractController {
         String product_description = request.getParameter("product_description");
         String old_pimage = request.getParameter("old_pimage");
 
-        // 2. 파일 데이터 처리
+        // 파일 데이터 처리
         Part part = request.getPart("pimage"); 
         String final_pimage = old_pimage; // 기본값은 기존 이미지
 
-        // 사용자가 새로운 파일을 선택했는지 확인
+        // 새로운 파일을 선택했는지 확인
         String contentDisposition = part.getHeader("content-disposition");
         String fileName = "";
         for (String temp : contentDisposition.split(";")) {
@@ -52,14 +52,13 @@ public class ProductUpdateEndController extends AbstractController {
         if (fileName != null && !fileName.isEmpty()) {
             String uploadPath = request.getServletContext().getRealPath("/img");
             
-            // 파일명 중복 방지를 위해 현재시간 추가 (선택사항)
+            // 파일명 중복 방지 - 현재시간 추가
             final_pimage = System.currentTimeMillis() + "_" + fileName;
             part.write(uploadPath + File.separator + final_pimage);
             
-            // (옵션) 기존 파일이 서버에서 용량만 차지하지 않게 삭제하고 싶다면 여기에 삭제 로직 추가 가능
         }
 
-        // 3. DTO 세팅
+        // DTO
         ProductDTO pdto = new ProductDTO();
         pdto.setProduct_id(product_id);
         pdto.setFk_category_id(fk_category_id);
@@ -69,15 +68,15 @@ public class ProductUpdateEndController extends AbstractController {
         pdto.setProduct_description(product_description);
         pdto.setPimage(final_pimage);
 
-        // 4. DB 업데이트
+        // DB 업데이트
         ProductDAO pdao = new ProductDAO_imple();
         int result = pdao.updateProduct(pdto);
-
+        
         if(result == 1) {
             super.setRedirect(true);
-            super.setViewPage(request.getContextPath() + "/admin/allproductList.sp");
+            super.setViewPage(request.getContextPath() + "/admin/allproductList.sp");      
         } else {
-            // 에러 처리 로직
+        	
         }
     }
 }

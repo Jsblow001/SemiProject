@@ -11,15 +11,15 @@ public class ProductDetailController extends AbstractController {
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
         
-        // 1. 목록에서 넘겨준 상품번호(product_id)를 받는다.
+        // 목록에서 넘겨준 상품번호 받기
         String product_id = request.getParameter("product_id");
         
-        // 2. DB에서 해당 상품의 정보를 가져온다.
+        // DB에서 해당 상품의 정보를 가져오기
         ProductDAO pdao = new ProductDAO_imple();
         ProductDTO pdto = pdao.selectOneProduct(product_id);
         
         if(pdto != null) {
-            // 3. 데이터를 JSP에 전달한다.
+            // 데이터를 JSP에 전달
             request.setAttribute("pdto", pdto);
             
             super.setRedirect(false);

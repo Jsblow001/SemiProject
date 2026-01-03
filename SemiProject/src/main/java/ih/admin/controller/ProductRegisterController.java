@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import sp.common.controller.AbstractController;
-// import member.domain.MemberDTO; // 나중에 MemberDTO 만드시면 주석 해제하세요.
+// import member.domain.MemberDTO; // 나중에 MemberDTO 만들면 주석해제하기
 
 public class ProductRegisterController extends AbstractController {
 
