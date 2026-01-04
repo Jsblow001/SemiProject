@@ -340,6 +340,42 @@ public class MemberDAO_imple implements MemberDAO {
     
     
     // ===============================
+    // 관리자 페이지 內 회원 요약 데이터 조회 - 전체회원 수
+    // ===============================
+    @Override
+	public int getTotalMemberCount() throws SQLException {
+    	
+		/* [수정 전] -> ResultSet 종료 에러
+		 * int count = 0;
+		 * 
+		 * try { conn = ds.getConnection();
+		 * 
+		 * String sql = " SELECT COUNT(*) " + " FROM tbl_member " +
+		 * " WHERE MEMBER_ID != 'admin' ";
+		 * 
+		 * pstmt = conn.prepareStatement(sql); rs = pstmt.executeQuery();
+		 * 
+		 * if (rs.next()) { count = rs.getInt(1); } } finally { close(); }
+		 * 
+		 * return count;
+		 */
+    	
+    	// 수정 전 과 같은 논리이지만 자원관리 방식만 다름
+    	String sql = "SELECT COUNT(*) FROM tbl_member WHERE MEMBER_ID != 'admin'";
+
+    	// try with resources
+        try ( // rs 에 표 count(*) 들어감
+            Connection conn = ds.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery();
+        ) { // 표 첫번째 컬럼 값 꺼내기
+            return rs.next() ? rs.getInt(1) : 0;
+        }
+	}
+    
+    
+    
+    // ===============================
     // 관리자 페이지 內 회원목록 조회
     // ===============================
 	 @Override
@@ -466,6 +502,8 @@ public class MemberDAO_imple implements MemberDAO {
 
 		    return memberList;
 	}
+
+	
 
 
 

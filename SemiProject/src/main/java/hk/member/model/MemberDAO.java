@@ -34,6 +34,9 @@ public interface MemberDAO {
 	// 회원정보 수정
 	int updateMember(MemberDTO member) throws SQLException;
 
+	// 관리자 페이지 內 회원 검색 조회
+	int getTotalMemberCount() throws SQLException;
+	
 	//관리자 페이지 內 메인 페이지 -  회원 요약 데이터 (오늘 회원가입 수)
 	int getTodayRegisterCount() throws SQLException;
 	
@@ -45,6 +48,8 @@ public interface MemberDAO {
 
 	// 관리자 페이지 內 회원 검색 조회
 	List<MemberDTO> selectMemberBySearch(String searchType, String searchWord);
+
+	
 
 
 	

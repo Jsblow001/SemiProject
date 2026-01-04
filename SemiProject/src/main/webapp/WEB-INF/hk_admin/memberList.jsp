@@ -99,7 +99,7 @@
 <div class="container">
 
     <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h3>회원 관리</h3>
+        <h3 class="font-weight-bold mb-4 text-dark">회원 관리</h3>
 
         <!-- 메인페이지로 돌아가기 -->
         <a href="<%= ctxPath %>/admin/memberMain.sp"

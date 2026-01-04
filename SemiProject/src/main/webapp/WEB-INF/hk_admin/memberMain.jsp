@@ -2,9 +2,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <% String ctxPath = request.getContextPath(); %>
 
-<%-- 관리자 헤더 : 아직 미구현이라 주석 처리 --%>
-<%-- <jsp:include page="" /> --%>
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>

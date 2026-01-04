@@ -35,7 +35,7 @@ public class AdminMemberMainController extends AbstractController {
         /* ==================================================
          * 2. 회원 요약 데이터 조회
          * ================================================== */
-        //int totalCount  = mdao.getTotalMemberCount();    // 전체 회원 수
+        int totalCount  = mdao.getTotalMemberCount();    // 전체 회원 수
         //int activeCount = mdao.getTotalMemberCount();    // 정상 회원
         //int deleteCount = mdao.getTotalMemberCount();    // 탈퇴 회원
         //int idleCount   = mdao.getTotalMemberCount();    // 휴면 회원
@@ -50,7 +50,7 @@ public class AdminMemberMainController extends AbstractController {
         /* ==================================================
          * 3. JSP로 전달
          * ================================================== */
-        //request.setAttribute("totalCount", totalCount);
+        request.setAttribute("totalCount", totalCount);
         //request.setAttribute("activeCount", activeCount);
         //request.setAttribute("deleteCount", deleteCount);
         //request.setAttribute("idleCount", idleCount);
