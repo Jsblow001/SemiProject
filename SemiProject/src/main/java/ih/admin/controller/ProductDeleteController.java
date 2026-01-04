@@ -1,9 +1,12 @@
 package ih.admin.controller;
 
 import java.io.File;
+
+import hk.member.domain.MemberDTO;
 import sp.common.controller.AbstractController;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import ih.product.domain.ProductDTO;
 import ih.product.model.*;
 
@@ -14,11 +17,15 @@ public class ProductDeleteController extends AbstractController {
         
         // 삭제할 상품 번호 받기
         String productId = request.getParameter("product_id");
-
+        HttpSession session = request.getSession();
+        MemberDTO loginuser = (MemberDTO) session.getAttribute("loginuser");
+        
         if(productId != null) {
-            ProductDAO pdao = new ProductDAO_imple();
             
-            ProductDTO pdto = pdao.selectOneProduct(productId);
+        	String userid = (loginuser != null) ? loginuser.getUserid() : null;
+        	ProductDAO pdao = new ProductDAO_imple();
+            
+            ProductDTO pdto = pdao.selectOneProduct(productId, userid);
             String pimage = pdto.getPimage();
 
             // DB 상품 정보 삭제

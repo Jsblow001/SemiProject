@@ -7,16 +7,16 @@ import ih.product.domain.ProductDTO;
 public interface ProductDAO {
     
     // 카테고리 코드(sunglasses, eyeglasses 등)를 받아 해당 상품 리스트를 가져오는 메서드
-    List<ProductDTO> selectProductByCategory(String categoryCode) throws SQLException;
+    List<ProductDTO> selectProductByCategory(String categoryId, String userid) throws SQLException;
     
     // 상품 등록하는 메서드
     int productInsert(ProductDTO pdto) throws SQLException;
 
     // 아까 DAO에 추가한 메소드
-	List<ProductDTO> selectProductAll()  throws SQLException;
+	List<ProductDTO> selectProductAll(String productId, String userid)  throws SQLException;
 
 	// 상품 상세 정보를 가져오는 메서드
-	ProductDTO selectOneProduct(String productId) throws SQLException;
+	ProductDTO selectOneProduct(String productId, String userid) throws SQLException;
 
 	// 관리자전용 - 등록된 상품 리스트
 	//List<ProductDTO> selectAllProduct() throws SQLException;

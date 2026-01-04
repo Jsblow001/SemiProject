@@ -38,7 +38,7 @@ public class ProductDAO_imple implements ProductDAO {
 
     // 카테고리 번호를 받아 해당 카테고리 상품만 조회
     @Override
-    public List<ProductDTO> selectProductByCategory(String categoryId) throws SQLException {
+    public List<ProductDTO> selectProductByCategory(String categoryId, String userid) throws SQLException {
         
         List<ProductDTO> productList = new ArrayList<>();
         
@@ -46,12 +46,15 @@ public class ProductDAO_imple implements ProductDAO {
             conn = ds.getConnection();
             
             String sql = " SELECT product_id, product_name, pimage, sale_price, list_price, stock, fk_category_id "
-                       + " FROM tbl_product "
+            		   + " (SELECT count(*) FROM tbl_wishlist WHERE product_id = P.product_id AND member_id = ?) AS is_wish "
+            		   + " FROM tbl_product "
                        + " WHERE fk_category_id = ? " // 카테고리 필터링
                        + " ORDER BY product_id DESC ";
             
             pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, Integer.parseInt(categoryId)); 
+            
+            pstmt.setString(1, userid); 
+            pstmt.setInt(2, Integer.parseInt(categoryId)); 
             rs = pstmt.executeQuery();
             
             while(rs.next()) {
@@ -63,7 +66,7 @@ public class ProductDAO_imple implements ProductDAO {
                 pdto.setList_price(rs.getInt("list_price"));
                 pdto.setStock(rs.getInt("stock"));
                 pdto.setFk_category_id(rs.getInt("fk_category_id"));
-                
+                pdto.setIs_wish(rs.getInt("is_wish"));
                 productList.add(pdto);
             }
         } finally {
@@ -74,13 +77,20 @@ public class ProductDAO_imple implements ProductDAO {
 
     // 상품 상세 정보 조회
     @Override
-    public ProductDTO selectOneProduct(String productId) throws SQLException {
+    public ProductDTO selectOneProduct(String productId, String userid) throws SQLException {
         ProductDTO pdto = null;
         try {
             conn = ds.getConnection();
-            String sql = " SELECT * FROM tbl_product WHERE product_id = ? ";
+            
+            String sql = " SELECT P.*,"
+            		   + " (SELECT count(*) FROM tbl_wishlist WHERE product_id = P.product_id AND member_id = ?) AS is_wish "
+            		   + " FROM tbl_product P "
+            		   + " WHERE P.product_id = ? ";
+            
             pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, productId); // String으로 받아도 DB가 숫자로 자동 변환해줍니다.
+            pstmt.setString(1, userid); // String으로 받아도 DB가 숫자로 자동 변환 .
+            pstmt.setString(2, productId);
+            
             rs = pstmt.executeQuery();
             
             if(rs.next()) {
@@ -135,15 +145,19 @@ public class ProductDAO_imple implements ProductDAO {
     } // end of  public int productInsert(ProductDTO dto) throws SQLException ----
     
     // 전체 상품 목록 조회 (관리자용/사용자용 공통)
-    public List<ProductDTO> selectProductAll() throws SQLException {
+    public List<ProductDTO> selectProductAll(String productId, String userid) throws SQLException {
         List<ProductDTO> productList = new ArrayList<>();
         try {
             conn = ds.getConnection();
             // 최신 등록순으로 조회
-            String sql = " SELECT product_id, product_name, pimage, sale_price, stock " +
-                         " FROM tbl_product ORDER BY product_id DESC ";
+            String sql = " SELECT product_id, product_name, pimage, sale_price, stock " 
+            		   + " (SELECT count(*) FROM tbl_wishlist WHERE product_id = P.product_id AND member_id = ?) AS is_wish "  
+            		   + " FROM tbl_product ORDER BY product_id DESC ";
+            
             pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, userid);
             rs = pstmt.executeQuery();
+            
             while(rs.next()) {
                 ProductDTO pdto = new ProductDTO();
                 pdto.setProduct_id(rs.getInt("product_id"));
@@ -151,6 +165,8 @@ public class ProductDAO_imple implements ProductDAO {
                 pdto.setPimage(rs.getString("pimage"));
                 pdto.setSale_price(rs.getInt("sale_price"));
                 pdto.setStock(rs.getInt("stock"));
+                pdto.setIs_wish(rs.getInt("is_wish"));
+                
                 productList.add(pdto);
             }
         } finally { close(); }
