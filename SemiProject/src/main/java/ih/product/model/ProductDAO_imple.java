@@ -245,6 +245,62 @@ public class ProductDAO_imple implements ProductDAO {
         return result;
     } // end of  public int deleteProduct(String productId) throws SQLException ----
 
+    // 찜하기
+	@Override
+	public int processWish(String userid, String product_id) {
+	    int n = 0;
+	    try {
+	        conn = ds.getConnection();
+	        
+	        // 유저가 이 상품을 찜했는지 확인
+	        String sql = " SELECT count(*) FROM tbl_wishlist "
+	        		   + " WHERE member_id = ? AND product_id = ? ";
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        
+	        pstmt.setString(1, userid);
+	        pstmt.setString(2, product_id);
+	        
+	        rs = pstmt.executeQuery();
+	        rs.next();
+	        
+	        int count = rs.getInt(1);
+
+	        if(count == 0) {
+	            // 찜 기록 없으면 추가(Insert)
+	            sql = " INSERT INTO tbl_wishlist(wish_id, member_id, product_id, wish_date) "
+	            	+ " VALUES(seq_wishlist_id.nextval, ?, ?, default) ";
+	            
+	            pstmt = conn.prepareStatement(sql);
+	            
+	            pstmt.setString(1, userid);
+	            pstmt.setString(2, product_id);
+	            
+	            if(pstmt.executeUpdate() == 1) {
+	            	n = 1; 
+	            }
+	        } else {
+	            // 찜 기록 있으면 삭제(Delete)
+	            sql = " DELETE FROM tbl_wishlist "
+	            	+ " WHERE member_id = ? AND product_id = ? ";
+	            
+	            pstmt = conn.prepareStatement(sql);
+	            
+	            pstmt.setString(1, userid);
+	            pstmt.setString(2, product_id);
+	            
+	            if(pstmt.executeUpdate() == 1) {
+	            	n = -1; 
+	            }
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        n = 0;
+	    } finally {
+	        close();
+	    }
+	    return n;
+	}
     
     
 }
