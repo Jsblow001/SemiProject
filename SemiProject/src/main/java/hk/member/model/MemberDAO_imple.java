@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
+import hk.member.domain.MemberCountDTO;
 import hk.member.domain.MemberDTO;
 import sp.util.security.AES256;
 import sp.util.security.SecretMyKey;
@@ -340,6 +342,38 @@ public class MemberDAO_imple implements MemberDAO {
     
     
     // ===============================
+    // 회원 탈퇴 (status = 0)
+    // ===============================
+    @Override
+	public int withdrawMember(String userid) throws SQLException {
+    	
+    	int result = 0;
+
+        try {
+            conn = ds.getConnection();
+
+            String sql = " UPDATE tbl_member "
+                       + " SET status = 0 "
+                       + " WHERE member_id = ? ";
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, userid);
+
+            result = pstmt.executeUpdate();  // 1이면 성공
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            close();
+        }
+
+        return result;
+	}
+
+    
+    
+    // ===============================
     // 관리자 페이지 內 회원 요약 데이터 조회 - 전체회원 수
     // ===============================
     @Override
@@ -361,7 +395,8 @@ public class MemberDAO_imple implements MemberDAO {
 		 */
     	
     	// 수정 전 과 같은 논리이지만 자원관리 방식만 다름
-    	String sql = "SELECT COUNT(*) FROM tbl_member WHERE MEMBER_ID != 'admin'";
+    	String sql = "SELECT COUNT(*) FROM tbl_member "
+    			   + " WHERE MEMBER_ID != 'admin' ";
 
     	// try with resources
         try ( // rs 에 표 count(*) 들어감
@@ -372,6 +407,49 @@ public class MemberDAO_imple implements MemberDAO {
             return rs.next() ? rs.getInt(1) : 0;
         }
 	}
+    
+    
+    
+    // ===============================
+    // 관리자 페이지 內 회원 요약 데이터 조회 - 정상회원 수
+    // ===============================
+	@Override
+	public int getActiveMemberCount() throws SQLException {
+		
+		String sql = " SELECT COUNT(*) FROM tbl_member "
+	               + " WHERE status = 1 "
+	               + "   AND member_id != 'admin' ";
+
+	    try (
+	        Connection conn = ds.getConnection();
+	        PreparedStatement pstmt = conn.prepareStatement(sql);
+	        ResultSet rs = pstmt.executeQuery();
+	    ) {
+	        return rs.next() ? rs.getInt(1) : 0;
+	    }
+	}
+	
+	
+	
+	// ===============================
+    // 관리자 페이지 內 회원 요약 데이터 조회 - 탈퇴회원 수
+    // ===============================
+	@Override
+	public int getDeleteMemberCount() throws SQLException {
+		
+		String sql = " SELECT COUNT(*) FROM tbl_member "
+	               + " WHERE status = 0 "
+	               + "   AND member_id != 'admin' ";
+
+	    try (
+	        Connection conn = ds.getConnection();
+	        PreparedStatement pstmt = conn.prepareStatement(sql);
+	        ResultSet rs = pstmt.executeQuery();
+	    ) {
+	        return rs.next() ? rs.getInt(1) : 0;
+	    }
+	}
+
     
     
     
@@ -449,12 +527,87 @@ public class MemberDAO_imple implements MemberDAO {
 	 }
 
 	 
+	 
+	// ======================================================
+	// 관리자 페이지 內 최근 7일 가입자 수 (합계)
+	// ======================================================
+	 @Override
+	 public int getLast7DaysRegisterCount() throws SQLException {
+		 
+		 int count = 0;
+
+		    try {
+		        conn = ds.getConnection();
+
+		        String sql = " SELECT COUNT(*) "
+		                   + " FROM tbl_member "
+		                   + " WHERE member_id != 'admin' "
+		                   + "   AND registerday >= TRUNC(SYSDATE) - 6 ";
+
+		        pstmt = conn.prepareStatement(sql);
+		        rs = pstmt.executeQuery();
+
+		        if (rs.next()) {
+		            count = rs.getInt(1);
+		        }
+		    }
+		    catch (Exception e) {
+		        e.printStackTrace();
+		    }
+		    finally {
+		        close();
+		    }
+
+		    return count;
+	}
+	 
+	 
+	 
+	// ======================================================
+	// 관리자 페이지 內 최근 7일 날짜별 가입자 수 (그래프)
+	// ======================================================
+	 @Override
+		public List<Map<String, Object>> getLast7DaysRegisterList() throws SQLException {
+		 List<Map<String, Object>> list = new ArrayList<>();
+
+		    try {
+		        conn = ds.getConnection();
+
+		        String sql =
+		              " SELECT TO_CHAR(registerday, 'MM-DD') AS reg_date "
+		            + "      , COUNT(*) AS cnt "
+		            + " FROM tbl_member "
+		            + " WHERE registerday >= TRUNC(SYSDATE) - 6 "
+		            + "   AND status = 1 "
+		            + " GROUP BY TO_CHAR(registerday, 'MM-DD') "
+		            + " ORDER BY reg_date ";
+
+		        pstmt = conn.prepareStatement(sql);
+		        rs = pstmt.executeQuery();
+
+		        while (rs.next()) {
+		            Map<String, Object> map = new HashMap<>();
+		            map.put("date", rs.getString("reg_date"));
+		            map.put("count", rs.getInt("cnt"));
+
+		            list.add(map);
+		        }
+		    }
+		    finally {
+		        close();
+		    }
+
+		    return list;
+		}
+	 
+	 
 	// ======================================================
 	// 관리자 페이지 內 회원 검색 조회
 	// ======================================================
 	@Override
 	public List<MemberDTO> selectMemberBySearch(String searchType, String searchWord) {
-		 List<MemberDTO> memberList = new ArrayList<>();
+		
+		List<MemberDTO> memberList = new ArrayList<>();
 
 		    try {
 		        conn = ds.getConnection();
@@ -504,10 +657,123 @@ public class MemberDAO_imple implements MemberDAO {
 	}
 
 	
+	
+	// ======================================================
+	// 관리자 페이지 內 최근 가입 회원 TOP N
+	// ======================================================
+	@Override
+	public List<MemberDTO> getRecentMemberList(int topN) {
 
+		List<MemberDTO> memberList = new ArrayList<>();
 
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = " SELECT member_id, name, registerday "
+	                   + " FROM tbl_member "
+	                   + " WHERE member_id != 'admin' "
+	                   + " ORDER BY registerday DESC "
+	                   + " FETCH FIRST " + topN + " ROWS ONLY ";
+
+	        pstmt = conn.prepareStatement(sql);
+
+	        rs = pstmt.executeQuery();
+
+	        while (rs.next()) {
+
+	            MemberDTO member = new MemberDTO();
+	            member.setUserid(rs.getString("member_id"));
+	            member.setName(rs.getString("name"));
+	            member.setRegisterday(rs.getString("registerday"));
+
+	            memberList.add(member);
+	        }
+	    }
+	    catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    finally {
+	        close();
+	    }
+
+	    return memberList;
+	}
 
 	
+	
+	// ======================================================
+	// 관리자 페이지 內 등급별 회원수
+	// ======================================================
+	@Override
+	public List<MemberCountDTO> getGradeCountList() throws SQLException {
+		 
+		List<MemberCountDTO> list = new ArrayList<>();
+
+		    try {
+		        conn = ds.getConnection();
+
+		        String sql = " SELECT g.grade_name AS key, COUNT(*) AS cnt " 
+		                   + " FROM tbl_member m "
+		                   + " JOIN tbl_grade g ON m.grade_code = g.grade_code "
+		                   +  " WHERE m.status = 1 "         // 정상회원만
+		                   +  " GROUP BY g.grade_name, g.grade_code " 
+		                   + " ORDER BY g.grade_code ";
+
+		        pstmt = conn.prepareStatement(sql);
+		        rs = pstmt.executeQuery();
+
+		        while (rs.next()) {
+		            MemberCountDTO dto = new MemberCountDTO();
+		            dto.setKey(rs.getString("key"));
+		            dto.setCnt(rs.getInt("cnt"));
+		            list.add(dto);
+		        }
+
+		    } finally {
+		        close();
+		    }
+
+		    return list;
+	}
+
+	
+	
+	// ======================================================
+	// 관리자 페이지 內 등급별 회원수
+	// ======================================================
+	@Override
+	public List<MemberCountDTO> getGenderCountList() throws SQLException {
+		
+		List<MemberCountDTO> list = new ArrayList<>();
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = " SELECT NVL(DECODE(gender, '1', '남자', '2', '여자'), '미입력') AS key, "
+	        		   + "    COUNT(*) AS cnt "
+	                   + " FROM tbl_member "
+	                   + " WHERE status = 1 "
+	                   + " GROUP BY gender ";
+
+	        pstmt = conn.prepareStatement(sql);
+	        rs = pstmt.executeQuery();
+
+	        while (rs.next()) {
+	            MemberCountDTO dto = new MemberCountDTO();
+	            dto.setKey(rs.getString("key")); // "남자", "여자"
+	            dto.setCnt(rs.getInt("cnt"));
+	            list.add(dto);
+	        }
+
+	    } finally {
+	        close();
+	    }
+
+	    return list;
+	}
+
+	
+
 
 
     // ======================================================

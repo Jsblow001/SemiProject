@@ -122,6 +122,7 @@
     <table>
         <thead>
             <tr>
+            	<th style="width:60px;">No</th>
                 <th>아이디</th>
                 <th>이름</th>
                 <th>이메일</th>
@@ -140,8 +141,9 @@
             </c:if>
 
             <%-- 회원 목록 반복 출력 --%>
-            <c:forEach var="m" items="${memberList}">
+            <c:forEach var="m" items="${memberList}" varStatus="status">
                 <tr>
+                	<td>${status.count}</td>
                     <%-- MemberDTO.getUserid() --%>
                     <td>${m.userid}</td>
 
