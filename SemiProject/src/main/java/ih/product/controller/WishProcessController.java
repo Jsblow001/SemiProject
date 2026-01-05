@@ -1,11 +1,9 @@
 package ih.product.controller;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import sp.common.controller.AbstractController;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -16,12 +14,9 @@ import hk.member.domain.MemberDTO;
 import ih.product.model.ProductDAO;
 import ih.product.model.ProductDAO_imple;
 
-
-@WebServlet("/WishProcessController")
-public class WishProcessController extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+public class WishProcessController extends AbstractController {
    
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		
 		
 		// 로그인 여부 확인
@@ -44,9 +39,9 @@ public class WishProcessController extends HttpServlet {
 			ProductDAO pdao = new ProductDAO_imple();
 			
 			// DB
-			int result;
+			
 			try {
-				result = pdao.processWish(userid, product_id);
+				int result = pdao.processWish(userid, product_id);
 
 				if(result == 1) {
 	                jsonObj.put("result", "added");
@@ -61,13 +56,11 @@ public class WishProcessController extends HttpServlet {
 				
 			} catch (SQLException e) {
 				e.printStackTrace();
+				jsonObj.put("result", "error");
+                jsonObj.put("message", "서버 오류가 발생했습니다.");
 			}
-			
 		}
-		
 		response.setContentType("application/json; charset=UTF-8");
         response.getWriter().print(jsonObj.toString());
-		
 	}
-
 }

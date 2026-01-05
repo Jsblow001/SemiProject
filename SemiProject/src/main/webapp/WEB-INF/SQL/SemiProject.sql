@@ -493,6 +493,11 @@ CREATE TABLE tbl_wishlist (
     constraint fk_wishlist_p_id foreign key(product_id) references tbl_product(product_id)
 );
 
+CREATE SEQUENCE seq_wishlist_id
+START WITH 1
+INCREMENT BY 1
+NOMAXVALUE;
+
 commit;
 
 select *
@@ -584,19 +589,4 @@ VALUES (102, 'java', 2, 32000, 1, SYSDATE - 1);
 INSERT INTO TBL_ORDER (odrcode, fk_member_id, fk_addr_id, odrtotalprice, payment_status, odrdate)
 VALUES (103, 'java', 2, 78000, 1, SYSDATE - 3);
 
-INSERT INTO TBL_ORDER (odrcode, fk_member_id, fk_addr_id, odrtotalprice, payment_status, odrdate)
-VALUES (104, 'java', 2, 78000, 1, SYSDATE - 6);
 
-INSERT INTO TBL_ORDER (odrcode, fk_member_id, fk_addr_id, odrtotalprice, payment_status, odrdate)
-VALUES (105, 'java', 2, 178000, 1, SYSDATE - 20);
-
--- 반드시 커밋!
-COMMIT;
-
-DELETE FROM TBL_ORDER 
-WHERE odrcode = '104';
-
-COMMIT;
-
-select *
-from TBL_ORDER;
