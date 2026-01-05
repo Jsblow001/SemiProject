@@ -20,9 +20,9 @@
     <link href="<%= ctxPath%>/css/style.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="<%= ctxPath%>/css/index/index.css" />
     
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script src="<%= ctxPath%>/js/jquery-3.7.1.min.js"></script>
     
+    <script src="<%= ctxPath%>/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js" type="text/javascript"></script>
     <style>
         :root {
             --dark-wood: #5D4037;   /* 짙은 밤나무색 */
@@ -143,17 +143,17 @@
 
                 <div class="d-flex align-items-center ml-auto" style="z-index: 1001;">
                     
-                    <%-- <c:if test="${not empty sessionScope.loginuser && sessionScope.loginuser.userid == 'admin'}"> --%> 
-                    	<li class='nav-item dropdown'>
-                    		<a class="nav-link dropdown-toggle menufont_size text-primary" href="#" id="navbarDropdown" data-toggle="dropdown">관리자전용</a>
-                    		<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <c:if test="${not empty sessionScope.loginuser && sessionScope.loginuser.userid == 'admin'}">
+                    	<li class="nav-item dropdown" style="list-style: none;">
+                    		<a class="nav-link dropdown-toggle menufont_size text-primary" href="#" id="adminDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">관리자전용</a>
+                    		<div class="dropdown-menu dropdown-menu-right shadow border-0" aria-labelledby="adminDropdown">
                     			<a class="dropdown-item text-primary" href="<%= ctxPath%>">회원관리</a>
                     			<a class="dropdown-item text-primary" href="<%= ctxPath%>/admin/allproductList.sp">상품관리</a>
-                    			<a class="dropdown-item text-primary" href="<%= ctxPath%>">문의관리</a>
+                    			<a class="dropdown-item text-primary" href="<%= ctxPath%>/qnaList.sp">문의관리</a>
                     			<a class="dropdown-item text-primary" href="<%= ctxPath%>">운영관리</a>
                     		</div>
                     	</li>
-                    <%-- </c:if> --%> 
+                    </c:if>
                     
                     <div class="collapse navbar-collapse mr-lg-4">
                         <div class="navbar-nav">
@@ -176,8 +176,24 @@
                                 </div>
                             </div>
                         </div>
-                        <a href="/wish" class="btn p-0 mr-3"><i class="fas fa-user text-wood"></i></a>
-                        <a href="/cart" class="btn p-0"><i class="fas fa-shopping-cart text-wood"></i></a>
+                        
+					    <c:choose>
+					        <%-- 로그인한 상태일 때 --%>
+					        <c:when test="${not empty sessionScope.loginuser}">
+					            <a href="<%= ctxPath %>/mypage.sp" class="btn p-0 mr-3" title="마이페이지">
+					                <i class="fas fa-user text-primary"></i> 
+					            </a>
+					        </c:when>
+					        
+					        <%-- 로그인하지 않은 상태일 때 --%>
+					        <c:otherwise>
+					            <a href="<%= ctxPath %>/loginSelect.sp" class="btn p-0 mr-3" title="로그인">
+					                <i class="fas fa-user text-wood"></i>
+					            </a>
+					        </c:otherwise>
+					    </c:choose>
+					    
+                        <a href="<%= ctxPath%>/cart/cartList.sp" class="btn p-0"><i class="fas fa-shopping-cart text-wood"></i></a>
                     </div>
                 </div>
             </nav>

@@ -11,7 +11,7 @@
     .product-item { transition: transform 0.2s; border-radius: 10px; overflow: hidden; }
     .product-item:hover { transform: translateY(-8px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }
     
-    /* 1. 이미지 박스 설정 (비율 고정) */
+    /* 이미지 박스 설정 (비율 고정) */
     .product-img {
         width: 100%;
         aspect-ratio: 4 / 5; 
@@ -23,7 +23,7 @@
         padding: 10px !important; /* 사진이 테두리에 너무 붙지 않게 여백 추가 */
     }
 
-    /* 2. 이미지 정렬: 잘리지 않고 전체 다 보이기 */
+    /* 이미지 정렬: 잘리지 않고 전체 다 보이기 */
     .product-img img { 
         width: 100%;
         height: 100%;
@@ -79,9 +79,10 @@
                         </div>
 
                         <div class="card-footer d-flex justify-content-between bg-white border">
-                            <button type="button" class="btn btn-wish p-0" 
-							        onclick="goWish('${p.product_id}', '<%= ctxPath%>/js/product/product.js')">
-							    <i class="far fa-heart text-danger mr-1"></i>
+                            
+                            <button type="button" class="btn btn-wish p-0 wish-btn-${p.product_id}" 
+							        onclick="goWish('${p.product_id}', '<%= ctxPath %>/js/product/product.js')">
+							    <i class="far fa-heart text-danger mr-1 wish-icon-${p.product_id}"></i>
 							    <span class="small text-dark">Wish</span>
 							</button>
 							
@@ -90,6 +91,7 @@
 							    <i class="fas fa-shopping-cart text-dark mr-1"></i>
 							    <span class="small text-dark">Cart</span>
 							</button>
+							
                         </div>
                     </div>
                 </div>

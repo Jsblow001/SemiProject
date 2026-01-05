@@ -28,7 +28,9 @@ public interface ProductDAO {
 	// 관리자전용 - 상품 삭제
 	int deleteProduct(String productId) throws SQLException;
 
-	
+	// 찜하기 
+	int processWish(String userid, String product_id) throws SQLException;
+
     
     // 카테고리 리스트 가져오기 메서드 (상품 등록 폼용)
     // List<CategoryDTO> selectCategoryList() throws SQLException;

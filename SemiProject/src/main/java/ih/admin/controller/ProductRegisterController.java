@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import sp.common.controller.AbstractController;
-// import member.domain.MemberDTO; // 나중에 MemberDTO 만들면 주석해제하기
+import hk.member.domain.MemberDTO; 
 
 public class ProductRegisterController extends AbstractController {
 
@@ -14,7 +14,7 @@ public class ProductRegisterController extends AbstractController {
         
     	
     	// 관리자 모드 설정
-        /* 
+        
         HttpSession session = request.getSession();
         MemberDTO loginuser = (MemberDTO) session.getAttribute("loginuser");
 
@@ -29,7 +29,7 @@ public class ProductRegisterController extends AbstractController {
             super.setViewPage("/WEB-INF/msg.jsp");
             return;
         }
-        */
+        
 
         super.setRedirect(false); // forward 방식
         super.setViewPage("/WEB-INF/ih_admin/productRegister.jsp");

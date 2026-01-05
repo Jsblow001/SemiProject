@@ -156,7 +156,7 @@
                             <div class="collapse show" id="productSub" data-parent="#adminAccordion">
                                 <div class="sub-menu-list">
                                     <a href="<%= ctxPath %>/admin/allproductList.sp">상품 전체목록</a>
-                                    <a href="#">상품 등록</a>
+                                    <a href="<%= ctxPath %>/admin/productRegister.sp">상품 등록</a>
                                     <a href="#">재고 관리</a>
                                 </div>
                             </div>
