@@ -6,7 +6,7 @@
 %>
 
 <%-- 1. 제공된 헤더 포함 --%>
-<jsp:include page="../header.jsp" />
+<jsp:include page="../header2.jsp" />
 
 <style>
     /* 관리자 페이지 레이아웃 */
@@ -34,21 +34,21 @@
            <div class="col-md-4 mb-4">
                <div class="card dashboard-card p-4" style="border-left: 5px solid var(--dark-wood) !important;">
                    <p class="text-muted mb-2">Total Members</p>
-                   <h2 class="font-weight-bold">${requestScope.totalMemberCount} 0 명</h2>
+                   <h2 class="font-weight-bold">${(totalCount != null) ? totalCount : 0} 명</h2>
                    <a href="#" class="small text-wood font-weight-bold mt-2">상세 명단 보기 ></a>
                </div>
            </div>
            <div class="col-md-4 mb-4">
                <div class="card dashboard-card p-4" style="border-left: 5px solid #BCAA8F !important;">
                    <p class="text-muted mb-2">New Orders</p>
-                   <h2 class="font-weight-bold">${requestScope.newOrderCount} 0 건</h2>
+                   <h2 class="font-weight-bold">${(newOrderCount != null) ? newOrderCount : 0} 건</h2>
                    <a href="#" class="small text-wood font-weight-bold mt-2">주문 내역 관리 ></a>
                </div>
            </div>
            <div class="col-md-4 mb-4">
                <div class="card dashboard-card p-4" style="border-left: 5px solid #D7CCC8 !important;">
                    <p class="text-muted mb-2 font-weight-medium">Today's QnA</p>
-                   <h2 class="font-weight-bold mb-3">${requestScope.newQnACount} 0 건</h2>
+                   <h2 class="font-weight-bold mb-3">${(newQnACount != null) ? newQnACount : 0} 건</h2>
                    <a href="#" class="small text-wood font-weight-bold text-decoration-none">미답변 문의 확인 ></a>
                </div>
            </div>
@@ -57,4 +57,4 @@
 </div>
 
 <%-- 2. 제공된 푸터 포함 --%>
-<jsp:include page="../footer.jsp" />
+<jsp:include page="../footer2.jsp" />

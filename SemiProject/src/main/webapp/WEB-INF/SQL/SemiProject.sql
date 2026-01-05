@@ -483,14 +483,21 @@ select *
 from tbl_member;
 
 
-
-SELECT * FROM tbl_product P JOIN tbl_wishlist W ON P.pnum = W.fk_pnum WHERE W.fk_userid = '현재아이디'
-    
 select *
-from tbl_wishlist;
+from tab;
 
-SELECT P.product_id, P.product_name, P.price, P.product_img,
-       (SELECT count(*) FROM tbl_wishlist W 
-        WHERE W.product_id = P.product_id AND W.member_id = 'honggd') AS is_wish
-FROM tbl_product P
-ORDER BY P.product_id DESC;
+show user;
+
+-- 오늘 데이터
+INSERT INTO TBL_ORDER (odrcode, fk_member_id, fk_addr_id, odrtotalprice, payment_status, odrdate)
+VALUES (101, 'java', 2, 55000, 1, SYSDATE);
+
+-- 어제 데이터
+INSERT INTO TBL_ORDER (odrcode, fk_member_id, fk_addr_id, odrtotalprice, payment_status, odrdate)
+VALUES (102, 'java', 2, 32000, 1, SYSDATE - 1);
+
+-- 3일 전 데이터
+INSERT INTO TBL_ORDER (odrcode, fk_member_id, fk_addr_id, odrtotalprice, payment_status, odrdate)
+VALUES (103, 'java', 2, 78000, 1, SYSDATE - 3);
+
+
