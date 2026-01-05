@@ -404,6 +404,11 @@ CREATE TABLE tbl_wishlist (
     constraint fk_wishlist_p_id foreign key(product_id) references tbl_product(product_id)
 );
 
+CREATE SEQUENCE seq_wishlist_id
+START WITH 1
+INCREMENT BY 1
+NOMAXVALUE;
+
 commit;
 
 select *
@@ -479,5 +484,13 @@ from tbl_member;
 
 
 
-
+SELECT * FROM tbl_product P JOIN tbl_wishlist W ON P.pnum = W.fk_pnum WHERE W.fk_userid = '현재아이디'
     
+select *
+from tbl_wishlist;
+
+SELECT P.product_id, P.product_name, P.price, P.product_img,
+       (SELECT count(*) FROM tbl_wishlist W 
+        WHERE W.product_id = P.product_id AND W.member_id = 'honggd') AS is_wish
+FROM tbl_product P
+ORDER BY P.product_id DESC;
