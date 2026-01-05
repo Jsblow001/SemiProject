@@ -317,6 +317,45 @@ public class ProductDAO_imple implements ProductDAO {
 	    }
 	    return n;
 	}
+
+	// 위시리스트 보기
+	@Override
+	public List<ProductDTO> getWishList(String userid) throws SQLException {
+		
+		List<ProductDTO> wishList = new ArrayList<>();
+	    
+	    try {
+	        conn = ds.getConnection();
+	        
+	        // tbl_wish, tbl_product -> JOIN
+	        String sql = " SELECT P.product_id, P.product_name, P.pimage, P.sale_price, P.stock " +
+	                     " FROM tbl_wishlist W JOIN tbl_product P " +
+	                     " ON W.product_id = P.product_id " +
+	                     " WHERE W.member_id = ? " +
+	                     " ORDER BY W.wish_date DESC "; 
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, userid);
+	        
+	        rs = pstmt.executeQuery();
+	        
+	        while(rs.next()) {
+	            ProductDTO pdto = new ProductDTO();
+	            pdto.setProduct_id(rs.getInt("product_id"));
+	            pdto.setProduct_name(rs.getString("product_name"));
+	            pdto.setPimage(rs.getString("pimage"));
+	            pdto.setSale_price(rs.getInt("sale_price"));
+	            pdto.setStock(rs.getInt("stock"));
+	            
+	            wishList.add(pdto);
+	        }
+	        
+	    } finally {
+	        close();
+	    }
+	    
+	    return wishList;
+	}
     
     
 }

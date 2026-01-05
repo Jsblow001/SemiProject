@@ -31,6 +31,9 @@ public interface ProductDAO {
 	// 찜하기 
 	int processWish(String userid, String product_id) throws SQLException;
 
+	// 위시리스트 보기
+	List<ProductDTO> getWishList(String userid) throws SQLException;
+
     
     // 카테고리 리스트 가져오기 메서드 (상품 등록 폼용)
     // List<CategoryDTO> selectCategoryList() throws SQLException;
