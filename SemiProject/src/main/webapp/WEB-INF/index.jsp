@@ -5,7 +5,7 @@
 
 <jsp:include page="header.jsp"/>
 <!-- Customized Bootstrap Stylesheet -->
-<link href="css/index.css" rel="stylesheet">
+<link href="<%= request.getContextPath() %>/css/style.css" rel="stylesheet">
 
 <style type="text/css">
 .carousel-inner .carousel-item.active,
@@ -35,6 +35,7 @@
 <a href="<%= request.getContextPath() %>/reviews.sp">Reviews</a>
 <a href="<%= request.getContextPath() %>/notice.sp">Notice</a>
 <a href="<%= request.getContextPath() %>/qnaList.sp">QnA</a>
+<a href="<%= request.getContextPath() %>/adminQnaList.sp">QnA_admin</a>
 <%-- 임시 review, notice, qna 이동 버튼 --%>
     
     <!-- Navbar Start -->

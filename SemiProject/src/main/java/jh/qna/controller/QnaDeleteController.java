@@ -4,9 +4,11 @@ import java.io.File;
 import java.sql.Connection;
 import java.util.List;
 
+import hk.member.domain.MemberDTO;
 import sp.common.controller.AbstractController;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jh.qna.domain.QnaDTO;
 import jh.qna.domain.QnaFileDTO;
 import jh.qna.model.QnaDAO_imple;
 
@@ -17,36 +19,86 @@ public class QnaDeleteController extends AbstractController {
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        long qnaId = Long.parseLong(request.getParameter("qnaId"));
+        // 1) POST만 허용
+        if(!"POST".equalsIgnoreCase(request.getMethod())) {
+            request.setAttribute("message", "비정상 접근입니다.");
+            request.setAttribute("loc", request.getContextPath() + "/qnaList.sp");
+            super.setRedirect(false);
+            super.setViewPage("/WEB-INF/msg.jsp");
+            return;
+        }
 
+        // 2) 로그인 체크
+        MemberDTO loginuser = (MemberDTO) request.getSession().getAttribute("loginuser");
+        if(loginuser == null) {
+            request.setAttribute("message", "로그인 후 이용 가능합니다.");
+            request.setAttribute("loc", request.getContextPath() + "/qnaList.sp");
+            super.setRedirect(false);
+            super.setViewPage("/WEB-INF/msg.jsp");
+            return;
+        }
+
+        // 3) 글번호
+        int qnaId;
+        try {
+            qnaId = Integer.parseInt(request.getParameter("qnaId"));
+        } catch (NumberFormatException e) {
+            request.setAttribute("message", "잘못된 접근입니다.");
+            request.setAttribute("loc", request.getContextPath() + "/qnaList.sp");
+            super.setRedirect(false);
+            super.setViewPage("/WEB-INF/msg.jsp");
+            return;
+        }
+
+        // 4) 작성자/관리자 권한 체크(필수)
+        QnaDTO qdto = qdao.selectOneQna(qnaId);
+        if(qdto == null) {
+            request.setAttribute("message", "존재하지 않는 글입니다.");
+            request.setAttribute("loc", request.getContextPath() + "/qnaList.sp");
+            super.setRedirect(false);
+            super.setViewPage("/WEB-INF/msg.jsp");
+            return;
+        }
+
+        String loginId = loginuser.getUserid();
+        boolean isAdmin = "admin".equals(loginId);
+        boolean isWriter = loginId.equals(qdto.getFkMemberId());
+
+        if(!isAdmin && !isWriter) {
+            request.setAttribute("message", "삭제 권한이 없습니다.");
+            request.setAttribute("loc", "javascript:history.back()");
+            super.setRedirect(false);
+            super.setViewPage("/WEB-INF/msg.jsp");
+            return;
+        }
+
+        // 5) 첨부 포함 삭제 트랜잭션
         String uploadDir = request.getServletContext().getRealPath("/img/qna");
-
         Connection conn = null;
 
         try {
             conn = qdao.getConnection();
             conn.setAutoCommit(false);
 
-            // 1) 첨부 목록 조회
             List<QnaFileDTO> files = qdao.selectFilesByQnaId(conn, qnaId);
 
-            // 2) 디스크 파일 삭제
             for(QnaFileDTO f : files) {
                 File target = new File(uploadDir, f.getSaveFilename());
                 if(target.exists()) target.delete();
             }
 
-            // 3) DB 첨부 삭제
             qdao.deleteFilesByQnaId(conn, qnaId);
 
-            // 4) DB 글 삭제
             int n = qdao.deleteQna(conn, qnaId);
             if(n != 1) throw new Exception("QnA 글 삭제 실패");
 
             conn.commit();
 
-            super.setRedirect(true);
-            super.setViewPage(request.getContextPath() + "/qnaList.up");
+            request.setAttribute("message", "글 삭제 완료");
+            request.setAttribute("loc", request.getContextPath() + "/qnaList.sp"); // popup_close면 사실상 사용 안 함
+            request.setAttribute("popup_close", true);
+            super.setRedirect(false);
+            super.setViewPage("/WEB-INF/msg.jsp");
 
         } catch(Exception e) {
             if(conn != null) conn.rollback();
