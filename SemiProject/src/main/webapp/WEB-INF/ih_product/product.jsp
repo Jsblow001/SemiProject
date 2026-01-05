@@ -81,7 +81,7 @@
                         <div class="card-footer d-flex justify-content-between bg-white border">
                             
                             <button type="button" class="btn btn-wish p-0 wish-btn-${p.product_id}" 
-							        onclick="goWish('${p.product_id}', '<%= ctxPath %>/js/product/product.js')">
+							        onclick="goWish('${p.product_id}', '${pageContext.request.contextPath}')">
 							    <i class="far fa-heart text-danger mr-1 wish-icon-${p.product_id}"></i>
 							    <span class="small text-dark">Wish</span>
 							</button>
