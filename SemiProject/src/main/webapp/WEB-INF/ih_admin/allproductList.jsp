@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-
+<% String ctxPath = request.getContextPath(); %>
 <jsp:include page="../header2.jsp" />
 
 <style>
@@ -51,7 +51,7 @@
 
 <div class="container-fluid mt-5 px-5">
     <div class="d-flex justify-content-between align-items-center mb-5">
-        <h2 class="font-weight-bold"><i class="fas fa-user mr-2"></i>상품관리 (관리자 모드)</h2>
+        <h2 class="font-weight-bold"><i class="fas fa-user mr-2"></i>상품관리 (상품 전체 목록)</h2>
         <a href="${pageContext.request.contextPath}/admin/productRegister.sp" class="btn btn-dark px-4 shadow-sm">
             <i class="fas fa-plus mr-1"></i> 상품 등록
         </a>
@@ -127,7 +127,7 @@
                             <td>
                                 <div class="btn-group">
                                     <button class="btn btn-sm btn-outline-primary px-3" 
-                                            onclick="location.href='productUpdate.sp?product_id=${p.product_id}'">
+                                            onclick="location.href='<%= ctxPath%>/admin/productUpdate.sp?product_id=${p.product_id}'">
                                         <i class="fas fa-edit mr-1"></i>수정
                                     </button>
                                     <button class="btn btn-sm btn-outline-danger px-3" 
