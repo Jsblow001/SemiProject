@@ -202,119 +202,7 @@ public class QnaDAO_imple implements QnaDAO {
     }
 
 
-    // ======================================================
-    // 6) 목록 조회 (DAO 내부에서 conn 열고 닫는 ProductDAO 스타일)
-    // ======================================================
-    @Override
-    public List<QnaDTO> selectQnaList(Map<String, String> paraMap) throws SQLException {
-
-        List<QnaDTO> list = new ArrayList<>();
-
-        // ---- 파라미터(기본값) ----
-        String searchType = (paraMap == null) ? null : paraMap.get("searchType");
-        String keyword    = (paraMap == null) ? null : paraMap.get("keyword");
-
-        int currentShowPageNo = 1;
-        int sizePerPage = 10;
-
-        try {
-            if (paraMap != null) {
-                String p = paraMap.get("currentShowPageNo");
-                String s = paraMap.get("sizePerPage");
-                if (p != null && !p.trim().isEmpty()) currentShowPageNo = Integer.parseInt(p.trim());
-                if (s != null && !s.trim().isEmpty()) sizePerPage = Integer.parseInt(s.trim());
-            }
-        } catch (NumberFormatException e) {
-            currentShowPageNo = 1;
-            sizePerPage = 10;
-        }
-
-        if (currentShowPageNo <= 0) currentShowPageNo = 1;
-        if (sizePerPage <= 0) sizePerPage = 10;
-
-        boolean hasKeyword = (keyword != null && !keyword.trim().isEmpty());
-
-        // ---- WHERE 조립(검색 없으면 where = "" 이라 전체 조회) ----
-        String where = "";
-        if (hasKeyword) {
-            if ("writer".equals(searchType)) {
-                where = " WHERE q.FK_MEMBER_ID LIKE ? ";
-            } else if ("title_writer".equals(searchType)) {
-                where = " WHERE (q.SUBJECT LIKE ? OR q.FK_MEMBER_ID LIKE ?) ";
-            } else { // title or default
-                where = " WHERE (q.SUBJECT LIKE ? OR q.CONTENT LIKE ?) ";
-                // ※ 네 요구: "제목이나 내용에 검색어 포함"을 기본으로 잡음
-            }
-        }
-
-        String sql =
-            " SELECT q.QNA_ID, q.FK_MEMBER_ID, q.SUBJECT, q.REGDATE, " +
-            "        q.IS_SECRET, q.ANSWER, " +
-            "        CASE WHEN EXISTS ( " +
-            "            SELECT 1 FROM qna_comment c " +
-            "            WHERE c.fk_qna_id = q.qna_id " +
-            "        ) THEN 1 ELSE 0 END AS has_reply, " +
-            "        CASE WHEN EXISTS ( " +
-            "            SELECT 1 FROM qna_comment c " +
-            "            WHERE c.fk_qna_id = q.qna_id " +
-            "              AND c.fk_member_id = 'admin' " +
-            "        ) THEN 1 ELSE 0 END AS answered " +
-            " FROM tbl_qna q " +
-              where +
-            " ORDER BY q.QNA_ID DESC " +
-            " OFFSET (? - 1) * ? ROWS " +
-            " FETCH NEXT ? ROWS ONLY ";
-
-        try {
-            conn = ds.getConnection();
-            pstmt = conn.prepareStatement(sql);
-
-            int idx = 1;
-
-            // 1) 검색 바인딩
-            if (hasKeyword) {
-                String kw = "%" + keyword.trim() + "%";
-                if ("title_writer".equals(searchType)) {
-                    pstmt.setString(idx++, kw); // SUBJECT LIKE ?
-                    pstmt.setString(idx++, kw); // FK_MEMBER_ID LIKE ?
-                } else if ("writer".equals(searchType)) {
-                    pstmt.setString(idx++, kw); // FK_MEMBER_ID LIKE ?
-                } else {
-                    pstmt.setString(idx++, kw); // SUBJECT LIKE ?
-                    pstmt.setString(idx++, kw); // CONTENT LIKE ?
-                }
-            }
-
-            // 2) 페이징 바인딩(항상)
-            pstmt.setInt(idx++, currentShowPageNo);
-            pstmt.setInt(idx++, sizePerPage);
-            pstmt.setInt(idx++, sizePerPage);
-
-            rs = pstmt.executeQuery();
-
-            while (rs.next()) {
-                QnaDTO qna = new QnaDTO();
-
-                qna.setQnaId(rs.getLong("QNA_ID"));
-                qna.setFkMemberId(rs.getString("FK_MEMBER_ID"));
-                qna.setSubject(rs.getString("SUBJECT"));
-                qna.setRegDate(rs.getDate("REGDATE"));
-                qna.setIsSecret(rs.getInt("IS_SECRET"));
-                qna.setAnswer(rs.getString("ANSWER"));
-
-                // QnaDTO에 아래 boolean 필드(get/set) 있어야 함
-                qna.setHasReply(rs.getInt("has_reply") == 1);
-                qna.setAnswered(rs.getInt("answered") == 1);
-
-                list.add(qna);
-            }
-
-        } finally {
-            close();
-        }
-
-        return list;
-    }
+   
 
 
 
@@ -496,12 +384,21 @@ public class QnaDAO_imple implements QnaDAO {
             conn = ds.getConnection();
 
             String sql =
-                " select q.qna_id, q.fk_member_id, q.fk_admin_id, q.subject, q.is_secret, q.answer, "
-              + "        q.regdate, q.updatedate, "
-              + "        case when q.answer is not null and length(trim(q.answer)) > 0 then 1 else 0 end as answered, "
-              + "        case when exists (select 1 from qna_comment c where c.fk_qna_id = q.qna_id) then 1 else 0 end as has_reply "
-              + " from tbl_qna q "
-              + " where 1=1 ";
+            	    " select q.qna_id, q.fk_member_id, q.fk_admin_id, q.subject, q.is_secret, q.answer, "
+            	  + "        q.regdate, q.updatedate, "
+            	  + "        case when exists ( "
+            	  + "            select 1 from qna_comment c "
+            	  + "            where c.fk_qna_id = q.qna_id "
+            	  + "              and upper(trim(c.fk_member_id)) = 'ADMIN' "
+            	  + "        ) then 1 else 0 end as ANSWERED, "
+            	  + "        case when exists ( "
+            	  + "            select 1 from qna_comment c "
+            	  + "            where c.fk_qna_id = q.qna_id "
+            	  + "        ) then 1 else 0 end as HAS_REPLY "
+            	  + " from tbl_qna q "
+            	  + " where 1=1 ";
+
+
 
             String searchType = paraMap.get("searchType");
             String searchWord = paraMap.get("searchWord");
@@ -565,8 +462,8 @@ public class QnaDAO_imple implements QnaDAO {
                 dto.setRegDate(rs.getDate("regdate"));
                 dto.setUpdateDate(rs.getDate("updatedate"));
 
-                dto.setAnswered(rs.getInt("answered") == 1);
-                dto.setHasReply(rs.getInt("has_reply") == 1);
+                dto.setAnswered(rs.getInt("ANSWERED") == 1);
+                dto.setHasReply(rs.getInt("HAS_REPLY") == 1);
 
                 list.add(dto);
             }

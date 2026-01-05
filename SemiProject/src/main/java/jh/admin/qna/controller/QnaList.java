@@ -26,7 +26,7 @@ public class QnaList extends AbstractController {
         HttpSession session = request.getSession();
 
         // ===== 테스트 모드 =====
-        boolean testMode = true; // 테스트 끝나면 false
+        boolean testMode = false; // 테스트 끝나면 false
         MemberDTO loginuser = (MemberDTO) session.getAttribute("loginuser");
         if (testMode && loginuser == null) {
             loginuser = new MemberDTO();

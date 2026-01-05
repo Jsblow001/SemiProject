@@ -20,7 +20,7 @@ public class QnaCommentWriteController extends AbstractController {
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
     	// ===== 테스트 모드 =====
-    	boolean testMode = true; // 테스트 끝나면 false 로만 변경
+    	boolean testMode = false; // 테스트 끝나면 false 로만 변경
 
     	HttpSession session = request.getSession();
     	MemberDTO loginuser = (MemberDTO) session.getAttribute("loginuser");

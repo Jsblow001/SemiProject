@@ -20,7 +20,6 @@ public interface QnaDAO {
     
     int deleteQna(Connection conn, long qnaId) throws SQLException;
 
-    List<QnaDTO> selectQnaList(Map<String, String> paraMap) throws SQLException;
     
     QnaDTO selectOneQna(int qnaId) throws Exception;
 

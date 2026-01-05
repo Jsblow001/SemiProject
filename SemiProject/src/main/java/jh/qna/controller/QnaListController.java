@@ -26,7 +26,7 @@ public class QnaListController extends AbstractController {
 
         // ===== 테스트 모드(원하면 유지) =====
         // 로그인 세션이 없으면 admin으로 강제 세팅
-        boolean testMode = true;
+        boolean testMode = false;
         MemberDTO loginuser = (MemberDTO) session.getAttribute("loginuser");
 
         if (testMode && loginuser == null) {
