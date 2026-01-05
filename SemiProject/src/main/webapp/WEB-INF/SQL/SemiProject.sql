@@ -3,7 +3,96 @@ show user;
 select *
 from tab;
 
+-- 마이페이지 내 주문 조회 확인 위한 더미데이터 삽입
+desc tbl_order;
+desc tbl_order_detail;
+
 select * from tbl_member;
+select * from tbl_order;
+
+
+select *
+from tbl_member
+where member_id = 'java';
+
+-- 주소 삽입x
+select *
+from tbl_address;
+
+SELECT addr_id
+FROM tbl_address
+WHERE fk_member_id = 'java';
+
+-- 주소 더미 데이터 넣기
+INSERT INTO tbl_address
+(addr_id, fk_member_id, postcode, address, detailaddress)
+VALUES
+(seq_addr_id.nextval, 'java', '12345', '서울시 테스트구', '101동');
+
+COMMIT;
+
+-- 주문 더미 데이터 넣기
+INSERT INTO tbl_order
+(odrcode, fk_member_id, fk_addr_id, odrtotalprice, odrtotalpoint, odrdate, payment_status)
+VALUES
+(seq_odrcode.nextval, 'java', 2,              -- 위에서 확인한 addr_id
+  55000, 0, SYSDATE, 1               -- 1: 결제완료
+);
+
+-- 커밋 꼭 하기 !!!!
+COMMIT;
+
+select * from tbl_order;
+
+-- 주문번호 (2)
+SELECT MAX(odrcode)
+FROM tbl_order
+WHERE fk_member_id = 'java';
+
+-- 상품 ID (22, 안경 11) - 넣을 거임
+SELECT product_id, product_name
+FROM tbl_product
+WHERE pimage IS NOT NULL;
+
+-- 주문상세 더미 데이터 넣기
+INSERT INTO tbl_order_detail
+(odrdetailno, fk_odrcode, fk_product_id, odrqty, odrprice, deliverystatus, deliverydate)
+VALUES
+(seq_odrdetailno.nextval,
+  2,      -- 위에서 확인한 ODRCODE
+  22,       -- 실제 존재하는 product_id
+  1,
+  55000,
+  1,       -- 1: 주문완료
+  NULL
+);
+
+select * from tbl_order_detail;
+
+COMMIT;
+
+
+-- 주문
+SELECT *
+FROM tbl_order
+WHERE fk_member_id = 'java';
+
+-- 주문상세
+SELECT *
+FROM tbl_order_detail
+WHERE fk_odrcode = 2;
+
+
+
+
+
+
+select * from tbl_product;
+
+SELECT product_id, pimage
+FROM tbl_product
+WHERE pimage IS NOT NULL;
+
 
 ------- 회원등급 테이블 --------
 create table tbl_grade
