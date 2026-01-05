@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
 <html lang="ko">
@@ -36,8 +36,6 @@
     .col-writer{ width:180px; }
     .col-date{ width:130px; }
 
-    .is-notice td{ background:#fafafa; }
-
     .title-line{
         display:inline-flex; align-items:center; gap:8px;
         min-width:0; max-width:100%;
@@ -48,10 +46,10 @@
         border-radius:2px; background:#b9b9b9; color:#fff;
         flex:0 0 auto;
     }
-    .badge-hit{
+    .badge-ans{
         display:inline-flex; align-items:center; justify-content:center;
-        font-size:10px; line-height:1; padding:2px 5px;
-        border-radius:2px; border:1px solid #e0e0e0; color:#888; background:#fff;
+        font-size:11px; line-height:1; padding:3px 6px;
+        border-radius:2px; background:#2b2321; color:#fff;
         flex:0 0 auto;
     }
     .lock{ font-size:12px; color:#111; opacity:.9; flex:0 0 auto; }
@@ -65,136 +63,109 @@
     }
     .btn-write:hover{ filter:brightness(1.05); }
 
-    .pager{
-        display:flex; align-items:center; justify-content:center;
-        gap:14px; margin:26px 0 26px; color:#777; font-size:12px;
-    }
-    .pager a, .pager span{
-        display:inline-flex; align-items:center; justify-content:center;
-        min-width:18px; height:18px; padding:0 2px; color:#777;
-    }
-    .pager .active{ color:#111; font-weight:600; }
-    .pager .arrow{ font-size:14px; color:#999; }
-    .pager a:hover{ color:#111; text-decoration:none; }
-
-    .search-area{ display:flex; align-items:center; gap:8px; margin-top:18px; }
-    .search-area select, .search-area input{
-        height:30px; border:1px solid #d9d9d9; padding:0 8px; font-size:12px; outline:none; background:#fff;
-    }
-    .search-area select{ min-width:82px; }
-    .search-area input[type="text"]{ width:240px; }
-    .btn-search{
-        height:30px; padding:0 16px;
-        border:1px solid #2b2321; background:#2b2321; color:#fff; font-size:12px; cursor:pointer;
-    }
-    .btn-search:hover{ filter:brightness(1.05); }
-
-    @media (max-width: 900px){
-        .col-writer{ width:120px; }
-        .col-date{ width:92px; }
-        .col-no{ width:80px; }
-        .btn-write{ width:64px; }
-        .search-area{ flex-wrap:wrap; }
-        .search-area input[type="text"]{ width:100%; max-width:360px; }
-    }
-    
-    .btn-write{
-	  display:inline-flex;
-	  text-decoration:none; 
-	}
-    
+    /* pageBar가 <li> 기반이면 UL 스타일 필요 */
+    ul.pagebar { list-style:none; padding:0; margin:26px 0; display:flex; gap:6px; justify-content:center; }
+    ul.pagebar li a{ display:inline-block; padding:4px 8px; border:1px solid #ddd; font-size:12px; }
+    ul.pagebar li.active a{ background:#2b2321; color:#fff; border-color:#2b2321; }
 </style>
 </head>
 
 <body>
 <jsp:include page="../header.jsp"/>
+
 <div class="page-wrap">
-    <div class="inner">
-        <div class="page-title">Q&amp;A</div>
-        <div class="title-rule"></div>
+  <div class="inner">
+    <div class="page-title">Q&amp;A</div>
+    <div class="title-rule"></div>
 
-        <table class="board-table" aria-label="Q&A 목록">
-            <thead>
-                <tr>
-                    <th class="col-no">번호</th>
-                    <th>제목</th>
-                    <th class="col-writer">작성자</th>
-                    <th class="col-date">작성일</th>
-                </tr>
-            </thead>
+    <table class="board-table" aria-label="Q&A 목록">
+      <thead>
+        <tr>
+          <th class="col-no">번호</th>
+          <th>제목</th>
+          <th class="col-writer">작성자</th>
+          <th class="col-date">작성일</th>
+        </tr>
+      </thead>
 
-            <tbody>
-                <c:forEach var="row" items="${qnaList}">
-                    <tr class="${row.notice ? 'is-notice' : ''}">
-                        <td class="col-no">${row.no}</td>
+      <tbody>
+        <c:if test="${not empty qnaList}">
+          <c:forEach var="qna" items="${qnaList}" varStatus="status">
 
-                        <td>
-                            <!-- 상세보기 링크는 나중에 서블릿 붙일 때 변경 -->
-                            <a href="#" title="${row.title}">
-                                <span class="title-line">
-                                    <c:if test="${row.reply}">
-                                        <span class="badge-re">RE</span>
-                                    </c:if>
+            <fmt:parseNumber var="currentShowPageNo" value="${requestScope.currentShowPageNo}"/>
+            <fmt:parseNumber var="sizePerPage" value="${requestScope.sizePerPage}"/>
 
-                                    <span class="title-text">${row.title}</span>
+            <tr>
+              <!-- 페이징 순번 공식 -->
+              <td class="col-no">
+                ${requestScope.totalQnaCount - (currentShowPageNo-1)*sizePerPage - status.index}
+              </td>
 
-                                    <c:if test="${row.hit}">
-                                        <span class="badge-hit">HIT</span>
-                                    </c:if>
+              <td>
+                <c:set var="isSecret" value="${qna.isSecret == 1}" />
+                <c:set var="isAdmin" value="${sessionScope.loginuser != null && sessionScope.loginuser.userid == 'admin'}" />
+                <c:set var="loginId" value="${sessionScope.loginuser != null ? sessionScope.loginuser.userid : ''}" />
 
-                                    <c:if test="${row.secret}">
-                                        <span class="lock">🔒</span>
-                                    </c:if>
-                                </span>
-                            </a>
-                        </td>
+                <c:set var="canView" value="${!isSecret || isAdmin || (loginId != '' && loginId == qna.fkMemberId)}"/>
 
-                        <td class="col-writer">${row.author}</td>
-                        <td class="col-date">${row.date}</td>
-                    </tr>
-                </c:forEach>
-            </tbody>
-        </table>
-
-        <div class="btn-row">
-            <a class="btn-write" href="<%=request.getContextPath()%>/qnaWrite.sp">글쓰기</a>
-        </div>
-
-        <div class="pager" aria-label="페이지 이동">
-            <a class="arrow" href="#" aria-label="이전">&lsaquo;</a>
-
-            <c:forEach var="p" begin="1" end="${totalPages}">
                 <c:choose>
-                    <c:when test="${p == currentPage}">
-                        <span class="active">${p}</span>
-                    </c:when>
-                    <c:otherwise>
-                        <a href="#">${p}</a>
-                    </c:otherwise>
+                  <c:when test="${canView}">
+                    <a href="<%=request.getContextPath()%>/qnaView.sp?no=${qna.qnaId}" title="${qna.subject}">
+                      <span class="title-line">
+                        <c:if test="${qna.hasReply}">
+                          <span class="badge-re">RE</span>
+                        </c:if>
+                        <c:if test="${qna.answered}">
+                          <span class="badge-ans">답변완료</span>
+                        </c:if>
+                        <span class="title-text">${qna.subject}</span>
+                        <c:if test="${isSecret}">
+                          <span class="lock">🔒</span>
+                        </c:if>
+                      </span>
+                    </a>
+                  </c:when>
+
+                  <c:otherwise>
+                    <a href="<%=request.getContextPath()%>/qnaView.sp?no=${qna.qnaId}" title="비밀글입니다">
+                      <span class="title-line">
+                        <span class="title-text">비밀글입니다</span>
+                        <span class="lock">🔒</span>
+                      </span>
+                    </a>
+                  </c:otherwise>
                 </c:choose>
-            </c:forEach>
+              </td>
 
-            <a class="arrow" href="#" aria-label="다음">&rsaquo;</a>
-        </div>
+              <td class="col-writer">${qna.fkMemberId}</td>
 
-        <form class="search-area" method="get" action="<%=request.getContextPath()%>/qnaList.up">
-            <select name="period">
-                <option value="week">일주일</option>
-                <option value="month">한달</option>
-                <option value="all">전체</option>
-            </select>
+              <td class="col-date">
+                <fmt:formatDate value="${qna.regDate}" pattern="yy-MM-dd"/>
+              </td>
+            </tr>
+          </c:forEach>
+        </c:if>
 
-            <select name="searchType">
-                <option value="title">제목</option>
-                <option value="writer">작성자</option>
-                <option value="title_writer">제목+작성자</option>
-            </select>
+        <c:if test="${empty qnaList}">
+          <tr>
+            <td colspan="4">데이터가 존재하지 않습니다.</td>
+          </tr>
+        </c:if>
+      </tbody>
+    </table>
 
-            <input type="text" name="keyword" value="${param.keyword}" />
-            <button type="submit" class="btn-search">찾기</button>
-        </form>
+    <div class="btn-row">
+      <a class="btn-write" href="<%=request.getContextPath()%>/qnaWrite.sp">글쓰기</a>
     </div>
+
+    <!-- ✅ pageBar 출력 -->
+    <ul class="pagebar">
+      ${requestScope.pageBar}
+    </ul>
+
+  </div>
 </div>
+
 <jsp:include page="../footer.jsp"/>
 </body>
 </html>
