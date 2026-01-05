@@ -159,6 +159,7 @@
                         getter   : getRegisterday()
                     --%>
                     <td>${m.registerday}</td>
+                    
 
                     <%-- 
                         회원 상태

@@ -146,7 +146,7 @@ h2{font-size:23px!important;font-weight:700;letter-spacing:-0.3px;color:#2f2b2a;
 <body>
 
 <!-- 고정 헤더 -->
-<jsp:include page="../header.jsp" />
+<jsp:include page="../header2.jsp" />
 
 <div class="wrap">
 <%-- <div><pre>${last7daysList}</pre></div>   확인용 추후 삭제--%>
@@ -269,7 +269,7 @@ h2{font-size:23px!important;font-weight:700;letter-spacing:-0.3px;color:#2f2b2a;
 
 </div>
 
-<jsp:include page="../footer.jsp" />
+<jsp:include page="../footer2.jsp" />
 
 <%-- 그래프 구현 위해 추가 --%>
 <!-- 차트 생성 -->

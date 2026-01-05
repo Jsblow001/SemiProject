@@ -6,7 +6,7 @@
 %>
 
 <%-- 1. 제공된 헤더 포함 --%>
-<jsp:include page="../header.jsp" />
+<jsp:include page="../header2.jsp" />
 
 <style>
     /* 관리자 페이지 레이아웃 */
@@ -57,4 +57,4 @@
 </div>
 
 <%-- 2. 제공된 푸터 포함 --%>
-<jsp:include page="../footer.jsp" />
+<jsp:include page="../footer2.jsp" />
