@@ -3,7 +3,7 @@ function goWish(productId, contextPath) {
     const $wishIcon = $(".wish-icon-" + productId); 
 
     $.ajax({
-        url: contextPath + "/product/wishProcess.sp",
+        url:contextPath+"/product/wishProcess.sp",
         type: "POST",
         data: {"product_id": productId},
         dataType: "JSON",
