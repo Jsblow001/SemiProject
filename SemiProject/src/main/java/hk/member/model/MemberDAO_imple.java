@@ -464,7 +464,7 @@ public class MemberDAO_imple implements MemberDAO {
 	     try {
 	         conn = ds.getConnection();
 	
-	         String sql = " SELECT MEMBER_ID, name, email, registerday, status "
+	         String sql = " SELECT MEMBER_ID, name, gender, email, registerday, status "
 	                    + " FROM tbl_member "
 	                    + " WHERE MEMBER_ID != 'admin' "
 	                    + " ORDER BY registerday DESC ";
@@ -478,6 +478,7 @@ public class MemberDAO_imple implements MemberDAO {
 	
 	             member.setUserid(rs.getString("MEMBER_ID"));
 	             member.setName(rs.getString("name"));
+	             member.setGender(rs.getString("gender"));  // 추가
 	             member.setEmail(aes.decrypt(rs.getString("email"))); // 복호화
 	             member.setRegisterday(rs.getString("registerday"));
 	
@@ -771,6 +772,53 @@ public class MemberDAO_imple implements MemberDAO {
 
 	    return list;
 	}
+
+	
+	
+	
+	// ======================================================
+	// 관리자 페이지 內 회원 상세 조회
+	// (입력받은 userid 를 가지고 한명의 회원정보를 가져오기)
+	// ======================================================
+	@Override
+	public MemberDTO selectOneMember(String userid) {
+
+	    MemberDTO member = null;
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = 
+	            " SELECT userid, name, gender, email, registerday, status " +
+	            " FROM tbl_member " +
+	            " WHERE userid = ? ";
+
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, userid);
+
+	        rs = pstmt.executeQuery();
+
+	        if (rs.next()) {
+
+	            member = new MemberDTO();
+
+	            member.setUserid(rs.getString("userid"));
+	            member.setName(rs.getString("name"));
+	            member.setGender(rs.getString("gender"));       // 1 / 2 / null
+	            member.setEmail(rs.getString("email"));
+	            member.setRegisterday(rs.getString("registerday"));
+	            member.setStatus(rs.getInt("status"));          // 1:정상 / 0:탈퇴
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        close();
+	    }
+
+	    return member;
+	}
+
 
 	
 
