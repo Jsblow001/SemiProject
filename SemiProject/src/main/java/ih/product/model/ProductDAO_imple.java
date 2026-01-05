@@ -45,9 +45,9 @@ public class ProductDAO_imple implements ProductDAO {
         try {
             conn = ds.getConnection();
             
-            String sql = " SELECT product_id, product_name, pimage, sale_price, list_price, stock, fk_category_id "
+            String sql = " SELECT product_id, product_name, pimage, sale_price, list_price, stock, fk_category_id, "
             		   + " (SELECT count(*) FROM tbl_wishlist WHERE product_id = P.product_id AND member_id = ?) AS is_wish "
-            		   + " FROM tbl_product "
+            		   + " FROM tbl_product P "
                        + " WHERE fk_category_id = ? " // 카테고리 필터링
                        + " ORDER BY product_id DESC ";
             
@@ -150,7 +150,7 @@ public class ProductDAO_imple implements ProductDAO {
         try {
             conn = ds.getConnection();
             // 최신 등록순으로 조회
-            String sql = " SELECT product_id, product_name, pimage, sale_price, stock " 
+            String sql = " SELECT product_id, product_name, pimage, sale_price, stock, " 
             		   + " (SELECT count(*) FROM tbl_wishlist WHERE product_id = P.product_id AND member_id = ?) AS is_wish "  
             		   + " FROM tbl_product ORDER BY product_id DESC ";
             
