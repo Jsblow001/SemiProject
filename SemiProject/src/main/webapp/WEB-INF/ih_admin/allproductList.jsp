@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-
+<% String ctxPath = request.getContextPath(); %>
 <jsp:include page="../header2.jsp" />
 
 <style>
@@ -127,7 +127,7 @@
                             <td>
                                 <div class="btn-group">
                                     <button class="btn btn-sm btn-outline-primary px-3" 
-                                            onclick="location.href='productUpdate.sp?product_id=${p.product_id}'">
+                                            onclick="location.href='<%= ctxPath%>/admin/productUpdate.sp?product_id=${p.product_id}'">
                                         <i class="fas fa-edit mr-1"></i>수정
                                     </button>
                                     <button class="btn btn-sm btn-outline-danger px-3" 
