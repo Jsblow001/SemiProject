@@ -22,7 +22,8 @@ function goWish(productId, contextPath) {
             else if(json.result === "removed") {
                 alert(json.message);
                 $wishIcon.removeClass("fas text-danger").addClass("far");
-            }
+				location.reload(true);
+			}
 			// far는 비어있는 하트 
 			// fas는 색이 꽉 찬 하트
         },
