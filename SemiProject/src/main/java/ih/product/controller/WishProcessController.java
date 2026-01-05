@@ -1,11 +1,11 @@
 package ih.product.controller;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import sp.common.controller.AbstractController;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -18,10 +18,10 @@ import ih.product.model.ProductDAO_imple;
 
 
 @WebServlet("/WishProcessController")
-public class WishProcessController extends HttpServlet {
+public class WishProcessController extends AbstractController {
 	private static final long serialVersionUID = 1L;
    
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void execute(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		
 		
 		// 로그인 여부 확인
