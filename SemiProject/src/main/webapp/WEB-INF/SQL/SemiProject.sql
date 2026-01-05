@@ -404,6 +404,11 @@ CREATE TABLE tbl_wishlist (
     constraint fk_wishlist_p_id foreign key(product_id) references tbl_product(product_id)
 );
 
+CREATE SEQUENCE seq_wishlist_id
+START WITH 1
+INCREMENT BY 1
+NOMAXVALUE;
+
 commit;
 
 select *
@@ -465,7 +470,8 @@ VALUES (4, '40001', '콜라보');
 COMMIT;
 
 select *
-from TBL_PRODUCT;
+from TBL_PRODUCT
+order by stock_date desc;
 
 SELECT pimage FROM tbl_product WHERE product_id = 4;
 
@@ -477,6 +483,21 @@ select *
 from tbl_member;
 
 
+select *
+from tab;
+
+show user;
+
+-- 오늘 데이터
+INSERT INTO TBL_ORDER (odrcode, fk_member_id, fk_addr_id, odrtotalprice, payment_status, odrdate)
+VALUES (101, 'java', 2, 55000, 1, SYSDATE);
+
+-- 어제 데이터
+INSERT INTO TBL_ORDER (odrcode, fk_member_id, fk_addr_id, odrtotalprice, payment_status, odrdate)
+VALUES (102, 'java', 2, 32000, 1, SYSDATE - 1);
+
+-- 3일 전 데이터
+INSERT INTO TBL_ORDER (odrcode, fk_member_id, fk_addr_id, odrtotalprice, payment_status, odrdate)
+VALUES (103, 'java', 2, 78000, 1, SYSDATE - 3);
 
 
-    

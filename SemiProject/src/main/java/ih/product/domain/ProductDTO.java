@@ -13,11 +13,11 @@ public class ProductDTO {
     private String stock_date;          // 입고일자
     private int point;                  // 포인트
     
-    // 조인해서 가져올 데이터 (대표 이미지 등)
+    // 조인해서 가져올 데이터
     private String pimage;              // 상품 이미지 파일명
     private String category_name;       // 카테고리 이름 
     private String spec_name;           // 스텍 이름
-
+    private int is_wish;                // DB에서 가져온 찜하기 상태 변수
     // ------------------------------------------------ // 
     
     // Getter & Setter
@@ -123,6 +123,14 @@ public class ProductDTO {
 
 	public void setSpec_name(String spec_name) {
 		this.spec_name = spec_name;
+	}
+
+	public int getIs_wish() {
+		return is_wish;
+	}
+
+	public void setIs_wish(int is_wish) {
+		this.is_wish = is_wish;
 	}
 
     

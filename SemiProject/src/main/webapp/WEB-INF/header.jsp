@@ -20,6 +20,9 @@
     <link href="<%= ctxPath%>/css/style.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="<%= ctxPath%>/css/index/index.css" />
     
+    <script src="<%= ctxPath%>/js/jquery-3.7.1.min.js"></script>
+    
+    <script src="<%= ctxPath%>/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js" type="text/javascript"></script>
     <style>
         :root {
             --dark-wood: #5D4037;   /* 짙은 밤나무색 */
@@ -27,44 +30,43 @@
             --light-bg: #EFEBE9;    /* 연한 베이지 브라운 */
         }
 
-        /* [추가] 헤더 상단 고정 스타일 */
+        /* 헤더 상단 고정 스타일 */
         .fixed-top-header {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             z-index: 2000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); /* 스크롤 시 하단과 구분되는 그림자 */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
         }
 
-        /* 헤더 고정으로 인해 가려지는 본문 영역 확보 */
         body {
             padding-top: 105px; /* 공지바(35px) + 내비바(70px) 합산 높이 */
         }
 
-        /* 1. 상단 공지 슬라이드 */
-        .top-announcement-bar {
-            background-color: var(--dark-wood);
-            height: 35px;
-            overflow: hidden;
-            position: relative;
-        }
-        #noticeCarousel, .carousel-inner { height: 100%; }
-        .announcement-item {
-            height: 100%;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none !important;
-            padding: 0 50px;
-        }
-        .announcement-item.active { display: flex; }
-        .announcement-text { color: #ffffff; font-size: 0.85rem; }
-
-        .carousel-control-prev, .carousel-control-next { width: 40px; opacity: 0.7; }
-        .carousel-control-prev-icon, .carousel-control-next-icon { width: 14px; height: 14px; }
-
-        /* 2. 내비게이션 바 및 로고 정중앙 고정 */
+        /* 상단 공지 슬라이드 수정 */
+		.top-announcement-bar {
+		    background-color: var(--dark-wood);
+		    height: 35px;
+		}
+		.announcement-item {
+		    height: 35px;
+		    line-height: 35px; 
+		    text-align: center;
+		    text-decoration: none !important;
+		}
+		.announcement-text { 
+		    color: #ffffff; 
+		    font-size: 0.85rem; 
+		    display: block; 
+		}
+		.navbar-nav {
+		    list-style: none;
+		}
+		.nav-item.dropdown {
+		    list-style: none;
+		}
+        /* 내비게이션 바 및 로고 정중앙 고정 */
         .center-logo {
             position: absolute;
             left: 50%;
@@ -72,8 +74,6 @@
             transform: translate(-50%, -50%);
             z-index: 1000;
         }
-
-        /* 폰트 굵기 수정: Bold 제거 */
         .navbar-nav .nav-link {
             font-weight: 400 !important;
             color: #555 !important;
@@ -86,8 +86,6 @@
             .navbar-collapse.justify-content-start { padding-right: 120px; }
             .navbar-collapse.justify-content-end { padding-left: 120px; }
         }
-        
-        /* 모바일 대응 */
         @media (max-width: 991px) {
             body { padding-top: 95px; }
             .center-logo h1 { font-size: 1.5rem; }
@@ -126,7 +124,7 @@
                     <div class="navbar-nav">
                         <a href="<%= ctxPath %>/product/productList.sp?category=sunglasses" class="nav-item nav-link text-nowrap mr-lg-3">SUNGLASSES</a>
                         <a href="<%= ctxPath %>/product/productList.sp?category=eyeglasses" class="nav-item nav-link text-nowrap mr-lg-3">EYEGLASSES</a>
-                        <a href="<%= ctxPath %>/product/productList.sp?category=acc" class="nav-item nav-link text-nowrap mr-lg-3">ACC</a>
+                        <a href="<%= ctxPath %>/product/productList.sp?category=accessory" class="nav-item nav-link text-nowrap mr-lg-3">ACC</a>
                         <a href="<%= ctxPath %>/product/productList.sp?category=collaboration" class="nav-item nav-link text-nowrap">COLLABORATION</a>
                     </div>
                 </div>
@@ -144,6 +142,19 @@
                 </div>
 
                 <div class="d-flex align-items-center ml-auto" style="z-index: 1001;">
+                    
+                    <c:if test="${not empty sessionScope.loginuser && sessionScope.loginuser.userid == 'admin'}">
+                    	<li class="nav-item dropdown" style="list-style: none;">
+                    		<a class="nav-link dropdown-toggle menufont_size text-primary" href="#" id="adminDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">관리자전용</a>
+                    		<div class="dropdown-menu dropdown-menu-right shadow border-0" aria-labelledby="adminDropdown">
+                    			<a class="dropdown-item text-primary" href="<%= ctxPath%>">회원관리</a>
+                    			<a class="dropdown-item text-primary" href="<%= ctxPath%>/admin/allproductList.sp">상품관리</a>
+                    			<a class="dropdown-item text-primary" href="<%= ctxPath%>/qnaList.sp">문의관리</a>
+                    			<a class="dropdown-item text-primary" href="<%= ctxPath%>">운영관리</a>
+                    		</div>
+                    	</li>
+                    </c:if>
+                    
                     <div class="collapse navbar-collapse mr-lg-4">
                         <div class="navbar-nav">
                             <a href="/stockist" class="nav-item nav-link text-nowrap mr-lg-3">BRAND</a>
@@ -165,15 +176,29 @@
                                 </div>
                             </div>
                         </div>
-                        <a href="/wish" class="btn p-0 mr-3"><i class="fas fa-user text-wood"></i></a>
-                        <a href="/cart" class="btn p-0"><i class="fas fa-shopping-cart text-wood"></i></a>
+                        
+					    <c:choose>
+					        <%-- 로그인한 상태일 때 --%>
+					        <c:when test="${not empty sessionScope.loginuser}">
+					            <a href="<%= ctxPath %>/mypage.sp" class="btn p-0 mr-3" title="마이페이지">
+					                <i class="fas fa-user text-primary"></i> 
+					            </a>
+					        </c:when>
+					        
+					        <%-- 로그인하지 않은 상태일 때 --%>
+					        <c:otherwise>
+					            <a href="<%= ctxPath %>/loginSelect.sp" class="btn p-0 mr-3" title="로그인">
+					                <i class="fas fa-user text-wood"></i>
+					            </a>
+					        </c:otherwise>
+					    </c:choose>
+					    
+                        <a href="<%= ctxPath%>/cart/cartList.sp" class="btn p-0"><i class="fas fa-shopping-cart text-wood"></i></a>
                     </div>
                 </div>
             </nav>
         </div>
     </div> 
     
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

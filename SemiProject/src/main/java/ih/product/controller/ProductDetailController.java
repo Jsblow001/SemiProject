@@ -3,6 +3,8 @@ package ih.product.controller;
 import sp.common.controller.AbstractController;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import hk.member.domain.MemberDTO;
 import ih.product.domain.ProductDTO;
 import ih.product.model.*;
 
@@ -11,15 +13,18 @@ public class ProductDetailController extends AbstractController {
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
         
-        // 1. 목록에서 넘겨준 상품번호(product_id)를 받는다.
+        // 목록에서 넘겨준 상품번호 받기
         String product_id = request.getParameter("product_id");
+        HttpSession session = request.getSession();
+        MemberDTO loginuser = (MemberDTO) session.getAttribute("loginuser");
+        String userid = (loginuser != null) ? loginuser.getUserid() : null;
         
-        // 2. DB에서 해당 상품의 정보를 가져온다.
+        // DB에서 해당 상품의 정보를 가져오기
         ProductDAO pdao = new ProductDAO_imple();
-        ProductDTO pdto = pdao.selectOneProduct(product_id);
+        ProductDTO pdto = pdao.selectOneProduct(product_id, userid);
         
         if(pdto != null) {
-            // 3. 데이터를 JSP에 전달한다.
+            // 데이터를 JSP에 전달
             request.setAttribute("pdto", pdto);
             
             super.setRedirect(false);

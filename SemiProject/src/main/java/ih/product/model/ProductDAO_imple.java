@@ -36,22 +36,25 @@ public class ProductDAO_imple implements ProductDAO {
         }
     }
 
- // 카테고리 번호를 받아 해당 카테고리 상품만 조회
+    // 카테고리 번호를 받아 해당 카테고리 상품만 조회
     @Override
-    public List<ProductDTO> selectProductByCategory(String categoryId) throws SQLException {
+    public List<ProductDTO> selectProductByCategory(String categoryId, String userid) throws SQLException {
         
         List<ProductDTO> productList = new ArrayList<>();
         
         try {
             conn = ds.getConnection();
             
-            String sql = " SELECT product_id, product_name, pimage, sale_price, list_price, stock, fk_category_id "
-                       + " FROM tbl_product "
+            String sql = " SELECT product_id, product_name, pimage, sale_price, list_price, stock, fk_category_id, "
+            		   + " (SELECT count(*) FROM tbl_wishlist WHERE product_id = P.product_id AND member_id = ?) AS is_wish "
+            		   + " FROM tbl_product P "
                        + " WHERE fk_category_id = ? " // 카테고리 필터링
                        + " ORDER BY product_id DESC ";
             
             pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, Integer.parseInt(categoryId)); 
+            
+            pstmt.setString(1, userid); 
+            pstmt.setInt(2, Integer.parseInt(categoryId)); 
             rs = pstmt.executeQuery();
             
             while(rs.next()) {
@@ -63,7 +66,7 @@ public class ProductDAO_imple implements ProductDAO {
                 pdto.setList_price(rs.getInt("list_price"));
                 pdto.setStock(rs.getInt("stock"));
                 pdto.setFk_category_id(rs.getInt("fk_category_id"));
-                
+                pdto.setIs_wish(rs.getInt("is_wish"));
                 productList.add(pdto);
             }
         } finally {
@@ -74,13 +77,20 @@ public class ProductDAO_imple implements ProductDAO {
 
     // 상품 상세 정보 조회
     @Override
-    public ProductDTO selectOneProduct(String productId) throws SQLException {
+    public ProductDTO selectOneProduct(String productId, String userid) throws SQLException {
         ProductDTO pdto = null;
         try {
             conn = ds.getConnection();
-            String sql = " SELECT * FROM tbl_product WHERE product_id = ? ";
+            
+            String sql = " SELECT P.*,"
+            		   + " (SELECT count(*) FROM tbl_wishlist WHERE product_id = P.product_id AND member_id = ?) AS is_wish "
+            		   + " FROM tbl_product P "
+            		   + " WHERE P.product_id = ? ";
+            
             pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, productId); // String으로 받아도 DB가 숫자로 자동 변환해줍니다.
+            pstmt.setString(1, userid); // String으로 받아도 DB가 숫자로 자동 변환 .
+            pstmt.setString(2, productId);
+            
             rs = pstmt.executeQuery();
             
             if(rs.next()) {
@@ -135,15 +145,19 @@ public class ProductDAO_imple implements ProductDAO {
     } // end of  public int productInsert(ProductDTO dto) throws SQLException ----
     
     // 전체 상품 목록 조회 (관리자용/사용자용 공통)
-    public List<ProductDTO> selectProductAll() throws SQLException {
+    public List<ProductDTO> selectProductAll(String productId, String userid) throws SQLException {
         List<ProductDTO> productList = new ArrayList<>();
         try {
             conn = ds.getConnection();
             // 최신 등록순으로 조회
-            String sql = " SELECT product_id, product_name, pimage, sale_price, stock " +
-                         " FROM tbl_product ORDER BY product_id DESC ";
+            String sql = " SELECT product_id, product_name, pimage, sale_price, stock, " 
+            		   + " (SELECT count(*) FROM tbl_wishlist WHERE product_id = P.product_id AND member_id = ?) AS is_wish "  
+            		   + " FROM tbl_product ORDER BY product_id DESC ";
+            
             pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, userid);
             rs = pstmt.executeQuery();
+            
             while(rs.next()) {
                 ProductDTO pdto = new ProductDTO();
                 pdto.setProduct_id(rs.getInt("product_id"));
@@ -151,12 +165,197 @@ public class ProductDAO_imple implements ProductDAO {
                 pdto.setPimage(rs.getString("pimage"));
                 pdto.setSale_price(rs.getInt("sale_price"));
                 pdto.setStock(rs.getInt("stock"));
+                pdto.setIs_wish(rs.getInt("is_wish"));
+                
                 productList.add(pdto);
             }
         } finally { close(); }
         return productList;
-    }
+    } // end of public List<ProductDTO> selectProductAll() throws SQLException ----
+    
+    // 관리자전용 - 등록된 상품 리스트
+    @Override
+    public List<ProductDTO> selectAllProduct(String category) throws SQLException {
+        List<ProductDTO> productList = new ArrayList<>();
+        try {
+            conn = ds.getConnection();
+            
+            String sql = " SELECT * FROM tbl_product ";
+            
+            if(category != null && !category.isEmpty()) {
+                sql += " WHERE fk_category_id = ? ";
+            }
+            
+            sql += " ORDER BY product_id DESC ";
+            
+            pstmt = conn.prepareStatement(sql);
+            
+            if(category != null && !category.isEmpty()) {
+                pstmt.setString(1, category);
+            }
+            
+            rs = pstmt.executeQuery();
+            
+            while(rs.next()) {
+                ProductDTO pdto = new ProductDTO();
+                pdto.setProduct_id(rs.getInt("product_id"));
+                pdto.setProduct_name(rs.getString("product_name"));
+                pdto.setFk_category_id(rs.getInt("fk_category_id"));
+                pdto.setPimage(rs.getString("pimage"));
+                pdto.setSale_price(rs.getInt("sale_price"));
+                pdto.setStock(rs.getInt("stock"));
 
+                productList.add(pdto);
+            }
+        } finally {
+            close();
+        }
+        return productList;
+    } // end of public List<ProductDTO> selectAllProduct(String category) throws SQLException ----
+    
+    // 관리자전용 - 상품 수정
+    @Override
+    public int updateProduct(ProductDTO pdto) throws SQLException {
+        int result = 0;
+        try {
+        	conn = ds.getConnection();
+            
+            String sql = " UPDATE tbl_product SET fk_category_id = ?, "
+                       + " product_name = ?, sale_price = ?, stock = ?, "
+                       + " product_description = ?, pimage = ? " // 추가됨
+                       + " WHERE product_id = ? ";
+         
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setInt(1, pdto.getFk_category_id());
+	        pstmt.setString(2, pdto.getProduct_name());
+	        pstmt.setInt(3, pdto.getSale_price());
+	        pstmt.setInt(4, pdto.getStock());
+	        pstmt.setString(5, pdto.getProduct_description()); // 추가됨
+	        pstmt.setString(6, pdto.getPimage());
+	        pstmt.setInt(7, pdto.getProduct_id());
+	         
+	        result = pstmt.executeUpdate();
+        } finally {
+            close();
+        }
+        return result;
+    } // end of public int updateProduct(ProductDTO pdto) throws SQLException ----
+    
+    // 관리자전용 - 상품 삭제
+    @Override
+    public int deleteProduct(String productId) throws SQLException {
+        int result = 0;
+        try {
+            conn = ds.getConnection();
+            
+            // 상품 테이블에서 해당 ID 삭제
+            String sql = " DELETE FROM tbl_product WHERE product_id = ? ";
+            
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, productId);
+            
+            result = pstmt.executeUpdate();
+        } finally {
+            close();
+        }
+        return result;
+    } // end of  public int deleteProduct(String productId) throws SQLException ----
+
+    // 찜하기
+	@Override
+	public int processWish(String userid, String product_id) {
+	    int n = 0;
+	    try {
+	        conn = ds.getConnection();
+	        
+	        // 유저가 이 상품을 찜했는지 확인
+	        String sql = " SELECT count(*) FROM tbl_wishlist "
+	        		   + " WHERE member_id = ? AND product_id = ? ";
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        
+	        pstmt.setString(1, userid);
+	        pstmt.setString(2, product_id);
+	        
+	        rs = pstmt.executeQuery();
+	        rs.next();
+	        
+	        int count = rs.getInt(1);
+
+	        if(count == 0) {
+	            // 찜 기록 없으면 추가(Insert)
+	            sql = " INSERT INTO tbl_wishlist(wish_id, member_id, product_id, wish_date) "
+	            	+ " VALUES(seq_wishlist_id.nextval, ?, ?, default) ";
+	            
+	            pstmt = conn.prepareStatement(sql);
+	            
+	            pstmt.setString(1, userid);
+	            pstmt.setString(2, product_id);
+	            
+	            if(pstmt.executeUpdate() == 1) {
+	            	n = 1; 
+	            }
+	        } else {
+	            // 찜 기록 있으면 삭제(Delete)
+	            sql = " DELETE FROM tbl_wishlist "
+	            	+ " WHERE member_id = ? AND product_id = ? ";
+	            
+	            pstmt = conn.prepareStatement(sql);
+	            
+	            pstmt.setString(1, userid);
+	            pstmt.setString(2, product_id);
+	            
+	            if(pstmt.executeUpdate() == 1) {
+	            	n = -1; 
+	            }
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        n = 0;
+	    } finally {
+	        close();
+	    }
+	    return n;
+	}
+
+	// 위시리스트 보기
+	@Override
+	public List<ProductDTO> getWishList(String userid) throws SQLException {
+		
+		List<ProductDTO> wishList = new ArrayList<>();
+	    
+	    try {
+	        conn = ds.getConnection();
+	        
+	        // tbl_wish, tbl_product -> JOIN
+	        String sql = " SELECT P.product_id, P.product_name, P.pimage, P.sale_price, P.stock " +
+	                     " FROM tbl_wishlist W JOIN tbl_product P " +
+	                     " ON W.product_id = P.product_id " +
+	                     " WHERE W.member_id = ? " +
+	                     " ORDER BY W.wish_date DESC "; 
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, userid);
+	        
+	        rs = pstmt.executeQuery();
+	        
+	        while(rs.next()) {
+	            ProductDTO pdto = new ProductDTO();
+	            pdto.setProduct_id(rs.getInt("product_id"));
+	            pdto.setProduct_name(rs.getString("product_name"));
+	            pdto.setPimage(rs.getString("pimage"));
+	            pdto.setSale_price(rs.getInt("sale_price"));
+	            pdto.setStock(rs.getInt("stock"));
+	            
+	            wishList.add(pdto);
+	        }
+	        
+	    } finally {
+	        close();
+	    }
+	    
+	    return wishList;
+	}
     
     
 }
