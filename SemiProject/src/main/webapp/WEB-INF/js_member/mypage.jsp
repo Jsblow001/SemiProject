@@ -70,6 +70,41 @@
         .card-icon { font-size: 30px; margin-bottom: 15px; }
         .card-title { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 5px; }
         .card-desc { font-size: 12px; color: #999; }
+   
+         .account-box {
+          border-top: 1px solid #eee;
+          color: #888;
+      }
+      
+      .account-title {
+          font-size: 13px;
+          letter-spacing: 2px;
+          margin-bottom: 10px;
+          color: #aaa;
+      }
+      
+      .account-actions {
+          font-size: 13px;
+      }
+      
+      .account-link {
+          color: #777;
+          text-decoration: none;
+          transition: color .2s;
+      }
+      
+      .account-link:hover {
+          color: #5D4037;
+      }
+      
+      .account-link.withdraw:hover {
+          color: #c62828;
+      }
+      
+      .divider {
+          margin: 0 10px;
+          color: #ccc;
+      }
     </style>
 </head>
 <body>
@@ -126,7 +161,7 @@
                 </a>
             </div>
             <div class="col-md-3 mb-4">
-                <a href="<%= ctxPath %>/shop/wishlist.sp" class="btn-mypage-card">
+                <a href="<%= ctxPath %>/product/wishList.sp" class="btn-mypage-card">
                     <div class="card-icon">🖤</div>
                     <div class="card-title">위시리스트</div>
                     <div class="card-desc">담아둔 관심 상품</div>
@@ -163,7 +198,24 @@
                 </tbody>
             </table>
         </div>
+        
+         <%-- 계정 관리 영역 --%>
+         <div class="account-box mt-5 pt-4 text-center">
+             <div class="account-title">계정 설정</div>
+         
+             <div class="account-actions">
+                 <a href="<%=ctxPath%>/logout.sp" class="account-link">
+                     로그아웃
+                 </a>
+                 <span class="divider">|</span>
+                 <a href="<%=ctxPath%>/withdraw.sp" class="account-link withdraw">
+                     회원탈퇴
+                 </a>
+             </div>
+         </div>
+ 
     </div>
+     
 
     <%-- 하단 푸터 인클루드 --%>
     <jsp:include page="../footer.jsp" />

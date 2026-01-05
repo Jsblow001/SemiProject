@@ -478,6 +478,36 @@ select *
 from tbl_member;
 
 
+select *
+from tab;
 
+show user;
 
-    
+-- 오늘 데이터
+INSERT INTO TBL_ORDER (odrcode, fk_member_id, fk_addr_id, odrtotalprice, payment_status, odrdate)
+VALUES (101, 'java', 2, 55000, 1, SYSDATE);
+
+-- 어제 데이터
+INSERT INTO TBL_ORDER (odrcode, fk_member_id, fk_addr_id, odrtotalprice, payment_status, odrdate)
+VALUES (102, 'java', 2, 32000, 1, SYSDATE - 1);
+
+-- 3일 전 데이터
+INSERT INTO TBL_ORDER (odrcode, fk_member_id, fk_addr_id, odrtotalprice, payment_status, odrdate)
+VALUES (103, 'java', 2, 78000, 1, SYSDATE - 3);
+
+INSERT INTO TBL_ORDER (odrcode, fk_member_id, fk_addr_id, odrtotalprice, payment_status, odrdate)
+VALUES (104, 'java', 2, 78000, 1, SYSDATE - 6);
+
+INSERT INTO TBL_ORDER (odrcode, fk_member_id, fk_addr_id, odrtotalprice, payment_status, odrdate)
+VALUES (105, 'java', 2, 178000, 1, SYSDATE - 20);
+
+-- 반드시 커밋!
+COMMIT;
+
+DELETE FROM TBL_ORDER 
+WHERE odrcode = '104';
+
+COMMIT;
+
+select *
+from TBL_ORDER;
