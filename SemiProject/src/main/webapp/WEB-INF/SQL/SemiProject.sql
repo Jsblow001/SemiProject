@@ -590,3 +590,77 @@ INSERT INTO TBL_ORDER (odrcode, fk_member_id, fk_addr_id, odrtotalprice, payment
 VALUES (103, 'java', 2, 78000, 1, SYSDATE - 3);
 
 
+-- 방문자 기록 테이블
+CREATE TABLE visitor_log (
+    v_idx       NUMBER PRIMARY KEY,          -- 방문 로그 고유 번호 (PK)
+    v_date      DATE DEFAULT SYSDATE,        -- 방문 일시 (기본값: 현재 시간)
+    v_ip        VARCHAR2(50),                -- 접속자 IP 주소
+    member_id   VARCHAR2(50) NULL,           -- 회원 아이디 (비회원은 NULL)
+    last_access DATE DEFAULT SYSDATE         -- 실시간 접속 확인을 위한 최종 활동 시간
+);
+
+
+-- 방문자 기록 시퀀스
+CREATE SEQUENCE seq_visitor_log
+START WITH 1
+INCREMENT BY 1
+NOMAXVALUE
+NOMINVALUE
+NOCYCLE
+NOCACHE;
+
+select *
+from visitor_log;
+
+-- 오늘 접속한 횟수
+SELECT COUNT(*) FROM visitor_log WHERE TRUNC(v_date) = TRUNC(SYSDATE);
+
+SELECT b.dt, COUNT(a.v_idx)
+FROM visitor_log a, 
+(SELECT TRUNC(SYSDATE) - LEVEL + 1 AS dt FROM DUAL CONNECT BY LEVEL <= 7) b
+WHERE b.dt = TRUNC(a.v_date(+))
+GROUP BY b.dt ORDER BY b.dt ASC;
+
+
+-- 1. 어제 회원 'admin'이 3번 페이지를 이동한 기록 (이탈 아님)
+INSERT INTO visitor_log (v_idx, v_ip, v_date, last_access, member_id)
+VALUES (seq_visitor_log.NEXTVAL, '192.168.0.10', SYSDATE-1, SYSDATE-1, 'admin');
+INSERT INTO visitor_log (v_idx, v_ip, v_date, last_access, member_id)
+VALUES (seq_visitor_log.NEXTVAL, '192.168.0.10', SYSDATE-1, SYSDATE-1, 'admin');
+INSERT INTO visitor_log (v_idx, v_ip, v_date, last_access, member_id)
+VALUES (seq_visitor_log.NEXTVAL, '192.168.0.10', SYSDATE-1, SYSDATE-1, 'admin');
+
+-- 2. 어제 비회원이 들어와서 1 페이지만 보고 나간 기록 (이탈자)
+INSERT INTO visitor_log (v_idx, v_ip, v_date, last_access, member_id)
+VALUES (seq_visitor_log.NEXTVAL, '192.168.0.20', SYSDATE-1, SYSDATE-1, NULL);
+INSERT INTO visitor_log (v_idx, v_ip, v_date, last_access, member_id)
+VALUES (seq_visitor_log.NEXTVAL, '192.168.0.40', SYSDATE-1, SYSDATE-1, NULL);
+INSERT INTO visitor_log (v_idx, v_ip, v_date, last_access, member_id)
+VALUES (seq_visitor_log.NEXTVAL, '192.168.0.50', SYSDATE-1, SYSDATE-1, NULL);
+
+-- 3. 어제 또 다른 회원이 가입 후 접속한 기록
+INSERT INTO visitor_log (v_idx, v_ip, v_date, last_access, member_id)
+VALUES (seq_visitor_log.NEXTVAL, '192.168.0.30', SYSDATE-1, SYSDATE-1, 'testuser');
+
+-- 3. 오늘 비회원이 들어와서 1 페이지만 보고 나간 기록 (이탈자)
+INSERT INTO visitor_log (v_idx, v_ip, v_date, last_access, member_id)
+VALUES (seq_visitor_log.NEXTVAL, '192.168.0.51', SYSDATE, SYSDATE, NULL);
+
+-- 반드시 실행!
+COMMIT;
+
+
+-- 7일치 방문자 기록 임의로 생성
+BEGIN
+  FOR i IN 1..7 LOOP
+    FOR j IN 1..TRUNC(DBMS_RANDOM.VALUE(1, 5)) LOOP
+      INSERT INTO visitor_log (v_idx, v_ip, v_date, last_access, member_id)
+      VALUES (seq_visitor_log.NEXTVAL, 
+              '127.0.0.' || i, 
+              SYSDATE - i, 
+              SYSDATE - i, 
+              CASE WHEN MOD(j, 2) = 0 THEN 'admin' ELSE NULL END);
+    END LOOP;
+  END LOOP;
+  COMMIT;
+END;
