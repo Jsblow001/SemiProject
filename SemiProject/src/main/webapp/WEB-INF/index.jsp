@@ -8,33 +8,36 @@
 <link href="<%= request.getContextPath() %>/css/style.css" rel="stylesheet">
 
 <style type="text/css">
-.carousel-inner .carousel-item.active,
-.carousel-inner .carousel-item-next,
-.carousel-inner .carousel-item-prev {
+/* ✅ 멀티 아이템 캐러셀(#recipeCarousel) 전용 */
+#recipeCarousel .carousel-inner .carousel-item.active,
+#recipeCarousel .carousel-inner .carousel-item-next,
+#recipeCarousel .carousel-inner .carousel-item-prev {
   display: flex;
 }
 
-.carousel-inner .carousel-item-right.active,
-.carousel-inner .carousel-item-next {
+#recipeCarousel .carousel-inner .carousel-item-right.active,
+#recipeCarousel .carousel-inner .carousel-item-next {
   transform: translateX(25%);
 }
 
-.carousel-inner .carousel-item-left.active, 
-.carousel-inner .carousel-item-prev {
+#recipeCarousel .carousel-inner .carousel-item-left.active,
+#recipeCarousel .carousel-inner .carousel-item-prev {
   transform: translateX(-25%);
 }
-  
-.carousel-inner .carousel-item-right,
-.carousel-inner .carousel-item-left{ 
+
+#recipeCarousel .carousel-inner .carousel-item-right,
+#recipeCarousel .carousel-inner .carousel-item-left {
   transform: translateX(0);
 }
+
   </style>
   
 <%-- 임시 review, notice, qna 이동 버튼 --%>
 <br><br>
-<a href="<%= request.getContextPath() %>/reviews.sp">Reviews</a>
-<a href="<%= request.getContextPath() %>/notice.sp">Notice</a>
-<a href="<%= request.getContextPath() %>/qnaList.sp">QnA</a>
+<a href="<%= request.getContextPath() %>/reviews.sp">Reviews</a>&nbsp&nbsp
+<a href="<%= request.getContextPath() %>/noticeList.sp">Notice</a>&nbsp&nbsp
+<a href="<%= request.getContextPath() %>/adminNoticeList.sp">Notice_admin</a>&nbsp&nbsp
+<a href="<%= request.getContextPath() %>/qnaList.sp">QnA</a>&nbsp&nbsp
 <a href="<%= request.getContextPath() %>/adminQnaList.sp">QnA_admin</a>
 <%-- 임시 review, notice, qna 이동 버튼 --%>
     
