@@ -501,4 +501,25 @@ public class ProductDAO_imple implements ProductDAO {
 	    }
 	    return result;
 	}
+
+	// 주문하기
+	@Override
+	public int orderAdd(Map<String, Object> paraMap) throws SQLException {
+		
+		return 0;
+	}
+
+	// 주문 상품 정보 불러오기
+	@Override
+	public ProductDTO getProductDetail(String productId) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	// 주문자 주소 가져오기
+	@Override
+	public List<Map<String, String>> getAddressList(String userid) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
