@@ -5,6 +5,7 @@ import java.util.*;
 import javax.naming.*;
 import javax.sql.DataSource;
 
+import ih.product.domain.CartDTO;
 import ih.product.domain.ProductDTO;
 
 public class ProductDAO_imple implements ProductDAO {
@@ -356,6 +357,169 @@ public class ProductDAO_imple implements ProductDAO {
 	    
 	    return wishList;
 	}
+	
+	// 장바구니
+	@Override
+	public int addCart(Map<String, String> paraMap) throws SQLException {
+	    int result = 0;
+	    
+	    try {
+	        conn = ds.getConnection();
+	        
+	        // 1. 해당 사용자의 장바구니에 해당 상품이 이미 있는지 확인합니다.
+	        String sql = " SELECT cart_id FROM tbl_cart " +
+	                     " WHERE fk_member_id = ? AND fk_product_id = ? ";
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, paraMap.get("userid"));
+	        pstmt.setString(2, paraMap.get("product_id"));
+	        
+	        rs = pstmt.executeQuery();
+	        
+	        if(rs.next()) {
+	            // 2. 이미 있다면 수량만 더해주는 UPDATE를 실행합니다.
+	            int cart_id = rs.getInt("cart_id");
+	            
+	            sql = " UPDATE tbl_cart SET cart_qty = cart_qty + ? " +
+	                  " WHERE cart_id = ? ";
+	            
+	            pstmt = conn.prepareStatement(sql);
+	            pstmt.setInt(1, Integer.parseInt(paraMap.get("cart_qty")));
+	            pstmt.setInt(2, cart_id);
+	            
+	            result = pstmt.executeUpdate();
+	        } 
+	        else {
+	            // 3. 없다면 새로 저장하는 INSERT를 실행합니다.
+	            sql = " INSERT INTO tbl_cart(cart_id, fk_member_id, fk_product_id, cart_qty) " +
+	                  " VALUES(seq_cart_id.nextval, ?, ?, ?) "; // 시퀀스명 확인 필요!
+	            
+	            pstmt = conn.prepareStatement(sql);
+	            pstmt.setString(1, paraMap.get("userid"));
+	            pstmt.setString(2, paraMap.get("product_id"));
+	            pstmt.setInt(3, Integer.parseInt(paraMap.get("cart_qty")));
+	            
+	            result = pstmt.executeUpdate();
+	        }
+	        
+	    } finally {
+	        close();
+	    }
+	    
+	    return result;
+	} // end of public int addCart(Map<String, String> paraMap) throws SQLException ----
+	
+	// 장바구니 목록 조회
+	@Override
+	public List<CartDTO> getCartList(String userid) throws SQLException {
+	    
+	    List<CartDTO> cartList = new ArrayList<>();
+	    
+	    try {
+	        conn = ds.getConnection();
+	        
+	        // 장바구니 정보와 상품 정보를 JOIN하여 가져옵니다.
+	        String sql = " SELECT C.cart_id, C.fk_member_id, C.fk_product_id, C.cart_qty, " +
+	                     "        P.product_name, P.pimage, P.sale_price, P.stock " +
+	                     " FROM tbl_cart C JOIN tbl_product P " +
+	                     " ON C.fk_product_id = P.product_id " +
+	                     " WHERE C.fk_member_id = ? " +
+	                     " ORDER BY C.cart_date DESC ";
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, userid);
+	        
+	        rs = pstmt.executeQuery();
+	        
+	        while(rs.next()) {
+	            CartDTO cdto = new CartDTO();
+	            cdto.setCart_id(rs.getInt("cart_id"));
+	            cdto.setCart_qty(rs.getInt("cart_qty"));
+	            
+	            // JOIN된 상품 정보를 ProductDTO에 담습니다.
+	            ProductDTO pdto = new ProductDTO();
+	            pdto.setProduct_id(rs.getInt("fk_product_id"));
+	            pdto.setProduct_name(rs.getString("product_name"));
+	            pdto.setPimage(rs.getString("pimage"));
+	            pdto.setSale_price(rs.getInt("sale_price"));
+	            pdto.setStock(rs.getInt("stock"));
+	            
+	            // CartDTO에 ProductDTO를 꽂아줍니다.
+	            cdto.setPdto(pdto);
+	            
+	            cartList.add(cdto);
+	        }
+	        
+	    } finally {
+	        close();
+	    }
+	    
+	    return cartList;
+	} // end of public List<CartDTO> getCartList(String userid) throws SQLException ----
     
-    
+	// 장바구니 상품 수량 업데이트
+	@Override
+	public int updateCartQty(Map<String, String> paraMap) throws SQLException {
+	    int result = 0;
+	    try {
+	        conn = ds.getConnection();
+	        
+	        String sql = " UPDATE tbl_cart SET cart_qty = cart_qty + ? " +
+	                     " WHERE cart_id = ? AND (cart_qty + ?) >= 1 ";
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        int change = Integer.parseInt(paraMap.get("change"));
+	        
+	        pstmt.setInt(1, change);
+	        pstmt.setString(2, paraMap.get("cart_id"));
+	        pstmt.setInt(3, change);
+	        
+	        result = pstmt.executeUpdate();
+	        
+	    } finally {
+	        close();
+	    }
+	    return result;
+	} // end of public int updateCartQty(Map<String, String> paraMap) throws SQLException  ----
+	
+	// 장바구니 상품 삭제
+	@Override
+	public int deleteCart(String cart_id) throws SQLException {
+	    int result = 0;
+	    try {
+	        conn = ds.getConnection();
+	        
+	        String sql = " DELETE FROM tbl_cart WHERE cart_id = ? ";
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, cart_id);
+	        
+	        result = pstmt.executeUpdate();
+	        
+	    } finally {
+	        close();
+	    }
+	    return result;
+	}
+
+	// 주문하기
+	@Override
+	public int orderAdd(Map<String, Object> paraMap) throws SQLException {
+		
+		return 0;
+	}
+
+	// 주문 상품 정보 불러오기
+	@Override
+	public ProductDTO getProductDetail(String productId) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	// 주문자 주소 가져오기
+	@Override
+	public List<Map<String, String>> getAddressList(String userid) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

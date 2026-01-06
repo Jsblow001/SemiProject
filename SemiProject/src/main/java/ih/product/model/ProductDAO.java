@@ -2,6 +2,9 @@ package ih.product.model;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
+
+import ih.product.domain.CartDTO;
 import ih.product.domain.ProductDTO;
 
 public interface ProductDAO {
@@ -33,6 +36,27 @@ public interface ProductDAO {
 
 	// 위시리스트 보기
 	List<ProductDTO> getWishList(String userid) throws SQLException;
+
+	// 장바구니 상품 추가
+	int addCart(Map<String, String> paraMap) throws SQLException;
+
+	// 장바구니 목록 조회
+	List<CartDTO> getCartList(String userid) throws SQLException;
+
+	// 장바구니 상품 수량 업데이트
+	int updateCartQty(Map<String, String> paraMap) throws SQLException;
+
+	// 장바구니 상품 삭제
+	int deleteCart(String cart_id) throws SQLException;
+
+	// 주문하기
+	int orderAdd(Map<String, Object> paraMap) throws SQLException;
+
+	// 상품 정보 가져오기
+	ProductDTO getProductDetail(String productId) throws SQLException;
+
+	// 주소 가져오기
+	List<Map<String, String>> getAddressList(String userid) throws SQLException;
 
     
     // 카테고리 리스트 가져오기 메서드 (상품 등록 폼용)

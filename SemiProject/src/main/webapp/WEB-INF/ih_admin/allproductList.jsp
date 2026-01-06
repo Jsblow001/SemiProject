@@ -80,8 +80,8 @@
             <thead class="thead-light">
                 <tr>
                     <th style="width: 80px;">ID</th>
-                    <th style="width: 120px;">이미지</th>
-                    <th>상품명</th>
+                    <th style="width: 200px;">이미지</th>
+                    <th style="width: 400px;">상품명</th>
                     <th style="width: 150px;">판매가</th>
                     <th style="width: 120px;">재고</th>
                     <th style="width: 200px;">관리</th>
