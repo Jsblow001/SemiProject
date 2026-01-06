@@ -94,7 +94,7 @@ a:hover { text-decoration: underline; }
 </head>
 
 <body>
-<jsp:include page="../../header.jsp"/>
+<jsp:include page="../../header2.jsp"/>
 
 <div class="page-wrap">
   <div class="inner">
@@ -261,6 +261,6 @@ function goSearch(){
   </div>
 </div>
 
-<jsp:include page="../../footer.jsp"/>
+<jsp:include page="../../footer2.jsp"/>
 </body>
 </html>
