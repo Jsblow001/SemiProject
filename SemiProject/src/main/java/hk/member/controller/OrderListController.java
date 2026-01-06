@@ -1,10 +1,12 @@
 package hk.member.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+
 import sp.common.controller.AbstractController;
 
 import hk.member.domain.MemberDTO;
@@ -19,48 +21,80 @@ public class OrderListController extends AbstractController {
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        HttpSession session = request.getSession();
-        MemberDTO loginuser = (MemberDTO) session.getAttribute("loginuser");
-
         /* ===============================
            1. 로그인 체크
         =============================== */
+        HttpSession session = request.getSession();
+        MemberDTO loginuser = (MemberDTO) session.getAttribute("loginuser");
+
         if (loginuser == null) {
             super.setRedirect(true);
             super.setViewPage(request.getContextPath() + "/login.sp");
             return;
         }
 
-        /* ===============================
-           2. 사용자 아이디
-        =============================== */
         String userid = loginuser.getUserid();
 
         /* ===============================
-           3. (선제적) 조회 조건 처리
-              - 상태
-              - 기간
+           2. 파라미터 받기
         =============================== */
-        String status = request.getParameter("status");      // 결제완료, 배송중 등
-        String startDate = request.getParameter("startDate");
-        String endDate = request.getParameter("endDate");
+        String status    = request.getParameter("status");     // 결제상태
+        String startDate = request.getParameter("startDate");  // yyyy-MM-dd
+        String endDate   = request.getParameter("endDate");    // yyyy-MM-dd
+        String range     = request.getParameter("range");      // today, 7d, 1m, 3m, 6m
+
+        /* ===============================
+           3. 빠른 기간(range) 처리
+        =============================== */
+        LocalDate today = LocalDate.now();
+
+        if (range != null && !"".equals(range)) {
+
+            switch (range) {
+                case "today":
+                    startDate = today.toString();
+                    endDate   = today.toString();
+                    break;
+
+                case "7d":
+                    startDate = today.minusDays(7).toString();
+                    endDate   = today.toString();
+                    break;
+
+                case "1m":
+                    startDate = today.minusMonths(1).toString();
+                    endDate   = today.toString();
+                    break;
+
+                case "3m":
+                    startDate = today.minusMonths(3).toString();
+                    endDate   = today.toString();
+                    break;
+
+                case "6m":
+                    startDate = today.minusMonths(6).toString();
+                    endDate   = today.toString();
+                    break;
+            }
+        }
 
         /* ===============================
            4. 주문 목록 조회
         =============================== */
-        List<OrderDTO> orderList = 
-                odao.selectMyOrderList(userid);
+        List<OrderDTO> orderList =
+            odao.selectMyOrderList(userid, status, startDate, endDate);
 
         /* ===============================
-           5. request 영역에 저장
+           5. request 영역에 저장 (값 유지용)
         =============================== */
         request.setAttribute("orderList", orderList);
         request.setAttribute("status", status);
         request.setAttribute("startDate", startDate);
         request.setAttribute("endDate", endDate);
+        request.setAttribute("range", range);
 
         /* ===============================
-           6. 뷰 페이지 이동
+           6. JSP 이동
         =============================== */
         super.setRedirect(false);
         super.setViewPage("/WEB-INF/hk_member/orderlist.jsp");

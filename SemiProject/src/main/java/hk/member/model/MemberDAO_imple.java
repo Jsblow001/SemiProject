@@ -789,9 +789,9 @@ public class MemberDAO_imple implements MemberDAO {
 	        conn = ds.getConnection();
 
 	        String sql = 
-	            " SELECT userid, name, gender, email, registerday, status " +
+	            " SELECT member_id, name, gender, email, mobile, registerday, status " +
 	            " FROM tbl_member " +
-	            " WHERE userid = ? ";
+	            " WHERE member_id = ? ";
 
 	        pstmt = conn.prepareStatement(sql);
 	        pstmt.setString(1, userid);
@@ -802,10 +802,11 @@ public class MemberDAO_imple implements MemberDAO {
 
 	            member = new MemberDTO();
 
-	            member.setUserid(rs.getString("userid"));
+	            member.setUserid(rs.getString("member_id"));
 	            member.setName(rs.getString("name"));
 	            member.setGender(rs.getString("gender"));       // 1 / 2 / null
-	            member.setEmail(rs.getString("email"));
+	            member.setEmail(aes.decrypt(rs.getString("email"))); // 이메일 복호화
+	            member.setMobile(aes.decrypt(rs.getString("mobile")));
 	            member.setRegisterday(rs.getString("registerday"));
 	            member.setStatus(rs.getInt("status"));          // 1:정상 / 0:탈퇴
 	        }

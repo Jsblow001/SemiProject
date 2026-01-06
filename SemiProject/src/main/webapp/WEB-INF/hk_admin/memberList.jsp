@@ -7,6 +7,7 @@
 <head>
 <meta charset="UTF-8">
 <title>관리자 | 회원관리</title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script> <%-- jquery 추가 --%>
 
 <style>
 	body {
@@ -97,7 +98,7 @@
 	        const userid = $(this).find(".userid").text().trim();
 	
 	        // hidden form에 값 넣기
-	        const frm = document.memberDetailFrm;
+	        const frm = document.memberOneDetailFrm;
 	        frm.userid.value = userid;
 	
 	        // 이동

@@ -99,6 +99,27 @@ body {
     color:#999;
 }
 
+/* ===== 주문상세 버튼 ===== */
+.btn-order-detail {
+    display:inline-block;
+    padding:6px 14px;
+    font-size:12px;
+    font-weight:500;
+    color:#3b2f2a;
+    border:1px solid #e3e0dc;
+    border-radius:20px;
+    background:#fff;
+    text-decoration:none;
+    transition:all .2s ease;
+}
+
+.btn-order-detail:hover {
+    background:#3b2f2a;
+    color:#fff;
+    border-color:#3b2f2a;
+}
+
+
 /* ===== 페이지네이션 ===== */
 .pagination {
     justify-content:center;
@@ -117,32 +138,46 @@ body {
 
     <!-- 탭 -->
     <div class="order-tabs">
-        <a href="#" class="active">주문내역 (0)</a>
+        <a href="#" class="active">주문내역 (${orderList.size()})</a>
         <a href="#">취소/교환/반품 내역 (0)</a>
     </div>
 
     <!-- 필터 -->
     <div class="filter-box">
         <div class="filter-left">
-            <select>
-                <option>전체 주문처리상태</option>
-                <option>결제완료</option>
-                <option>배송중</option>
-                <option>배송완료</option>
-            </select>
+            <form method="get" action="<%=ctxPath%>/shop/orderList.sp">
+			    <select name="status" onchange="this.form.submit()">
+			        <option value="" ${empty status ? 'selected' : ''}>전체 주문처리상태</option>
+					<option value="1" ${status == '1' ? 'selected' : ''}>결제완료</option>
+					<option value="0" ${status == '0' ? 'selected' : ''}>결제대기</option>
+					<option value="2" ${status == '2' ? 'selected' : ''}>결제취소</option>
+			    </select>
+			</form>
+
         </div>
 
         <div class="filter-right">
-            <button>오늘</button>
-            <button>1주일</button>
-            <button>1개월</button>
-            <button>3개월</button>
-            <button>6개월</button>
-            <input type="date">
-            <span>~</span>
-            <input type="date">
-            <button>조회</button>
-        </div>
+		    <form method="get" action="<%=ctxPath%>/shop/orderList.sp" style="display:flex;align-items:center;gap:6px;">
+		
+		        <!-- 빠른 기간 버튼 -->
+		        <button type="submit" name="range" value="today">오늘</button>
+		        <button type="submit" name="range" value="7d">1주일</button>
+		        <button type="submit" name="range" value="1m">1개월</button>
+		        <button type="submit" name="range" value="3m">3개월</button>
+		        <button type="submit" name="range" value="6m">6개월</button>
+		
+		        <!-- 직접 날짜 선택 -->
+		        <input type="date" name="startDate" value="${startDate}">
+		        <span>~</span>
+		        <input type="date" name="endDate" value="${endDate}">
+		
+		        <button type="submit">조회</button>
+		
+		        <!-- 상태값 유지 -->
+		        <input type="hidden" name="status" value="${status}">
+		    </form>
+		</div>
+
     </div>
 
     <!-- 안내 -->
@@ -155,19 +190,24 @@ body {
     <table class="order-table">
         <thead>
             <tr>
+            	<th style="width:5%">No</th>
                 <th style="width:18%">주문일자<br>[주문번호]</th>
                 <th>상품정보</th>
                 <th style="width:8%">수량</th>
                 <th style="width:15%">상품구매금액</th>
                 <th style="width:12%">주문처리상태</th>
                 <th style="width:12%">취소/교환/반품</th>
+                <th style="width:15%">주문상세내역</th>
             </tr>
         </thead>
         <tbody>
 			<c:choose>
 			    <c:when test="${not empty requestScope.orderList}">
-			        <c:forEach var="o" items="${requestScope.orderList}">
+			        <c:forEach var="o" items="${requestScope.orderList}" varStatus="status">
 			            <tr>
+			                <td>
+			                    ${status.count}
+			                </td>
 			                <!-- 주문일자 / 주문번호 -->
 			                <td>
 			                    <fmt:formatDate value="${o.odrDate}" pattern="yyyy-MM-dd"/><br>
@@ -198,6 +238,13 @@ body {
 			                <td>
 			                    <a href="#" style="font-size:12px;color:#999;">신청</a>
 			                </td>
+			                
+			                <td>
+							    <a href="<%=ctxPath%>/orderDetail.sp?odrcode=${o.odrCode}"
+							       class="btn-order-detail">
+							       주문상세
+							    </a>
+							</td>
 			            </tr>
 			        </c:forEach>
 			    </c:when>
