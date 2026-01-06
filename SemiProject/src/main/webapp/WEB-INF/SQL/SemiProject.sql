@@ -10,12 +10,11 @@ desc tbl_order_detail;
 select * from tbl_member;
 select * from tbl_order;
 
-
 select *
 from tbl_member
 where member_id = 'java';
 
--- 주소 삽입x
+-- 주소 삽입 x
 select *
 from tbl_address;
 
@@ -36,7 +35,7 @@ INSERT INTO tbl_order
 (odrcode, fk_member_id, fk_addr_id, odrtotalprice, odrtotalpoint, odrdate, payment_status)
 VALUES
 (seq_odrcode.nextval, 'java', 2,              -- 위에서 확인한 addr_id
-  55000, 0, SYSDATE, 1               -- 1: 결제완료
+  55000, 0, SYSDATE, 1                        -- 1: 결제완료
 );
 
 -- 커밋 꼭 하기 !!!!
@@ -82,17 +81,39 @@ SELECT *
 FROM tbl_order_detail
 WHERE fk_odrcode = 2;
 
-
-
-
-
-
 select * from tbl_product;
 
 SELECT product_id, pimage
 FROM tbl_product
 WHERE pimage IS NOT NULL;
 
+
+-- 마이페이지 주문목록 조회
+SELECT
+       o.odrcode,
+       o.odrdate,
+       o.odrtotalprice,
+       o.payment_status,
+       MIN(p.product_name) AS product_name,
+       SUM(d.odrqty) AS total_qty,
+       CASE o.payment_status
+            WHEN 0 THEN '결제대기'
+            WHEN 1 THEN '결제완료'
+            WHEN 2 THEN '결제취소'
+       END AS payment_status_name
+FROM tbl_order o
+JOIN tbl_order_detail d
+  ON o.odrcode = d.fk_odrcode
+JOIN tbl_product p
+  ON d.fk_product_id = p.product_id
+WHERE o.fk_member_id = 'java'
+GROUP BY
+       o.odrcode,
+       o.odrdate,
+       o.odrtotalprice,
+       o.payment_status
+ORDER BY o.odrdate DESC;
+-- 2	26/01/05	55000	1	안경 11	1	결제완료
 
 ------- 회원등급 테이블 --------
 create table tbl_grade
