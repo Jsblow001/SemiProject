@@ -47,6 +47,49 @@
     .heart-remove-btn:hover {
         transform: scale(1.2);
     }
+    
+    
+    /* 버튼들을 감싸는 영역 정렬 */
+	.wish-action-area {
+	    display: flex;
+	    align-items: center;
+	    justify-content: flex-end;
+	    gap: 12px; /* 아이콘 사이 간격 */
+	}
+	
+	/* 찜 버튼 & 장바구니 버튼 공통 (투명 스타일) */
+	.heart-remove-btn, .btn-cart-custom {
+	    background: none !important;  /* 배경색 제거 */
+	    border: none !important;      /* 테두리 제거 */
+	    outline: none !important;     /* 클릭 시 테두리 제거 */
+	    box-shadow: none !important;  /* 그림자 제거 */
+	    padding: 0 !important;
+	    cursor: pointer;
+	    transition: transform 0.2s ease;
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+	}
+	
+	/* 아이콘 크기 통일 */
+	.heart-remove-btn i, .btn-cart-custom i {
+	    font-size: 1.3rem; 
+	}
+	
+	/* 찜 버튼(하트) 색상 */
+	.heart-remove-btn i {
+	    color: #ff4d4d;
+	}
+	
+	/* 장바구니 버튼 색상 (원하시는 색상으로 조절 가능) */
+	.btn-cart-custom i {
+	    color: #444; 
+	}
+	
+	/* 호버 시 살짝 커지는 효과 (선택사항) */
+	.heart-remove-btn:hover, .btn-cart-custom:hover {
+	    transform: scale(1.15);
+	}
 </style>
 
 <div class="container mt-5">
@@ -73,12 +116,19 @@
                                     </p>
                                 </div>
 
-                                <div style="flex: 0 0 30%;" class="text-right">
-                                    <button type="button" class="heart-remove-btn" 
-                                            onclick="goWish('${p.product_id}', '${pageContext.request.contextPath}')"
-                                            title="찜 해제">
-                                        <i class="fas fa-heart"></i> </button>
-                                </div>
+                                <div style="flex: 0 0 35%;" class="text-right">
+								    <div class="wish-action-area">
+								        <button type="button" class="heart-remove-btn" 
+								                onclick="goWish('${p.product_id}', '${pageContext.request.contextPath}')">
+								            <i class="fas fa-heart"></i>
+								        </button>
+								            
+								        <button type="button" class="btn-cart-custom cart-btn-${p.product_id}" 
+								                onclick="goCart('${p.product_id}', '1', '${pageContext.request.contextPath}')">
+								            <i class="fas fa-shopping-cart mr-5 ml-2"></i>
+								        </button>
+								    </div>
+								</div>
 
                             </div>
                         </div>
