@@ -6,7 +6,20 @@
 
 <jsp:include page="../header.jsp" />
 
+<script type="text/javascript" src="<%= ctxPath%>/js/ih_product/product.js"></script>
+<script type="text/javascript" src="<%= ctxPath%>/js/ih_product/product.js?v=<%= System.currentTimeMillis() %>"></script>
 
+<style>
+
+.cart-icon-bold {
+    color: #000 !important;     
+    font-weight: 900 !important;
+    font-size: 1.3rem;           
+    opacity: 1 !important;       
+    text-shadow: 0.2px 0px 0px #000; 
+}
+
+</style>
 <div class="container mt-5">
     <div class="row">
         <div class="col-md-6 text-center">
@@ -55,10 +68,27 @@
                 </c:choose>
             </div>
             
-            <div class="d-flex mt-5">
-                <button class="btn btn-outline-dark btn-lg mr-2" style="flex: 1;">장바구니 담기</button>
-                <button class="btn btn-dark btn-lg" style="flex: 2;" ${pdto.stock == 0 ? 'disabled' : ''}>바로 구매하기</button>
-            </div>
+            <div class="d-flex mt-5" style="gap: 10px; align-items: center;">
+    
+			    <button type="button" class="btn btn-outline-secondary p-0 wish-btn-${p.product_id}" 
+			            style="flex: 1; height: 50px; display: flex; align-items: center; justify-content: center;"
+			            onclick="goWish('${p.product_id}', '${pageContext.request.contextPath}')">
+			        <i class="far fa-heart text-danger wish-icon-${p.product_id}" style="font-size: 1.2rem;"></i>
+			    </button>
+			    
+			    <button type="button" class="btn btn-outline-secondary p-0 cart-btn-${p.product_id}" 
+			            style="flex: 1; height: 50px; display: flex; align-items: center; justify-content: center;"
+			            onclick="goCart('${p.product_id}', '1', '<%= ctxPath %>')">
+			        <i class="fas fa-shopping-cart cart-icon-bold cart-icon-${p.product_id}" style="font-size: 1.2rem;"></i>
+			    </button>
+			    
+			    <button class="btn btn-dark" 
+			            style="flex: 3; height: 50px; font-weight: bold;" 
+			            ${pdto.stock == 0 ? 'disabled' : ''}>
+			        ${pdto.stock == 0 ? '품절' : '바로 구매하기'}
+			    </button>
+			
+			</div>
             
             <%-- 하단 수정/삭제 버튼 부분 (관리자만 보이게) --%>
 			<c:if test="${sessionScope.loginuser.userid == 'admin'}">
