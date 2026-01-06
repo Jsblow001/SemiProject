@@ -192,10 +192,38 @@
                     </tr>
                 </thead>
                 <tbody class="text-center">
-                    <tr>
-                        <td colspan="4" class="py-5 text-muted">최근 30일 내에 주문하신 내역이 없습니다.</td>
-                    </tr>
-                </tbody>
+				    <c:choose>
+				
+				        <%-- 최근 주문이 있는 경우 --%>
+				        <c:when test="${not empty recentOrderList}">
+				            <c:forEach var="o" items="${recentOrderList}">
+				                <tr>
+				                    <td>
+				                        <fmt:formatDate value="${o.odrDate}" pattern="yyyy-MM-dd"/>
+				                    </td>
+				                    <td>
+				                        ${o.productName}
+				                    </td>
+				                    <td>
+				                        <fmt:formatNumber value="${o.odrTotalPrice}" pattern="#,###"/>원
+				                    </td>
+				                    <td>
+				                        ${o.paymentStatusName}
+				                    </td>
+				                </tr>
+				            </c:forEach>
+				        </c:when>
+				
+				        <%-- 최근 주문이 없는 경우 --%>
+				        <c:otherwise>
+				            <tr>
+				                <td colspan="4" class="py-5 text-muted">
+				                    최근 30일 내에 주문하신 내역이 없습니다.
+				                </td>
+				            </tr>
+				        </c:otherwise>
+				
+				    </c:choose>
             </table>
         </div>
         

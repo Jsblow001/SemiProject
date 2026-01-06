@@ -193,7 +193,7 @@
 					        </c:otherwise>
 					    </c:choose>
 					    
-                        <a href="<%= ctxPath%>/cart/cartList.sp" class="btn p-0"><i class="fas fa-shopping-cart text-wood"></i></a>
+                        <a href="<%= ctxPath%>/product/cartList.sp" class="btn p-0"><i class="fas fa-shopping-cart text-wood"></i></a>
                     </div>
                 </div>
             </nav>

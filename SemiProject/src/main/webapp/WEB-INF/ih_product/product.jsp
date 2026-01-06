@@ -86,9 +86,9 @@
 							    <span class="small text-dark">Wish</span>
 							</button>
 							
-							<button type="button" class="btn btn-cart p-0" 
-							        onclick="goCart('${p.product_id}', '<%= ctxPath%>/js/product/product.js')">
-							    <i class="fas fa-shopping-cart text-dark mr-1"></i>
+							<button type="button" class="btn btn-cart p-0 cart-btn-${p.product_id}" 
+							        onclick="goCart('${p.product_id}', '1', '${pageContext.request.contextPath}')">
+							    <i class="fas fa-shopping-cart text-dark mr-1 cart-icon-${p.product_id}"></i>
 							    <span class="small text-dark">Cart</span>
 							</button>
 							

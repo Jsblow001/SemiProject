@@ -83,9 +83,10 @@
             <nav class="navbar navbar-expand-lg navbar-light py-2 px-xl-5 position-relative">
                 <div class="collapse navbar-collapse justify-content-start">
                     <div class="navbar-nav">
-                        <a href="#" class="nav-item nav-link mr-lg-3">SUNGLASSES</a>
-                        <a href="#" class="nav-item nav-link mr-lg-3">EYEGLASSES</a>
-                        <a href="#" class="nav-item nav-link mr-lg-3">ACC</a>
+                        <a href="<%= ctxPath %>/product/productList.sp?category=sunglasses" class="nav-item nav-link text-nowrap mr-lg-3">SUNGLASSES</a>
+                        <a href="<%= ctxPath %>/product/productList.sp?category=eyeglasses" class="nav-item nav-link text-nowrap mr-lg-3">EYEGLASSES</a>
+                        <a href="<%= ctxPath %>/product/productList.sp?category=accessory" class="nav-item nav-link text-nowrap mr-lg-3">ACC</a>
+                        <a href="<%= ctxPath %>/product/productList.sp?category=collaboration" class="nav-item nav-link text-nowrap">COLLABORATION</a>
                     </div>
                 </div>
 
@@ -102,7 +103,7 @@
                         <a href="<%= ctxPath %>/index.sp" class="nav-item nav-link text-primary font-weight-bold">사용자홈 바로가기</a>
                     </div>
                     <div class="d-inline-flex align-items-center">
-                        <a href="#" class="btn p-0 mr-3"><i class="fas fa-user text-wood"></i></a>
+                        <a href="<%= ctxPath %>/admin.sp" class="btn p-0 mr-3"><i class="fas fa-user text-wood"></i></a>
                         <a href="#" class="btn p-0"><i class="fas fa-sign-out-alt text-wood"></i></a>
                     </div>
                 </div>
@@ -131,7 +132,8 @@
                             </a>
                             <div class="collapse" id="memberSub">
                                 <div class="sub-menu-list">
-                                    <a href="#">회원목록조회</a>
+                                    <a href="<%= ctxPath %>/admin/memberMain.sp">회원 관리</a>
+                                    <a href="<%= ctxPath %>/admin/memberList.sp">회원 목록</a>
                                 </div>
                             </div>
                         </div>
@@ -158,8 +160,8 @@
                             </a>
                             <div class="collapse" id="questionSub">
                                 <div class="sub-menu-list">
-                                    <a href="#">QnA 관리</a>
-                                    <a href="#">리뷰 관리</a>
+                                    <a href="<%= ctxPath %>/adminQnaList.sp">QnA 관리</a>
+                                    <a href="<%= ctxPath %>/admin/revenueData.sp">리뷰 관리</a>
                                 </div>
                             </div>
                         </div>
@@ -172,10 +174,11 @@
                             <div class="collapse" id="operationSub">
                                 <div class="sub-menu-list">
                                     <a href="<%= ctxPath %>/revenue.sp">수익 관리</a>
-                                    <a href="#">... 관리</a>
+                                    <a href="<%= ctxPath %>/visitor.sp">방문자 관리</a>
+                                    <a href="<%= ctxPath %>/adminNoticeList.sp">공지사항 관리</a>
                                 </div>
                             </div>
-                        </div>
+                        </div> 
                         
                         
                         

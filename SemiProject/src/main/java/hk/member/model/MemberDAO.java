@@ -54,6 +54,9 @@ public interface MemberDAO {
 	// 관리자 페이지 內 회원 검색 조회
 	List<MemberDTO> selectMemberBySearch(String searchType, String searchWord) throws SQLException;
 	
+	// 관리자 페이지 內 회원 상세 조회 (입력받은 userid 를 가지고 한명의 회원정보를 가져오기) 
+	MemberDTO selectOneMember(String userid);
+	
 	// 관리자 페이지 內
 	int getTodayRegisterCount() throws SQLException;
 
@@ -72,6 +75,8 @@ public interface MemberDAO {
 
 	// 관리자 페이지 內 메인 페이지 - 성별 회원 수
 	List<MemberCountDTO> getGenderCountList() throws SQLException;
+
+	
 
 	
 

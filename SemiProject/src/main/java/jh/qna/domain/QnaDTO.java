@@ -1,15 +1,25 @@
 package jh.qna.domain;
 
+import java.sql.Date;
+
 public class QnaDTO {
+
     private long qnaId;
     private String fkMemberId;
-    private String fkAdminId;   // 답변자(관리자) - 없을 수 있음
+    private String fkAdminId;
     private String subject;
     private String content;
-    private int isSecret;       // 0/1
-    private String answer;      // CLOB
+    private int isSecret;
+    private String answer;
 
-    // getter/setter
+    private Date regDate;
+    private Date updateDate;
+
+    // ===== 목록 화면용 파생 상태 =====
+    private boolean hasReply;     // 댓글 존재 여부
+    private boolean answered;     // 관리자 답변 여부
+
+    // getter / setter
     public long getQnaId() { return qnaId; }
     public void setQnaId(long qnaId) { this.qnaId = qnaId; }
 
@@ -30,4 +40,16 @@ public class QnaDTO {
 
     public String getAnswer() { return answer; }
     public void setAnswer(String answer) { this.answer = answer; }
+
+    public Date getRegDate() { return regDate; }
+    public void setRegDate(Date regDate) { this.regDate = regDate; }
+
+    public Date getUpdateDate() { return updateDate; }
+    public void setUpdateDate(Date updateDate) { this.updateDate = updateDate; }
+
+    public boolean isHasReply() { return hasReply; }
+    public void setHasReply(boolean hasReply) { this.hasReply = hasReply; }
+
+    public boolean isAnswered() { return answered; }
+    public void setAnswered(boolean answered) { this.answered = answered; }
 }
