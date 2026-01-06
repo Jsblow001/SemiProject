@@ -174,10 +174,11 @@
                             <div class="collapse" id="operationSub">
                                 <div class="sub-menu-list">
                                     <a href="<%= ctxPath %>/revenue.sp">수익 관리</a>
-                                    <a href="#">방문자 관리</a>
+                                    <a href="<%= ctxPath %>/visitor.sp">방문자 관리</a>
+                                    <a href="<%= ctxPath %>/adminNoticeList.sp">공지사항 관리</a>
                                 </div>
                             </div>
-                        </div>
+                        </div> 
                         
                         
                         
