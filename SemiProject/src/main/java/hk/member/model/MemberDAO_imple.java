@@ -178,62 +178,79 @@ public class MemberDAO_imple implements MemberDAO {
 	}
 
     
-    // ======================================================
-    // 로그인 처리
-    // ======================================================
-    @Override
-    public MemberDTO login(Map<String, String> paraMap) throws SQLException {
+	    // ======================================================
+	   // 로그인 처리 (수정본)
+	   // ======================================================
+	   @Override
+	   public MemberDTO login(Map<String, String> paraMap) throws SQLException {
 
-        MemberDTO member = null;
+	       MemberDTO member = null;
 
-        try {
-            conn = ds.getConnection();
+	       try {
+	           conn = ds.getConnection();
 
-            String sql = " SELECT M.member_id, "
-            	   	   + "        M.name, "
-            		   + "        M.email, "
-            		   + "        M.mobile, "
-            		   + "        M.postcode, "
-            		   + "        M.address, "
-            		   + "        M.detailaddress, "
-            		   + "        M.extraaddress, "
-            		   + "        M.gender, "
-            		   + "        M.birthday, "
-            		   + "        M.point, "
-            		   + "        M.status, "
-            		   + "        M.registerday, "
-            		   + "        M.grade_code, "
-            		   + "        G.grade_name "
-            		   + " FROM tbl_member M "
-            		   + " JOIN tbl_grade G ON M.grade_code = G.grade_code "
-            		   + " WHERE M.member_id = ? AND M.passwd = ? AND M.status = 1 ";
+	           // SQL 문은 이미 필요한 컬럼들을 Join해서 잘 가져오고 있습니다.
+	           String sql = " SELECT M.member_id, "
+	                      + "        M.name, "
+	                      + "        M.email, "
+	                      + "        M.mobile, "
+	                      + "        M.postcode, "
+	                      + "        M.address, "
+	                      + "        M.detailaddress, "
+	                      + "        M.extraaddress, "
+	                      + "        M.gender, "
+	                      + "        M.birthday, "
+	                      + "        M.point, "
+	                      + "        M.status, "
+	                      + "        M.registerday, "
+	                      + "        M.grade_code, "
+	                      + "        G.grade_name "
+	                      + " FROM tbl_member M "
+	                      + " JOIN tbl_grade G ON M.grade_code = G.grade_code "
+	                      + " WHERE M.member_id = ? AND M.passwd = ? AND M.status = 1 ";
 
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, paraMap.get("userid"));
-            pstmt.setString(2, Sha256.encrypt(paraMap.get("passwd"))); // 변경
+	           pstmt = conn.prepareStatement(sql);
+	           pstmt.setString(1, paraMap.get("userid"));
+	           pstmt.setString(2, Sha256.encrypt(paraMap.get("passwd"))); 
 
-            rs = pstmt.executeQuery();
+	           rs = pstmt.executeQuery();
 
-            if (rs.next()) {
-                member = new MemberDTO();
+	           if (rs.next()) {
+	               member = new MemberDTO();
 
-                member.setUserid(rs.getString("member_id"));
-                member.setName(rs.getString("name"));
-                member.setEmail(aes.decrypt(rs.getString("email")));
-                member.setStatus(rs.getInt("status"));
-                member.setRegisterday(rs.getString("registerday"));
-                member.setGrade_name(rs.getString("grade_name"));; // ★ 카멜케이스
+	               // 1. 기본 정보 담기
+	               member.setUserid(rs.getString("member_id"));
+	               member.setName(rs.getString("name"));
+	               
+	               // 2. 암호화된 정보 복호화해서 담기 (핵심!)
+	               member.setEmail(aes.decrypt(rs.getString("email")));
+	               member.setMobile(aes.decrypt(rs.getString("mobile")));
+	               
+	               // 3. 주소 및 상세 정보 담기 (기존에 누락된 부분)
+	               member.setPostcode(rs.getString("postcode"));
+	               member.setAddress(rs.getString("address"));
+	               member.setDetailaddress(rs.getString("detailaddress"));
+	               member.setExtraaddress(rs.getString("extraaddress"));
+	               
+	               member.setGender(rs.getString("gender"));
+	               member.setBirthday(rs.getString("birthday"));
+	               member.setPoint(rs.getInt("point"));
+	               
+	               member.setStatus(rs.getInt("status"));
+	               member.setRegisterday(rs.getString("registerday"));
+	               member.setGrade_code(rs.getString("grade_code"));
+	               member.setGrade_name(rs.getString("grade_name"));
 
-            }
+	           }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            close();
-        }
+	       } catch (Exception e) {
+	           e.printStackTrace();
+	       } finally {
+	           close();
+	       }
 
-        return member;
-    }
+	       return member;
+	   }
     
     
     // ======================================================
