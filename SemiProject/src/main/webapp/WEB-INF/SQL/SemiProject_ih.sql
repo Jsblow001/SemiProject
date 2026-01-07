@@ -685,3 +685,74 @@ BEGIN
   END LOOP;
   COMMIT;
 END;
+
+select *
+from tbl_cart;
+
+select *
+from tbl_wishlist;
+
+select *
+from tbl_address;
+
+-- 1. 현재 테이블의 최대 주문번호 확인
+SELECT MAX(odrcode) FROM tbl_order;
+
+-- 2. 만약 최대값이 10인데 시퀀스가 5라면 에러가 납니다. 
+-- 시퀀스를 현재 최대값보다 크게 점프시킵니다.
+ALTER SEQUENCE seq_odrcode INCREMENT BY 100; -- 100만큼 증가하도록 설정
+SELECT seq_odrcode.nextval FROM dual;        -- 실행하여 값을 확 올림
+ALTER SEQUENCE seq_odrcode INCREMENT BY 1;   -- 다시 1씩 증가하도록 복구
+
+commit;
+
+select *
+from tbl_order;
+
+-- 1. 현재 테이블에 들어있는 주문번호 중 가장 큰 값을 확인 (예: 100번이 나왔다고 가정)
+SELECT MAX(odrcode) FROM tbl_order;
+
+-- 2. 현재 시퀀스가 몇 번인지 확인 (예: 95번이 나왔다고 가정 -> 다음 인서트 시 96번을 쓰려다 중복 에러 발생)
+SELECT seq_odrcode.nextval FROM dual;
+
+-- 3. 위 2번 쿼리를 테이블 최대값(100)보다 커질 때까지 여러 번 실행하세요.
+-- 101, 102... 이렇게 나올 때까지 실행하면 해결됩니다.
+
+--------------------------------------------------------------------------
+
+-- 1. 현재 시퀀스 삭제
+DROP SEQUENCE seq_odrcode;
+
+-- 2. 현재 테이블의 최대값 확인 (예를 들어 가데이터 최대 번호가 10이라면)
+SELECT MAX(odrcode) FROM tbl_order;
+
+-- 3. 최대값보다 큰 번호부터 시작하도록 시퀀스 생성 (예: 11부터 시작)
+CREATE SEQUENCE seq_odrcode
+START WITH 107  -- 위에서 확인한 MAX값 + 1 을 넣으세요
+INCREMENT BY 1
+NOMAXVALUE
+NOMINVALUE
+NOCYCLE
+NOCACHE;
+
+commit;
+
+
+
+-- 1. 현재 시퀀스 삭제
+DROP SEQUENCE seq_odrdetailno;
+
+-- 2. 현재 테이블의 최대값 확인 (예를 들어 가데이터 최대 번호가 10이라면)
+SELECT MAX(odrdetailno) FROM tbl_order_detail;
+
+
+-- 3. 최대값보다 큰 번호부터 시작하도록 시퀀스 생성 (예: 11부터 시작)
+CREATE SEQUENCE seq_odrdetailno
+START WITH 107  -- 위에서 확인한 MAX값 + 1 을 넣으세요
+INCREMENT BY 1
+NOMAXVALUE
+NOMINVALUE
+NOCYCLE
+NOCACHE;
+
+commit;
