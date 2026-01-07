@@ -29,7 +29,15 @@ public class ReviewsController extends AbstractController {
         String sort = request.getParameter("sort");           // recent | rating
         String searchWord = request.getParameter("searchWord");
         String currentShowPageNo = request.getParameter("currentShowPageNo");
+        String midSort = request.getParameter("midSort");
+        
+        
+        if(midSort == null || midSort.isBlank()) midSort = "reviewCount";
+        request.setAttribute("midSort", midSort);
 
+        int limit = 4;
+
+        
         if (sort == null || sort.isBlank()) sort = "recent";
         if (searchWord == null) searchWord = "";
         searchWord = searchWord.trim();
@@ -64,6 +72,10 @@ public class ReviewsController extends AbstractController {
         request.setAttribute("searchWord", searchWord);
         request.setAttribute("currentShowPageNo", nCurrentPage);
         request.setAttribute("totalPage", totalPage);
+        request.setAttribute("mid_reviewCount", rdao.selectMidRankProducts("reviewCount", limit));
+        request.setAttribute("mid_recentSales", rdao.selectMidRankProducts("recentSales", limit));
+        request.setAttribute("mid_avgRating",  rdao.selectMidRankProducts("avgRating",  limit));
+        request.setAttribute("mid_newProduct", rdao.selectMidRankProducts("newProduct", limit));
 
         super.setRedirect(false);
         super.setViewPage("/WEB-INF/jh_views/reviews.jsp");

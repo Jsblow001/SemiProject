@@ -361,4 +361,127 @@ public class ReviewDAO_imple implements ReviewDAO {
 
         return result;
     }
+    
+    
+    
+    @Override
+    public List<Map<String, Object>> selectMidRankProducts(String sortKey, int limit) throws SQLException {
+
+        List<Map<String, Object>> list = new ArrayList<>();
+
+        try {
+            conn = ds.getConnection();
+
+            String sql;
+
+            switch (sortKey) {
+
+                // 1) 리뷰 많은순
+                case "reviewCount":
+                    sql =
+                        " SELECT p.product_id, p.product_name AS code, " +
+                        "        COUNT(r.review_id) AS review_cnt, " +
+                        "        NVL(ROUND(AVG(r.rating), 1), 0) AS avg_rating, " +
+                        "        TO_CHAR(p.stock_date, 'yyyy-mm-dd') AS stock_date " +
+                        " FROM tbl_product p " +
+                        " LEFT JOIN tbl_product_review r " +
+                        "   ON r.fk_product_id = p.product_id " +
+                        " GROUP BY p.product_id, p.product_name, p.stock_date " +
+                        " ORDER BY review_cnt DESC, p.product_id DESC " +
+                        " FETCH FIRST ? ROWS ONLY ";
+                    break;
+
+                // 2) 리뷰 평점순 (리뷰 있는 상품만)
+                case "avgRating":
+                    sql =
+                        " SELECT p.product_id, p.product_name AS code, " +
+                        "        COUNT(r.review_id) AS review_cnt, " +
+                        "        ROUND(AVG(r.rating), 1) AS avg_rating, " +
+                        "        TO_CHAR(p.stock_date, 'yyyy-mm-dd') AS stock_date " +
+                        " FROM tbl_product p " +
+                        " JOIN tbl_product_review r " +
+                        "   ON r.fk_product_id = p.product_id " +
+                        " GROUP BY p.product_id, p.product_name, p.stock_date " +
+                        " ORDER BY avg_rating DESC, review_cnt DESC, p.product_id DESC " +
+                        " FETCH FIRST ? ROWS ONLY ";
+                    break;
+
+                // 3) 최근 판매량순 (최근 주문일 큰 순 → 그 다음 판매수량)
+                case "recentSales":
+                    sql =
+                        " SELECT p.product_id, p.product_name AS code, " +
+                        "        MAX(o.odrdate) AS last_sale_date, " +
+                        "        SUM(od.odrqty) AS sale_qty, " +
+                        "        COUNT(r.review_id) AS review_cnt, " +
+                        "        NVL(ROUND(AVG(r.rating), 1), 0) AS avg_rating, " +
+                        "        TO_CHAR(p.stock_date, 'yyyy-mm-dd') AS stock_date " +
+                        " FROM tbl_product p " +
+                        " JOIN tbl_order_detail od " +
+                        "   ON od.fk_product_id = p.product_id " +
+                        " JOIN tbl_order o " +
+                        "   ON o.odrcode = od.fk_odrcode " +
+                        " LEFT JOIN tbl_product_review r " +
+                        "   ON r.fk_product_id = p.product_id " +
+                        " WHERE o.payment_status = 1 " +   // ✅ A안: 결제완료만 집계 (JOIN 뒤에!)
+                        " GROUP BY p.product_id, p.product_name, p.stock_date " +
+                        " ORDER BY MAX(o.odrdate) DESC, SUM(od.odrqty) DESC, p.product_id DESC " +
+                        " FETCH FIRST ? ROWS ONLY ";
+                    break;
+
+
+
+
+                // 4) 최근 상품순 (입고일 최신)
+                case "newProduct":
+                    sql =
+                        " SELECT p.product_id, p.product_name AS code, " +
+                        "        COUNT(r.review_id) AS review_cnt, " +
+                        "        NVL(ROUND(AVG(r.rating), 1), 0) AS avg_rating, " +
+                        "        TO_CHAR(p.stock_date, 'yyyy-mm-dd') AS stock_date " +
+                        " FROM tbl_product p " +
+                        " LEFT JOIN tbl_product_review r " +
+                        "   ON r.fk_product_id = p.product_id " +
+                        " GROUP BY p.product_id, p.product_name, p.stock_date " +
+                        " ORDER BY p.stock_date DESC, p.product_id DESC " +
+                        " FETCH FIRST ? ROWS ONLY ";
+                    break;
+
+                default:
+                    throw new SQLException("Unknown sortKey: " + sortKey);
+            }
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, limit);
+
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Map<String, Object> m = new HashMap<>();
+
+                m.put("productId", rs.getLong("product_id"));
+                m.put("code", rs.getString("code"));
+
+                // 이미지 컬럼이 DB에 없으니 일단 기본값(또는 null)로
+                m.put("main", "img/product/default.png");
+
+                // 공통
+                m.put("count", rs.getInt("review_cnt"));
+                m.put("rating", rs.getDouble("avg_rating"));
+                m.put("stockDate", rs.getString("stock_date"));
+
+                // recentSales 전용
+                if ("recentSales".equals(sortKey)) {
+                    m.put("salesQty", rs.getInt("sale_qty"));
+                }
+
+                list.add(m);
+            }
+
+        } finally {
+            close(); // 너 프로젝트에서 쓰는 자원반납 메서드
+        }
+
+        return list;
+    }
+
 }
