@@ -19,16 +19,11 @@
 
     <div class="row">
         <div class="col-lg-9">
-            <div class="mb-2">
-                <button type="button" class="btn btn-outline-secondary btn-sm" 
-                        onclick="deleteSelected('${pageContext.request.contextPath}')">선택 삭제</button>
-            </div>
-            
             <table class="table table-hover">
                 <thead class="thead-light">
                     <tr>
                         <th style="width: 50px;">
-                            <input type="checkbox" id="checkAll" class="cart-checkbox">
+                            <input type="checkbox" id="checkAll" class="cart-checkbox" checked>
                         </th>
                         <th>이미지</th>
                         <th>상품명</th>
@@ -40,11 +35,13 @@
                 </thead>
                 <tbody>
                     <c:if test="${not empty cartList}">
-                        <c:set var="totalSum" value="0" />
                         <c:forEach var="cart" items="${cartList}">
                             <tr>
                                 <td>
-                                    <input type="checkbox" name="cartCheck" class="cart-checkbox chk" value="${cart.cart_id}">
+                                    <input type="checkbox" name="cartCheck" class="cart-checkbox chk" 
+                                           value="${cart.cart_id}" 
+                                           data-unit-price="${cart.pdto.sale_price}"
+                                           data-price="${cart.pdto.sale_price * cart.cart_qty}" checked>
                                 </td>
                                 <td>
                                     <img src="${pageContext.request.contextPath}/img/${cart.pdto.pimage}" class="cart-img">
@@ -76,7 +73,6 @@
                                     </button>
                                 </td>
                             </tr>
-                            <c:set var="totalSum" value="${totalSum + (cart.pdto.sale_price * cart.cart_qty)}" />
                         </c:forEach>
                     </c:if>
                     
@@ -95,23 +91,16 @@
                 <hr>
                 <div class="d-flex justify-content-between mb-2">
                     <span>상품 금액</span>
-                    <span><fmt:formatNumber value="${totalSum}" pattern="#,###" />원</span>
+                    <span id="display-totalSum">0원</span> 
                 </div>
                 <div class="d-flex justify-content-between mb-2">
                     <span>배송비</span>
-                    <span>
-                        <c:choose>
-                            <c:when test="${totalSum >= 50000 || totalSum == 0}">0원</c:when>
-                            <c:otherwise>3,000원</c:otherwise>
-                        </c:choose>
-                    </span>
+                    <span id="display-delivery">0원</span> 
                 </div>
                 <hr>
                 <div class="d-flex justify-content-between mb-4">
                     <strong>총 결제금액</strong>
-                    <strong class="text-danger" style="font-size: 1.2rem;">
-                        <fmt:formatNumber value="${totalSum + (totalSum >= 50000 || totalSum == 0 ? 0 : 3000)}" pattern="#,###" />원
-                    </strong>
+                    <strong id="display-finalPrice" class="text-danger" style="font-size: 1.2rem;">0원</strong> 
                 </div>
                 <button class="btn btn-primary btn-block btn-lg" onclick="goOrder()">주문하기</button>
             </div>
@@ -121,26 +110,69 @@
 
 <script>
     $(document).ready(function() {
-        // [전체 선택] 체크박스
-        $("#checkAll").click(function() {
+
+        calculateTotal();
+
+        // [전체 선택] 체크박스 이벤트
+        $("#checkAll").on("click", function() {
             $(".chk").prop("checked", $(this).is(":checked"));
+            calculateTotal();
         });
 
-        // [개별 체크박스] 클릭 시 전체 선택 체크박스 상태 업데이트
+        // [개별 체크박스] 클릭 이벤트
         $(document).on("click", ".chk", function() {
             let total = $(".chk").length;
             let checked = $(".chk:checked").length;
             $("#checkAll").prop("checked", total === checked);
+            calculateTotal();
         });
     });
 
+    // 실시간 금액 계산 함수
+    function calculateTotal() {
+        let totalSum = 0;
+        
+        // 체크된 항목들의 price 합산
+        $(".chk:checked").each(function() {
+            let price = $(this).attr("data-price");
+            if(price) {
+                totalSum += parseInt(price);
+            }
+        });
+
+        // 배송비 계산 (5만원 이상 무료)
+        let delivery = 0;
+        if(totalSum > 0 && totalSum < 50000) {
+            delivery = 3000;
+        }
+
+        let finalPrice = totalSum + delivery;
+
+        // 화면 갱신
+        $("#display-totalSum").text(totalSum.toLocaleString() + "원");
+        $("#display-delivery").text(delivery.toLocaleString() + "원");
+        $("#display-finalPrice").text(finalPrice.toLocaleString() + "원");
+    }
+
     // 주문 페이지 이동
     function goOrder() {
-        if($(".chk").length == 0) {
-            alert("장바구니에 담긴 상품이 없습니다.");
+        let checkCnt = $(".chk:checked").length;
+        
+        if(checkCnt == 0) {
+            alert("주문할 상품을 선택하세요.");
             return;
         }
-        location.href = "${pageContext.request.contextPath}/order/checkout.sp";
+
+        let cartIdArr = [];
+        $(".chk:checked").each(function() {
+            cartIdArr.push($(this).val());
+        });
+        
+        let cartIds = cartIdArr.join(","); 
+        
+        if(confirm("선택하신 " + checkCnt + "개의 상품을 주문하시겠습니까?")) {
+            location.href = "${pageContext.request.contextPath}/product/orderForm.sp?cartIds=" + cartIds;
+        }
     }
 </script>
 
