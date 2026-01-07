@@ -46,6 +46,12 @@ public class NoticeListController extends AbstractController {
         // 페이지바
         String pageBar = makePageBar(request.getContextPath() + "/noticeList.sp", currentShowPageNo, totalPage);
 
+        // 전체 공지글 개수 조회
+        int totalNoticeCount = ndao.getTotalNoticeCount(paraMap);
+
+        request.setAttribute("totalNoticeCount", totalNoticeCount);
+        
+        request.setAttribute("sizePerPage", sizePerPage);
         request.setAttribute("fixedList", fixedList);
         request.setAttribute("noticeList", noticeList);
         request.setAttribute("totalPage", totalPage);
