@@ -30,6 +30,7 @@ public class MemberEditEndController extends AbstractController {
             }
 
             // 1. 데이터 받아오기 
+            String userid = request.getParameter("userid");
             String name = request.getParameter("name");
             String email = request.getParameter("email");
             String mobile = request.getParameter("mobile");
@@ -42,6 +43,7 @@ public class MemberEditEndController extends AbstractController {
             String new_passwd = request.getParameter("new_passwd");
 
             // 2. 빈칸 처리 로직 (빈칸이면 기존 정보 유지)
+            if (userid == null || userid.trim().isEmpty()) { userid = loginuser.getUserid(); }
             if (name == null || name.trim().isEmpty()) { name = loginuser.getName(); }
             if (email == null || email.trim().isEmpty()) { email = loginuser.getEmail(); }
             if (mobile == null || mobile.trim().isEmpty()) { mobile = loginuser.getMobile(); }
@@ -54,6 +56,7 @@ public class MemberEditEndController extends AbstractController {
 
             // 3. DTO 객체 생성 및 데이터 담기
             MemberDTO member = new MemberDTO();
+            member.setUserid(userid);
             member.setName(name);
             member.setEmail(email);
             member.setMobile(mobile);

@@ -685,3 +685,26 @@ BEGIN
   END LOOP;
   COMMIT;
 END;
+
+select *
+from tbl_member
+where name = '나나나';
+
+update tbl_member set grade_code = 1
+;
+
+select *
+from tbl_order;
+
+SELECT fk_member_id, SUM(odrtotalprice) AS total_amount
+FROM tbl_order
+WHERE payment_status = 1  -- 결제 완료된 건만
+GROUP BY fk_member_id;
+
+desc tbl_order
+
+COMMIT;
+
+
+
+

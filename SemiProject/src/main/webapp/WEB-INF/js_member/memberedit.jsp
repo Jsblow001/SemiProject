@@ -154,7 +154,7 @@
             </button>
 
             <button type="button"
-                    class="btn btn-outline-secondary btn-block border-0"
+                    class="btn btn-outline-danger btn-block border-0"
                     style="border-radius:0; padding:15px; font-weight:bold;"
                     onclick="history.back()">
                 CANCEL
