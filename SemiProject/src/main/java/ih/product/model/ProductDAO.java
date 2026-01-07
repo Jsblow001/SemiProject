@@ -58,7 +58,16 @@ public interface ProductDAO {
 	// 주소 가져오기
 	List<Map<String, String>> getAddressList(String userid) throws SQLException;
 
+	// 장바구니에서 여러 상품 주문 시
+	List<Map<String, Object>> getCartListByCartIds(String cartIds) throws SQLException;
+
+	// 주문 완료 후 장바구니 비우기
+	int deleteCartList(String cartIds) throws SQLException;
     
+	// 주소 등록하기
+	int registerAddress(Map<String, String> paraMap) throws SQLException;
+	
+	
     // 카테고리 리스트 가져오기 메서드 (상품 등록 폼용)
     // List<CategoryDTO> selectCategoryList() throws SQLException;
     

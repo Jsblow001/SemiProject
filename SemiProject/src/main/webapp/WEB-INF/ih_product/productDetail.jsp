@@ -70,16 +70,16 @@
             
             <div class="d-flex mt-5" style="gap: 10px; align-items: center;">
     
-			    <button type="button" class="btn btn-outline-secondary p-0 wish-btn-${p.product_id}" 
+			    <button type="button" class="btn btn-outline-secondary p-0 wish-btn-${pdto.product_id}" 
 			            style="flex: 1; height: 50px; display: flex; align-items: center; justify-content: center;"
-			            onclick="goWish('${p.product_id}', '${pageContext.request.contextPath}')">
-			        <i class="far fa-heart text-danger wish-icon-${p.product_id}" style="font-size: 1.2rem;"></i>
+			            onclick="goWish('${pdto.product_id}', '${pageContext.request.contextPath}')">
+			        <i class="far fa-heart text-danger wish-icon-${pdto.product_id}" style="font-size: 1.2rem;"></i>
 			    </button>
 			    
-			    <button type="button" class="btn btn-outline-secondary p-0 cart-btn-${p.product_id}" 
+			    <button type="button" class="btn btn-outline-secondary p-0 cart-btn-${pdto.product_id}" 
 			            style="flex: 1; height: 50px; display: flex; align-items: center; justify-content: center;"
-			            onclick="goCart('${p.product_id}', '1', '<%= ctxPath %>')">
-			        <i class="fas fa-shopping-cart cart-icon-bold cart-icon-${p.product_id}" style="font-size: 1.2rem;"></i>
+			            onclick="goCart('${pdto.product_id}', '1', '<%= ctxPath %>')">
+			        <i class="fas fa-shopping-cart cart-icon-bold cart-icon-${pdto.product_id}" style="font-size: 1.2rem;"></i>
 			    </button>
 			    
 			    <button class="btn btn-dark" 

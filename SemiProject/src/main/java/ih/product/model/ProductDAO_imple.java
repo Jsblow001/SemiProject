@@ -358,15 +358,21 @@ public class ProductDAO_imple implements ProductDAO {
 	    return wishList;
 	}
 	
-	// 장바구니
+	// 장바구니 추가
 	@Override
 	public int addCart(Map<String, String> paraMap) throws SQLException {
-	    int result = 0;
+	    
+		System.out.println("~~~ 확인용 userid : " + paraMap.get("userid"));
+	    System.out.println("~~~ 확인용 product_id : " + paraMap.get("product_id"));
+	    System.out.println("~~~ 확인용 cart_qty : " + paraMap.get("cart_qty"));
+		
+		
+		int result = 0;
 	    
 	    try {
 	        conn = ds.getConnection();
 	        
-	        // 1. 해당 사용자의 장바구니에 해당 상품이 이미 있는지 확인합니다.
+	        // 사용자의 장바구니에 해당 상품이 이미 있는지 확인
 	        String sql = " SELECT cart_id FROM tbl_cart " +
 	                     " WHERE fk_member_id = ? AND fk_product_id = ? ";
 	        
@@ -377,7 +383,7 @@ public class ProductDAO_imple implements ProductDAO {
 	        rs = pstmt.executeQuery();
 	        
 	        if(rs.next()) {
-	            // 2. 이미 있다면 수량만 더해주는 UPDATE를 실행합니다.
+	            // 이미 있다면 수량만 더해주는 UPDATE 실행
 	            int cart_id = rs.getInt("cart_id");
 	            
 	            sql = " UPDATE tbl_cart SET cart_qty = cart_qty + ? " +
@@ -390,9 +396,9 @@ public class ProductDAO_imple implements ProductDAO {
 	            result = pstmt.executeUpdate();
 	        } 
 	        else {
-	            // 3. 없다면 새로 저장하는 INSERT를 실행합니다.
+	            // 없다면 새로 저장하는 INSERT 실행
 	            sql = " INSERT INTO tbl_cart(cart_id, fk_member_id, fk_product_id, cart_qty) " +
-	                  " VALUES(seq_cart_id.nextval, ?, ?, ?) "; // 시퀀스명 확인 필요!
+	                  " VALUES(seq_cart_id.nextval, ?, ?, ?) "; 
 	            
 	            pstmt = conn.prepareStatement(sql);
 	            pstmt.setString(1, paraMap.get("userid"));
@@ -501,25 +507,244 @@ public class ProductDAO_imple implements ProductDAO {
 	    }
 	    return result;
 	}
-
-	// 주문하기
+	
+	// 장바구니에서 주문하기
 	@Override
 	public int orderAdd(Map<String, Object> paraMap) throws SQLException {
-		
-		return 0;
+	    int result = 0;
+	    
+	    try {
+	        conn = ds.getConnection();
+	        conn.setAutoCommit(false); // [트랜잭션 시작] 수동 커밋 모드
+
+	        // 주문 메인 테이블(tbl_order)에 인서트
+	        String sql = " insert into tbl_order(odrcode, fk_member_id, fk_addr_id, odrtotalprice, odrtotalpoint, payment_status) "
+	                   + " values(seq_odrcode.nextval, ?, ?, ?, ?, 1) ";
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, String.valueOf(paraMap.get("userid")));
+	        pstmt.setString(2, String.valueOf(paraMap.get("addr_id")));
+	        pstmt.setInt(3, Integer.parseInt(String.valueOf(paraMap.get("totalPrice"))));
+	        pstmt.setInt(4, Integer.parseInt(String.valueOf(paraMap.get("totalPoint"))));
+	        
+	        int n1 = pstmt.executeUpdate();
+
+	        if(n1 != 1) {
+	            conn.rollback();
+	            return 0;
+	        }
+
+	        String orderType = (String)paraMap.get("orderType");
+	        List<Map<String, Object>> itemList = new ArrayList<>();
+
+	        if("direct".equals(orderType)) {
+	            // [단건 주문] 
+	            Map<String, Object> directItem = new HashMap<>();
+	            directItem.put("product_id", paraMap.get("product_id"));
+	            directItem.put("qty", paraMap.get("qty"));
+	            directItem.put("sale_price", paraMap.get("sale_price"));
+	            itemList.add(directItem);
+	        } else {
+	            // [장바구니 주문]
+	            String cartIds = String.valueOf(paraMap.get("cartIds"));
+	            String sql_cart = " select c.fk_product_id, c.cart_qty, p.sale_price "
+	                            + " from tbl_cart c join tbl_product p on c.fk_product_id = p.product_id "
+	                            + " where c.cart_id in (" + cartIds + ") ";
+	            
+	            // 별도의 pstmt2와 rs2를 사용하여 메인 커넥션을 유지
+	            try (PreparedStatement pstmt2 = conn.prepareStatement(sql_cart);
+	                 ResultSet rs2 = pstmt2.executeQuery()) {
+	                while(rs2.next()) {
+	                    Map<String, Object> map = new HashMap<>();
+	                    map.put("product_id", rs2.getString("fk_product_id"));
+	                    map.put("qty", rs2.getInt("cart_qty"));
+	                    map.put("sale_price", rs2.getInt("sale_price"));
+	                    itemList.add(map);
+	                }
+	            }
+	        }
+
+	        // 상세 인서트 및 재고 차감
+	        int n2_total = 1;
+	        int n3_total = 1;
+
+	        for(Map<String, Object> item : itemList) {
+	            // 주문 상세 테이블(tbl_order_detail) 인서트
+	            sql = " insert into tbl_order_detail(odrdetailno, fk_odrcode, fk_product_id, odrqty, odrprice) "
+	                + " values(seq_odrdetailno.nextval, seq_odrcode.currval, ?, ?, ?) ";
+	            
+	            pstmt = conn.prepareStatement(sql);
+	            pstmt.setString(1, String.valueOf(item.get("product_id")));
+	            pstmt.setInt(2, Integer.parseInt(String.valueOf(item.get("qty"))));
+	            pstmt.setInt(3, Integer.parseInt(String.valueOf(item.get("sale_price"))));
+	            
+	            if(pstmt.executeUpdate() != 1) { n2_total = 0; break; }
+
+	            // 제품 재고량 업데이트(차감) - 재고가 주문량보다 많을 때만 성공
+	            sql = " update tbl_product set stock = stock - ? "
+	                + " where product_id = ? and stock >= ? ";
+	            
+	            pstmt = conn.prepareStatement(sql);
+	            int qty = Integer.parseInt(String.valueOf(item.get("qty")));
+	            pstmt.setInt(1, qty);
+	            pstmt.setString(2, String.valueOf(item.get("product_id")));
+	            pstmt.setInt(3, qty);
+	            
+	            if(pstmt.executeUpdate() != 1) { n3_total = 0; break; }
+	        }
+
+	        // 장바구니 비우기 (장바구니 주문인 경우에만)
+	        int n4 = 1;
+	        if("cart".equals(orderType)) {
+	            String cartIds = String.valueOf(paraMap.get("cartIds"));
+	            sql = " delete from tbl_cart where cart_id in (" + cartIds + ") ";
+	            pstmt = conn.prepareStatement(sql);
+	            n4 = pstmt.executeUpdate(); // 삭제된 행이 1개 이상이면 성공
+	        }
+	        
+	        // 회원 포인트 업데이트
+	        sql = " update tbl_member set point = point + ? "
+	            + " where member_id = ? ";
+
+	        pstmt = conn.prepareStatement(sql);
+
+	        pstmt.setInt(1, Integer.parseInt(String.valueOf(paraMap.get("totalPoint"))));
+	        pstmt.setString(2, String.valueOf(paraMap.get("userid")));
+
+	        int n5 = pstmt.executeUpdate();
+
+	        if(n1 == 1 && n2_total == 1 && n3_total == 1 && n4 > 0 && n5 == 1) {
+	            conn.commit();   // [전체 성공]
+	            result = 1;
+	        } else {
+	            conn.rollback(); // [하나라도 실패 시 전체 취소]
+	            result = 0;
+	        }
+
+	    } catch (Exception e) { 
+	        if(conn != null) conn.rollback(); // 예외 발생 시 무조건 롤백
+	        e.printStackTrace(); 
+	        result = 0;
+	    } finally {
+	        if(conn != null) conn.setAutoCommit(true); // 커밋 모드 복구
+	        close(); // 커넥션 반납
+	    }
+
+	    return result;
 	}
 
-	// 주문 상품 정보 불러오기
+	// 주문 상품 정보 불러오기 -> 상품 상세페이지, 바로 구매시
 	@Override
 	public ProductDTO getProductDetail(String productId) throws SQLException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	// 장바구니에서 여러 상품 주문
+	@Override
+	public List<Map<String, Object>> getCartListByCartIds(String cartIds) throws SQLException {
+	    List<Map<String, Object>> orderList = new ArrayList<>();
+	    try {
+	        conn = ds.getConnection();
+	        String sql = " select c.cart_id, c.fk_product_id, c.cart_qty, "
+	                   + "        p.product_name, p.pimage, p.sale_price "
+	                   + " from tbl_cart c join tbl_product p "
+	                   + " on c.fk_product_id = p.product_id "
+	                   + " where c.cart_id in (" + cartIds + ") ";
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        rs = pstmt.executeQuery();
+	        
+	        while(rs.next()) {
+	            Map<String, Object> map = new HashMap<>();
+	            map.put("product_id", rs.getString("fk_product_id")); // 상세 테이블용
+	            map.put("cart_qty", rs.getInt("cart_qty"));           // 주문 수량
+	            map.put("sale_price", rs.getInt("sale_price"));       // 실제 DB 가격
+
+	            orderList.add(map);
+	        }
+	    } finally {
+	        close();
+	    }
+	    return orderList;
+	}
+	
 	// 주문자 주소 가져오기
+	// 주문자 주소 목록 가져오기
 	@Override
 	public List<Map<String, String>> getAddressList(String userid) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+	    
+	    List<Map<String, String>> addrList = new ArrayList<>();
+	    
+	    try {
+	        conn = ds.getConnection();
+	        
+	        String sql = " select addr_id, postcode, address, detailaddress, extraaddress "
+	                   + " from tbl_address "
+	                   + " where fk_member_id = ? "
+	                   + " order by addr_id desc "; 
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, userid);
+	        
+	        rs = pstmt.executeQuery();
+	        
+	        while(rs.next()) {
+	            Map<String, String> map = new HashMap<>();
+	            map.put("addr_id", rs.getString("addr_id"));
+	            map.put("postcode", rs.getString("postcode"));
+	            map.put("address", rs.getString("address"));
+	            map.put("detailaddress", rs.getString("detailaddress"));
+	            map.put("extraaddress", rs.getString("extraaddress"));
+	            
+	            addrList.add(map);
+	        }
+	        
+	    } finally {
+	        close();
+	    }
+	    
+	    return addrList;
+	}
+	
+	// 주소 등록하기
+	@Override
+	public int registerAddress(Map<String, String> paraMap) throws SQLException {
+	    int n = 0;
+	    try {
+	        conn = ds.getConnection();
+	        
+	        String sql = " insert into tbl_address(addr_id, fk_member_id, postcode, address, detailaddress, extraaddress) "
+	                   + " values(seq_addr_id.nextval, ?, ?, ?, ?, ?) ";
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, paraMap.get("userid"));
+	        pstmt.setString(2, paraMap.get("postcode"));
+	        pstmt.setString(3, paraMap.get("address"));
+	        pstmt.setString(4, paraMap.get("detailaddress"));
+	        pstmt.setString(5, paraMap.get("extraaddress"));
+	        
+	        n = pstmt.executeUpdate();
+	    } finally {
+	        close();
+	    }
+	    return n;
+	}
+
+	// 주문 완료 후 장바구니 비우기
+	@Override
+	public int deleteCartList(String cartIds) throws SQLException {
+	    int n = 0;
+	    try {
+	        conn = ds.getConnection();
+	        // 주문에 사용된 장바구니 항목들만 삭제
+	        String sql = " delete from tbl_cart where cart_id in (" + cartIds + ") ";
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        n = pstmt.executeUpdate();
+	    } finally {
+	        close();
+	    }
+	    return n;
 	}
 }
