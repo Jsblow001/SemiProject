@@ -23,6 +23,8 @@ public class MemberDTO {
 	private String grade_code;		   // 등급코드   
 	private String grade_name;		   // 등급이름
 	private double save_rate;		   // 적립률
+	
+	private int total_amount;          // DB 테이블에는 없지만, 주문 합계액을 담기 위한 용도
 	// ============================================================== //
 
 	// only select 용 
@@ -171,5 +173,14 @@ public class MemberDTO {
 		this.save_rate = save_rate;
 	}
 	
+	
+	
+	// 총합산 getter/setter
+	public int getTotal_amount() {
+		return total_amount;
+	}
+	public void setTotal_amount(int total_amount) {
+		this.total_amount = total_amount;
+	}
 	
 }
