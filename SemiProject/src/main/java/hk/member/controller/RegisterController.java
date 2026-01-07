@@ -4,6 +4,7 @@ import sp.common.controller.AbstractController;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import hk.member.domain.MemberDTO;
+import hk.member.domain.AddressDTO;     // ★ 추가
 import hk.member.model.MemberDAO;
 import hk.member.model.MemberDAO_imple;
 
@@ -27,7 +28,6 @@ public class RegisterController extends AbstractController {
          * ================================================== */
         if ("GET".equalsIgnoreCase(method)) {
 
-            // forward 방식으로 회원가입 JSP 이동
             super.setRedirect(false);
             super.setViewPage("/WEB-INF/hk_member/register.jsp");
             return;
@@ -40,7 +40,7 @@ public class RegisterController extends AbstractController {
 
             // JSP에서 넘어온 값 받기
             String userid        = request.getParameter("userid");
-            String passwd        = request.getParameter("passwd"); // 변경
+            String passwd        = request.getParameter("passwd");
             String name          = request.getParameter("name");
             String email         = request.getParameter("email");
             String mobile        = request.getParameter("mobile");
@@ -51,12 +51,14 @@ public class RegisterController extends AbstractController {
             String birthday      = request.getParameter("birthday");
             String gender        = request.getParameter("gender");
 
-            // DTO에 값 세팅
+            // ===============================
+            // 1️⃣ MemberDTO 세팅
+            // ===============================
             MemberDTO member = new MemberDTO();
             member.setUserid(userid);
-            member.setPasswd(passwd);       // 변경
+            member.setPasswd(passwd);
             member.setName(name);
-            member.setEmail(email);          // DAO에서 AES-256 암호화
+            member.setEmail(email);
             member.setMobile(mobile);
             member.setPostcode(postcode);
             member.setAddress(address);
@@ -65,24 +67,34 @@ public class RegisterController extends AbstractController {
             member.setBirthday(birthday);
             member.setGender(gender);
 
-            // DAO 호출 → DB insert
-            int n = mdao.registerMember(member);
-            // n == 1 : 성공
-            // n == 0 : 실패
+            // ===============================
+            // 2️⃣ AddressDTO 세팅 (★ 추가)
+            // ===============================
+            AddressDTO addr = new AddressDTO();
+            addr.setFkMemberId(userid);
+            addr.setPostcode(postcode);
+            addr.setAddress(address);
+            addr.setDetailaddress(detailaddress);
+            addr.setExtraaddress(extraaddress);
+           
 
-            // 결과 처리
+            // ===============================
+            // 3️⃣ DAO 호출
+            // ===============================
+            int n = mdao.registerMember(member, addr);
+
+            // ===============================
+            // 4️⃣ 결과 처리
+            // ===============================
             if (n == 1) {
-                // 회원가입 성공
                 request.setAttribute("message", "회원가입이 완료되었습니다.");
                 request.setAttribute("loc", request.getContextPath() + "/index.sp");
             }
             else {
-                // 회원가입 실패
                 request.setAttribute("message", "회원가입에 실패했습니다.");
                 request.setAttribute("loc", "javascript:history.back()");
             }
 
-            // msg.jsp로 이동
             super.setRedirect(false);
             super.setViewPage("/WEB-INF/msg.jsp");
         }

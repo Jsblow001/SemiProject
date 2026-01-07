@@ -11,7 +11,13 @@
 <style>
 /* ===== 공통 ===== */
 body{font-family:'Pretendard',Arial,sans-serif;background:#f7f6f3;color:#333;}
-.wrap{width:1100px;margin:60px auto;}
+.wrap { /* 반응형 웹 */
+    max-width:1100px;
+    width:100%;
+    margin:60px auto;
+    padding:0 16px;     /* 모바일 여백 */
+    box-sizing:border-box;
+}s
 h2{font-size:23px!important;font-weight:700;letter-spacing:-0.3px;color:#2f2b2a;margin-bottom:40px;}
 
 /* ===== 대시보드 상단 ===== */
@@ -26,14 +32,6 @@ h2{font-size:23px!important;font-weight:700;letter-spacing:-0.3px;color:#2f2b2a;
 .side-card h3{font-size:15px;margin-bottom:20px;color:#6d4c41;font-weight:600;}
 .side-card p{font-size:36px;font-weight:800;color:#4e342e;}
 
-/* ===== 검색 ===== */
-.search-area{background:#fff;padding:30px;border-radius:4px;margin-bottom:40px;box-shadow:0 4px 12px rgba(0,0,0,0.05);}
-.search-area h3{margin-bottom:20px;font-size:16px;font-weight:600;}
-.search-area form{display:flex;gap:10px;}
-.search-area select,.search-area input{padding:10px 12px;border:1px solid #ccc;border-radius:3px;font-size:14px;}
-.search-area input{flex:1;}
-.search-area button{padding:10px 18px;border:none;background:#6d4c41;color:#fff;font-weight:600;cursor:pointer;border-radius:3px;}
-.search-area button:hover{background:#5d4037;}
 
 /* ===== 하단 버튼 ===== */
 .btn-area a{display:inline-block;padding:12px 24px;background:#3e3a39;color:#fff;text-decoration:none;font-size:14px;font-weight:600;border-radius:3px;}
@@ -138,7 +136,6 @@ h2{font-size:23px!important;font-weight:700;letter-spacing:-0.3px;color:#2f2b2a;
     margin-right:8px;
 }
 
-
 </style>
 
 </head>
@@ -159,10 +156,10 @@ h2{font-size:23px!important;font-weight:700;letter-spacing:-0.3px;color:#2f2b2a;
 
     <%-- 왼쪽 : 동일 크기 카드 3개 --%>
     <div class="card-area main-cards">
-        <div class="card">
-            <h3>전체 회원</h3>
-            <p>${empty totalCount ? 0 : totalCount}</p>
-        </div>
+        <a href="<%=ctxPath%>/admin/memberList.sp" class="card card-link">
+		    <h3>전체 회원</h3>
+		    <p>${empty totalCount ? 0 : totalCount}</p>
+		</a>
         <div class="card">
             <h3>정상 회원</h3>
             <p>${empty activeCount ? 0 : activeCount}</p>
@@ -181,20 +178,6 @@ h2{font-size:23px!important;font-weight:700;letter-spacing:-0.3px;color:#2f2b2a;
 
 </div>
 
-<%-- ===============================
-     회원 조회 영역
-   =============================== --%>
-<div class="search-area">
-    <h3>회원 조회</h3>
-    <form action="<%=ctxPath%>/admin/memberList.sp" method="get">
-        <select name="searchType">
-            <option value="userid">아이디</option>
-            <option value="name">이름</option>
-        </select>
-        <input type="text" name="searchWord" placeholder="검색어 입력">
-        <button type="submit">조회</button>
-    </form>
-</div>
 
 <%-- ===============================
      하위 기능 이동

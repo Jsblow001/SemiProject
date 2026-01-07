@@ -76,6 +76,104 @@
     .btn-list:hover {
         background: #2f2b2a;
     }
+    /* ===== 관리자 SMS 박스 ===== */
+	.admin-action th {
+	    vertical-align: top;
+	}
+	
+	.sms-box {
+	    background: #faf9f6;
+	    border: 1px solid #ddd;
+	    padding: 20px;
+	    border-radius: 4px;
+	}
+	
+	/* 공통 필드 */
+	.sms-field {
+	    margin-bottom: 18px;
+	}
+	
+	.sms-field label {
+	    display: block;
+	    font-weight: 600;
+	    font-size: 14px;
+	    margin-bottom: 8px;
+	    color: #2f2b2a;
+	}
+	
+	/* 예약 발송 인라인 */
+	.sms-inline {
+	    display: flex;
+	    align-items: center;
+	    gap: 10px;
+	}
+	
+	.sms-inline input[type="date"],
+	.sms-inline input[type="time"] {
+	    padding: 6px 8px;
+	    font-size: 13px;
+	}
+	
+	.sms-hint {
+	    font-size: 12px;
+	    color: #888;
+	}
+	
+	/* textarea */
+	#smsContent {
+	    width: 100%;
+	    resize: none;
+	    padding: 10px;
+	    font-size: 13px;
+	    border: 1px solid #ccc;
+	    border-radius: 3px;
+	    box-sizing: border-box;
+	}
+	
+	/* 버튼 영역 */
+	.sms-btn-area {
+	    display: flex;
+	    align-items: center;
+	    gap: 15px;
+	}
+	
+	.sms-result {
+	    font-size: 13px;
+	    color: #2f6f4e;
+	    display: none;
+	}
+	
+	/* ===== 관리자 버튼 커스터마이징 ===== */
+	.admin-btn {
+    display: inline-block;
+    padding: 10px 22px;
+    background: #3e3a39;
+    color: #fff;
+    font-size: 14px;
+    border-radius: 3px;
+    cursor: pointer;
+    text-decoration: none;
+	}
+	
+	.admin-btn:hover {
+	    background: #2f2b2a;
+	}
+	
+	/* ===== 보조 버튼 (목록으로) ===== */
+	a.admin-btn.light,
+	a.admin-btn.light:link,
+	a.admin-btn.light:visited {
+	    background: #e6e4e1;
+	    color: #3e3a39 !important;
+	    text-decoration: none;
+	}
+	
+	/* hover */
+	a.admin-btn.light:hover {
+	    background: #d8d5d1;
+	    color: #2f2b2a !important;
+	}	
+	    
 </style>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -191,27 +289,33 @@ $(function(){
 	<!-- ==== 휴대폰 SMS(문자) 보내기 ==== -->
 	<table class="admin-action">
 	    <tr>
-	        <th>관리자 기능(문자 발송)</th>
+	        <th>관리자 기능<br>(문자 발송)</th>
 	        <td>
 	
-	            <div class="sms-wrap">
+	            <div class="sms-box">
 	
-	                <div class="sms-row">
-	                    <span class="sms-label">예약 발송</span>
-	                    <input type="date" id="reservedate" />
-	                    <input type="time" id="reservetime" />
+	                <!-- 예약 발송 -->
+	                <div class="sms-field">
+	                    <label>예약 발송</label>
+	                    <div class="sms-inline">
+	                        <input type="date" id="reservedate">
+	                        <input type="time" id="reservetime">
+	                        <span class="sms-hint">(미선택 시 즉시 발송)</span>
+	                    </div>
 	                </div>
 	
-	                <div class="sms-row">
-	                    <textarea id="smsContent" rows="3"
+	                <!-- 문자 내용 -->
+	                <div class="sms-field">
+	                    <label>문자 내용</label>
+	                    <textarea id="smsContent" rows="4"
 	                              placeholder="회원에게 보낼 문자 내용을 입력하세요."></textarea>
 	                </div>
 	
-	                <div class="sms-row sms-btn">
-	                    <button id="btnSend" class="btn btn-list">문자 전송</button>
+	                <!-- 버튼 -->
+	                <div class="sms-btn-area">
+	                    <button id="btnSend" class="admin-btn">문자 전송</button>
+	                    <span id="smsResult" class="admin-btn"></span>
 	                </div>
-	
-	                <div id="smsResult" class="sms-result"></div>
 	
 	            </div>
 	
@@ -219,8 +323,9 @@ $(function(){
 	    </tr>
 	</table>
 
+
     <div class="btn-box">
-        <a href="<%=ctxPath%>/admin/memberList.sp" class="btn btn-list">
+        <a href="<%=ctxPath%>/admin/memberList.sp" class="admin-btn light">
             목록으로
         </a>
     </div>
