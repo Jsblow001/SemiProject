@@ -13,6 +13,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
+import hk.member.domain.AddressDTO;
 import hk.member.domain.MemberCountDTO;
 import hk.member.domain.MemberDTO;
 import sp.util.security.AES256;
@@ -67,48 +68,84 @@ public class MemberDAO_imple implements MemberDAO {
     }
 
     
-    // ======================================================
-    // 회원가입
-    // ======================================================
-    @Override
-    public int registerMember(MemberDTO member) throws SQLException {
+ // ======================================================
+ // 회원가입 (TBL_MEMBER + TBL_ADDRESS 동시 처리)
+ // ======================================================
+ @Override
+ public int registerMember(MemberDTO member, AddressDTO address) throws SQLException {
 
-        int result = 0;
+     int result = 0;
 
-        try {
-            conn = ds.getConnection();
+     try {
+         conn = ds.getConnection();
+         conn.setAutoCommit(false); // ★ 트랜잭션 시작
 
-            String sql = " INSERT INTO TBL_MEMBER "
-                       + " (MEMBER_ID, NAME, PASSWD, EMAIL, MOBILE, "
-                       + "   POSTCODE, ADDRESS, DETAILADDRESS, EXTRAADDRESS, "
-                       + "   GENDER, BIRTHDAY, POINT, "
-                       + "   STATUS, REGISTERDAY, LASTPWDCHANGEDATE, GRADE_CODE) "
-                       + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1, SYSDATE, SYSDATE, 1) ";
+         // ==================================================
+         // 1️⃣ TBL_MEMBER INSERT (기존 컬럼명 그대로)
+         // ==================================================
+         String sqlMember =
+                 " INSERT INTO TBL_MEMBER "
+               + " (MEMBER_ID, NAME, PASSWD, EMAIL, MOBILE, "
+               + "   POSTCODE, ADDRESS, DETAILADDRESS, EXTRAADDRESS, "
+               + "   GENDER, BIRTHDAY, POINT, STATUS, "
+               + "   REGISTERDAY, LASTPWDCHANGEDATE, GRADE_CODE) "
+               + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
+               + "         0, 1, SYSDATE, SYSDATE, 1) ";
 
-            pstmt = conn.prepareStatement(sql);
+         pstmt = conn.prepareStatement(sqlMember);
 
-            pstmt.setString(1, member.getUserid());
-            pstmt.setString(2, member.getName());
-            pstmt.setString(3, Sha256.encrypt(member.getPasswd())); //  passwd 기준
-            pstmt.setString(4, aes.encrypt(member.getEmail()));
-            pstmt.setString(5, member.getMobile() != null ? aes.encrypt(member.getMobile()) : null);
-            pstmt.setString(6, member.getPostcode());
-            pstmt.setString(7, member.getAddress());
-            pstmt.setString(8, member.getDetailaddress());
-            pstmt.setString(9, member.getExtraaddress());
-            pstmt.setString(10, member.getGender());
-            pstmt.setString(11, member.getBirthday());
+         pstmt.setString(1, member.getUserid());
+         pstmt.setString(2, member.getName());
+         pstmt.setString(3, Sha256.encrypt(member.getPasswd()));
+         pstmt.setString(4, aes.encrypt(member.getEmail()));
+         pstmt.setString(5, member.getMobile() != null ? aes.encrypt(member.getMobile()) : null);
+         pstmt.setString(6, member.getPostcode());
+         pstmt.setString(7, member.getAddress());
+         pstmt.setString(8, member.getDetailaddress());
+         pstmt.setString(9, member.getExtraaddress());
+         pstmt.setString(10, member.getGender());
+         pstmt.setString(11, member.getBirthday());
 
-            result = pstmt.executeUpdate();
+         int memberInsertCnt = pstmt.executeUpdate();
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            close();
-        }
+         // ==================================================
+         // 2️⃣ TBL_ADDRESS INSERT (기본 배송지)
+         // ==================================================
+         if (memberInsertCnt == 1) {
 
-        return result;
-    }
+             String sqlAddress =
+                     " INSERT INTO TBL_ADDRESS "
+                   + " (ADDR_ID, FK_MEMBER_ID, POSTCODE, ADDRESS, DETAILADDRESS, EXTRAADDRESS) "
+                   + " VALUES (SEQ_ADDR_ID.NEXTVAL, ?, ?, ?, ?, ?) ";
+
+             pstmt.close(); // 기존 pstmt 정리
+             pstmt = conn.prepareStatement(sqlAddress);
+
+             pstmt.setString(1, member.getUserid());
+             pstmt.setString(2, address.getPostcode());
+             pstmt.setString(3, address.getAddress());
+             pstmt.setString(4, address.getDetailaddress());
+             pstmt.setString(5, address.getExtraaddress());
+
+             pstmt.executeUpdate();
+
+             conn.commit(); // ★ 둘 다 성공 → 커밋
+             result = 1;
+         }
+
+     } catch (Exception e) {
+         if (conn != null) {
+             try { conn.rollback(); } catch (SQLException ex) {}
+         }
+         e.printStackTrace();
+         result = 0;
+     } finally {
+         close();
+     }
+
+     return result;
+ }
+
 
     
     // ======================================================
