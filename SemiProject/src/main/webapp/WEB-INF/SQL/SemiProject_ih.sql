@@ -756,3 +756,31 @@ NOCYCLE
 NOCACHE;
 
 commit;
+
+-------------------------------------------------------------------------------
+select *
+from tab;
+
+select *
+from tbl_order;
+
+select *
+from tbl_order_detail;
+
+select *
+from tbl_wishlist;
+
+select *
+from tbl_cart;
+
+select *
+from tbl_member
+where member_id = 'honggd';
+
+select *
+from tbl_address;
+
+select *
+from tbl_product;
+
+commit;
