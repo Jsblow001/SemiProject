@@ -29,5 +29,9 @@ public interface NoticeDAO {
     // 공지글 삭제
     int deleteNotice(int noticeId) throws SQLException;
 
+    // 공지글 총개수 구하는 메서드
+    int getTotalNoticeCount(Map<String, String> paraMap) throws SQLException;
+
+
 
 }

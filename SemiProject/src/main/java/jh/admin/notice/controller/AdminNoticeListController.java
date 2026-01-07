@@ -74,6 +74,12 @@ public class AdminNoticeListController extends AbstractController {
                 totalPage,
                 queryString
         );
+        
+        // 전체 공지글 개수 조회
+        int totalNoticeCount = ndao.getTotalNoticeCount(paraMap);
+
+        request.setAttribute("totalNoticeCount", totalNoticeCount);
+
 
         request.setAttribute("fixedList", fixedList);
         request.setAttribute("noticeList", noticeList);

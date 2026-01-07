@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
 
 <jsp:include page="/WEB-INF/header2.jsp"/>
 
@@ -57,10 +59,15 @@
         </tr>
       </c:forEach>
 
-      <!-- ✅ 일반글 -->
-      <c:forEach var="n" items="${noticeList}">
+      <!-- ✅ 일반글 수정중 -->
+      <c:forEach var="n" items="${noticeList}" varStatus="status">
         <tr>
-          <td><c:out value="${n.noticeId}"/></td>
+        <fmt:parseNumber var="currentShowPageNo" value="${requestScope.currentShowPageNo}"/>
+	    <fmt:parseNumber var="sizePerPage" value="${requestScope.sizePerPage}"/>
+	
+		  <td>
+		      ${requestScope.totalNoticeCount - (currentShowPageNo - 1) * sizePerPage - status.index}
+		  </td>
           <td>
             <a href="noticeView.sp?noticeId=${n.noticeId}">
               <c:out value="${n.subject}"/>
@@ -70,7 +77,7 @@
           <td><c:out value="${n.regDate}"/></td>
         </tr>
       </c:forEach>
-
+<!-- ✅ 일반글 수정중 -->
       <c:if test="${empty fixedList and empty noticeList}">
         <tr><td colspan="4" style="text-align:center; padding: 30px 0;">검색 결과가 없습니다.</td></tr>
       </c:if>
