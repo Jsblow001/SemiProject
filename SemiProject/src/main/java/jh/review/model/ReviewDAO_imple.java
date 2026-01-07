@@ -1,0 +1,364 @@
+package jh.review.model;
+
+import java.sql.*;
+import java.util.*;
+import javax.naming.*;
+import javax.sql.DataSource;
+
+import jh.review.domain.ReviewDTO;
+
+public class ReviewDAO_imple implements ReviewDAO {
+
+    private DataSource ds;
+    private Connection conn;
+    private PreparedStatement pstmt;
+    private ResultSet rs;
+
+    public ReviewDAO_imple() {
+        try {
+            Context initContext = new InitialContext();
+            Context envContext  = (Context)initContext.lookup("java:/comp/env");
+            ds = (DataSource)envContext.lookup("SemiProject");
+        } catch (NamingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void close() {
+        try {
+            if(rs != null)    { rs.close(); rs=null; }
+            if(pstmt != null) { pstmt.close(); pstmt=null; }
+            if(conn != null)  { conn.close(); conn=null; }
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // =========================
+    // 1) 총 리뷰 수
+    // =========================
+    @Override
+    public int getTotalReviewCount(Map<String, String> paraMap) throws SQLException {
+
+        int totalCount = 0;
+        String searchWord = paraMap.get("searchWord");
+        if(searchWord == null) searchWord = "";
+        searchWord = searchWord.trim();
+
+        try {
+            conn = ds.getConnection();
+
+            StringBuilder sql = new StringBuilder();
+            sql.append(" select count(*) ")
+               .append(" from tbl_product_review r ")
+               .append(" where 1=1 ");
+
+            if(!searchWord.isBlank()) {
+                sql.append(" and ( lower(r.review_title) like '%'||lower(?)||'%' ")
+                   .append("    or lower(r.review_content) like '%'||lower(?)||'%' ) ");
+            }
+
+            pstmt = conn.prepareStatement(sql.toString());
+
+            int idx = 1;
+            if(!searchWord.isBlank()) {
+                pstmt.setString(idx++, searchWord);
+                pstmt.setString(idx++, searchWord);
+            }
+
+            rs = pstmt.executeQuery();
+            rs.next();
+            totalCount = rs.getInt(1);
+
+        } finally {
+            close();
+        }
+
+        return totalCount;
+    }
+
+    // =========================
+    // 2) 리뷰 목록 페이징
+    // sort: recent | rating
+    // sizePerPage: 기본 5
+    // =========================
+    @Override
+    public List<ReviewDTO> selectReviewListPaging(Map<String, String> paraMap) throws SQLException {
+
+        List<ReviewDTO> list = new ArrayList<>();
+
+        String sort = paraMap.get("sort");                 // recent | rating
+        String searchWord = paraMap.get("searchWord");     // 제목+내용
+        String currentShowPageNo = paraMap.get("currentShowPageNo");
+        String sizePerPage = paraMap.get("sizePerPage");
+
+        if(sort == null || sort.isBlank()) sort = "recent";
+        if(searchWord == null) searchWord = "";
+        searchWord = searchWord.trim();
+
+        if(currentShowPageNo == null || currentShowPageNo.isBlank()) currentShowPageNo = "1";
+        if(sizePerPage == null || sizePerPage.isBlank()) sizePerPage = "5";
+
+        int nCurrentPage = Integer.parseInt(currentShowPageNo);
+        int nSizePerPage = Integer.parseInt(sizePerPage);
+
+        String orderBy;
+        if("rating".equalsIgnoreCase(sort)) {
+            orderBy = " order by r.rating desc, r.review_date desc, r.review_id desc ";
+        } else {
+            orderBy = " order by r.review_date desc, r.review_id desc ";
+        }
+
+        try {
+            conn = ds.getConnection();
+
+            StringBuilder sql = new StringBuilder();
+            sql.append(" select ")
+               .append("   r.review_id, r.fk_product_id, r.fk_member_id, ")
+               .append("   r.review_title, r.rating, r.review_content, r.praise_keywords, ")
+               .append("   to_char(r.review_date,'yyyy-mm-dd') as review_date, ")
+               .append("   p.product_name, ")
+               .append("   substr(m.name,1,1) || '**' as writer, ")
+
+               // 구매인증(결제완료 구매이력 존재)
+               .append("   case when exists ( ")
+               .append("       select 1 ")
+               .append("         from tbl_order o join tbl_order_detail d ")
+               .append("           on o.odrcode = d.fk_odrcode ")
+               .append("        where o.fk_member_id = r.fk_member_id ")
+               .append("          and d.fk_product_id = r.fk_product_id ")
+               .append("          and o.payment_status = 1 ")
+               .append("   ) then 1 else 0 end as verified, ")
+
+               // date 라벨(JSP는 r.date 사용)
+               .append("   case ")
+               .append("     when trunc(sysdate) - trunc(r.review_date) = 0 then '오늘 작성' ")
+               .append("     when trunc(sysdate) - trunc(r.review_date) between 1 and 6 ")
+               .append("       then (trunc(sysdate) - trunc(r.review_date)) || '일 전 작성' ")
+               .append("     else to_char(r.review_date,'yy.mm.dd') || ' 작성' ")
+               .append("   end as date_label, ")
+
+               // badge: 7일 이내면 NEW
+               .append("   case when trunc(sysdate) - trunc(r.review_date) between 0 and 6 then 'NEW' else '' end as badge, ")
+
+               // 관리자 댓글(리뷰당 1개, status=1만)
+               .append("   case when c.review_comment_id is not null then 1 else 0 end as comment_count, ")
+               .append("   c.comment_content as admin_reply, ")
+
+               // 사진 최대 2개 (CSV)
+               .append("   ( ")
+               .append("     select listagg(x.image_filename, ',') within group(order by x.review_image_id) ")
+               .append("     from ( ")
+               .append("       select ri.review_image_id, ri.image_filename, ")
+               .append("              row_number() over(order by ri.review_image_id) as rn ")
+               .append("         from tbl_review_image ri ")
+               .append("        where ri.fk_review_id = r.review_id ")
+               .append("     ) x ")
+               .append("     where x.rn <= 2 ")
+               .append("   ) as photo_csv ")
+
+               .append(" from tbl_product_review r ")
+               .append(" join tbl_product p on p.product_id = r.fk_product_id ")
+               .append(" join tbl_member  m on m.member_id = r.fk_member_id ")
+               .append(" left join tbl_review_comment c ")
+               .append("   on c.fk_review_id = r.review_id and c.status = 1 ")
+               .append(" where 1=1 ");
+
+            if(!searchWord.isBlank()) {
+                sql.append(" and ( lower(r.review_title) like '%'||lower(?)||'%' ")
+                   .append("    or lower(r.review_content) like '%'||lower(?)||'%' ) ");
+            }
+
+            sql.append(orderBy);
+            sql.append(" offset (? - 1) * ? rows fetch next ? rows only ");
+
+            pstmt = conn.prepareStatement(sql.toString());
+
+            int idx = 1;
+            if(!searchWord.isBlank()) {
+                pstmt.setString(idx++, searchWord);
+                pstmt.setString(idx++, searchWord);
+            }
+            pstmt.setInt(idx++, nCurrentPage);
+            pstmt.setInt(idx++, nSizePerPage);
+            pstmt.setInt(idx++, nSizePerPage);
+
+            rs = pstmt.executeQuery();
+
+            while(rs.next()) {
+                ReviewDTO dto = new ReviewDTO();
+
+                dto.setReview_id(rs.getLong("review_id"));
+                dto.setFk_product_id(rs.getInt("fk_product_id"));
+                dto.setFk_member_id(rs.getString("fk_member_id"));
+
+                dto.setReview_title(rs.getString("review_title"));
+                dto.setRating(rs.getInt("rating"));
+                dto.setReview_content(rs.getString("review_content"));
+                dto.setPraise_keywords(rs.getString("praise_keywords"));
+                dto.setReview_date(rs.getString("review_date"));
+
+                dto.setProduct_name(rs.getString("product_name"));
+
+                // ✅ JSP는 productCode를 쓰고 있음 → 당장은 product_name을 꽂아준다
+                // (실제 제품 코드 컬럼이 생기면 여기만 교체)
+                dto.setProductCode(rs.getString("product_name"));
+
+                dto.setWriter(rs.getString("writer"));
+                dto.setVerified(rs.getInt("verified"));
+                dto.setDate(rs.getString("date_label"));
+                dto.setBadge(rs.getString("badge"));
+
+                dto.setCommentCount(rs.getInt("comment_count"));
+                dto.setAdminReply(rs.getString("admin_reply"));
+
+                // photo_csv -> photos(List)
+                String photoCsv = rs.getString("photo_csv");
+                if(photoCsv != null && !photoCsv.trim().isEmpty()) {
+                    String[] arr = photoCsv.split(",");
+                    dto.setPhotos(Arrays.asList(arr));
+                }
+
+                // praise_keywords -> tags(List)
+                String pk = rs.getString("praise_keywords");
+                if(pk != null && !pk.trim().isEmpty()) {
+                    String[] arr = pk.split("\\s*,\\s*");
+                    dto.setTags(Arrays.asList(arr));
+                }
+
+                list.add(dto);
+            }
+
+        } finally {
+            close();
+        }
+
+        return list;
+    }
+
+    // =========================
+    // 3) 리뷰 작성 가능한 구매이력(결: 결제완료=1) + 이미 리뷰 작성한 상품 제외
+    // =========================
+    @Override
+    public List<Map<String, String>> selectPurchasesForReview(String userid) throws SQLException {
+
+        List<Map<String, String>> list = new ArrayList<>();
+
+        try {
+            conn = ds.getConnection();
+
+            String sql =
+                " select od.fk_product_id as product_id, " +
+                "        p.product_name, " +
+                "        to_char(max(o.odrdate), 'yyyy-mm-dd') as last_order_date, " +
+                "        max(o.odrcode) keep (dense_rank last order by o.odrdate) as last_odrcode " +
+                "   from tbl_order o " +
+                "   join tbl_order_detail od on od.fk_odrcode = o.odrcode " +
+                "   join tbl_product p on p.product_id = od.fk_product_id " +
+                "  where o.fk_member_id = ? " +
+                "    and o.payment_status = 1 " +
+                "    and not exists ( " +
+                "        select 1 from tbl_product_review r " +
+                "         where r.fk_member_id = o.fk_member_id " +
+                "           and r.fk_product_id = od.fk_product_id " +
+                "    ) " +
+                "  group by od.fk_product_id, p.product_name " +
+                "  order by max(o.odrdate) desc ";
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, userid);
+
+            rs = pstmt.executeQuery();
+
+            while(rs.next()) {
+                Map<String, String> m = new HashMap<>();
+                m.put("product_id", rs.getString("product_id"));
+                m.put("product_name", rs.getString("product_name"));
+                m.put("last_order_date", rs.getString("last_order_date"));
+                m.put("last_odrcode", rs.getString("last_odrcode"));
+                list.add(m);
+            }
+
+        } finally {
+            close();
+        }
+
+        return list;
+    }
+
+    // =========================
+    // 4) 리뷰 등록
+    // =========================
+    @Override
+    public long getReviewSeqNextVal() throws SQLException {
+        long val = 0;
+        try {
+            conn = ds.getConnection();
+            String sql = " select seq_review_id.nextval from dual ";
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+            rs.next();
+            val = rs.getLong(1);
+        } finally {
+            close();
+        }
+        return val;
+    }
+
+    @Override
+    public int insertReview(ReviewDTO dto) throws SQLException {
+
+        int result = 0;
+
+        try {
+            conn = ds.getConnection();
+
+            String sql =
+                " insert into tbl_product_review " +
+                " (review_id, fk_product_id, fk_member_id, review_date, rating, review_title, review_content, praise_keywords) " +
+                " values (?, ?, ?, sysdate, ?, ?, ?, ?) ";
+
+            pstmt = conn.prepareStatement(sql);
+
+            pstmt.setLong(1, dto.getReview_id());
+            pstmt.setInt(2, dto.getFk_product_id());
+            pstmt.setString(3, dto.getFk_member_id());
+            pstmt.setInt(4, dto.getRating());
+            pstmt.setString(5, dto.getReview_title());
+            pstmt.setString(6, dto.getReview_content());
+            pstmt.setString(7, dto.getPraise_keywords()); // null 가능
+
+            result = pstmt.executeUpdate();
+
+        } finally {
+            close();
+        }
+
+        return result;
+    }
+
+    @Override
+    public int insertReviewImage(long review_id, String image_filename) throws SQLException {
+
+        int result = 0;
+
+        try {
+            conn = ds.getConnection();
+
+            String sql =
+                " insert into tbl_review_image (review_image_id, fk_review_id, image_filename) " +
+                " values (seq_review_image_id.nextval, ?, ?) ";
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, review_id);
+            pstmt.setString(2, image_filename);
+
+            result = pstmt.executeUpdate();
+
+        } finally {
+            close();
+        }
+
+        return result;
+    }
+}

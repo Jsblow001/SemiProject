@@ -103,57 +103,63 @@
             "heroPageCount",
             (heroReviews.size() + 2) / 3
         );
+    }
 
-
-     // =========================
-     // 2) 중단 캐러셀용 카드 데이터 (한 페이지 4개, 총 3페이지 예시 = 12개)
-     // =========================
-     java.util.List<java.util.Map<String,Object>> rankProducts = new java.util.ArrayList<>();
-     java.util.Map<String,Object> rp;
-     java.util.List<java.util.Map<String,Object>> miniReviews;
-     java.util.Map<String,Object> mr;
-
-     // 카드 12개 만들어두면 4개씩 3페이지로 넘어감
-     String[] codes = {"ROY_O_C3","LIKA_O_C4","VIVIR_C4","VIVIR_C3","ARNO_R_C3","RONENN_R_C2","DENSE_C5","AIR_2_R_C2","HEIZE_C2","RONENN_S_C2","RENAR_S_C2","VIVIR_C_C4"};
-     String[] mains = {"img/product/p1.png","img/product/p2.png","img/product/p3.png","img/product/p4.png","img/product/p5.png","img/product/p6.png","img/product/p7.png","img/product/p8.png","img/product/p1.png","img/product/p2.png","img/product/p3.png","img/product/p4.png"};
-     double[] ratings = {5.0,5.0,5.0,5.0,4.9,5.0,5.0,5.0,5.0,5.0,5.0,5.0};
-     int[] counts = {59,14,5,5,200,39,45,8,7,45,6,5};
-
-     for(int idx=0; idx<codes.length; idx++){
-         rp = new java.util.HashMap<>();
-         rp.put("code", codes[idx]);
-         rp.put("main", mains[idx]);
-         rp.put("rating", ratings[idx]);
-         rp.put("count", counts[idx]);
-
-         // 아래쪽 미니 리뷰 3줄(썸네일+텍스트)
-         miniReviews = new java.util.ArrayList<>();
-
-         mr = new java.util.HashMap<>();
-         mr.put("thumb","img/review/r1.jpg");
-         mr.put("text","너무 예뻐요! 포인트로 쓰기에 딱 좋네요.");
-         miniReviews.add(mr);
-
-         mr = new java.util.HashMap<>();
-         mr.put("thumb","img/review/r2.jpg");
-         mr.put("text","색감이 은은해서 데일리로 매일 착용중입니다.");
-         miniReviews.add(mr);
-
-         mr = new java.util.HashMap<>();
-         mr.put("thumb","img/review/r3.jpg");
-         mr.put("text","가볍고 착용감 좋아요. 포장도 꼼꼼했습니다.");
-         miniReviews.add(mr);
-
-         rp.put("reviews", miniReviews);
-         rankProducts.add(rp);
+     // 2) rankProducts 더미는 없을 때만
+     if (request.getAttribute("rankProducts") == null) {
+    	 
+	     
+	     // =========================
+	     // 2) 중단 캐러셀용 카드 데이터 (한 페이지 4개, 총 3페이지 예시 = 12개)
+	     // =========================
+	     java.util.List<java.util.Map<String,Object>> rankProducts = new java.util.ArrayList<>();
+	     java.util.Map<String,Object> rp;
+	     java.util.List<java.util.Map<String,Object>> miniReviews;
+	     java.util.Map<String,Object> mr;
+	
+	     // 카드 12개 만들어두면 4개씩 3페이지로 넘어감
+	     String[] codes = {"ROY_O_C3","LIKA_O_C4","VIVIR_C4","VIVIR_C3","ARNO_R_C3","RONENN_R_C2","DENSE_C5","AIR_2_R_C2","HEIZE_C2","RONENN_S_C2","RENAR_S_C2","VIVIR_C_C4"};
+	     String[] mains = {"img/product/p1.png","img/product/p2.png","img/product/p3.png","img/product/p4.png","img/product/p5.png","img/product/p6.png","img/product/p7.png","img/product/p8.png","img/product/p1.png","img/product/p2.png","img/product/p3.png","img/product/p4.png"};
+	     double[] ratings = {5.0,5.0,5.0,5.0,4.9,5.0,5.0,5.0,5.0,5.0,5.0,5.0};
+	     int[] counts = {59,14,5,5,200,39,45,8,7,45,6,5};
+	
+	     for(int idx=0; idx<codes.length; idx++){
+	         rp = new java.util.HashMap<>();
+	         rp.put("code", codes[idx]);
+	         rp.put("main", mains[idx]);
+	         rp.put("rating", ratings[idx]);
+	         rp.put("count", counts[idx]);
+	
+	         // 아래쪽 미니 리뷰 3줄(썸네일+텍스트)
+	         miniReviews = new java.util.ArrayList<>();
+	
+	         mr = new java.util.HashMap<>();
+	         mr.put("thumb","img/review/r1.jpg");
+	         mr.put("text","너무 예뻐요! 포인트로 쓰기에 딱 좋네요.");
+	         miniReviews.add(mr);
+	
+	         mr = new java.util.HashMap<>();
+	         mr.put("thumb","img/review/r2.jpg");
+	         mr.put("text","색감이 은은해서 데일리로 매일 착용중입니다.");
+	         miniReviews.add(mr);
+	
+	         mr = new java.util.HashMap<>();
+	         mr.put("thumb","img/review/r3.jpg");
+	         mr.put("text","가볍고 착용감 좋아요. 포장도 꼼꼼했습니다.");
+	         miniReviews.add(mr);
+	
+	         rp.put("reviews", miniReviews);
+	         rankProducts.add(rp);
+	     }
+	
+	     request.setAttribute("rankProducts", rankProducts);
+	  	// ✅ EL 호환성 최강: size() 호출/복잡한 산술을 EL에서 안 하도록 숫자를 미리 세팅
+	     request.setAttribute("rankSize", rankProducts.size());
+	     request.setAttribute("rankPageCount", (rankProducts.size() + 3) / 4);  // 4개씩 페이지 수
      }
 
-     request.setAttribute("rankProducts", rankProducts);
-  	// ✅ EL 호환성 최강: size() 호출/복잡한 산술을 EL에서 안 하도록 숫자를 미리 세팅
-     request.setAttribute("rankSize", rankProducts.size());
-     request.setAttribute("rankPageCount", (rankProducts.size() + 3) / 4);  // 4개씩 페이지 수
-
-
+  	 // 3) allReviews 더미는 "컨트롤러가 안 넣어준 경우에만" (보호)
+     if (request.getAttribute("allReviews") == null) {
         // =========================
         // 3) 하단 "모든 리뷰" 리스트 (3개만)
         // =========================
@@ -223,10 +229,13 @@
         allReviews.add(r);
 
         request.setAttribute("allReviews", allReviews);
+     }
+  	 
+  	// 4) totalReviews도 컨트롤러 우선
+     if (request.getAttribute("totalReviews") == null) {
+         request.setAttribute("totalReviews", 0);
+     }
 
-        // 상단 헤더 수치
-        request.setAttribute("totalReviews", 7557);
-    }
 %>
 
 <!DOCTYPE html>
@@ -867,21 +876,30 @@
 			All Reviews
 			</div>
 		    <div class="bottom-bar-right">
-		      <a href="#" class="active">추천순</a>
-		      <a href="#">최신순</a>
-		      <a href="#">별점 높은순</a>
-		      <span class="divider">|</span>
-		      <a href="#">직접검색</a>
-		
-		      <button type="button" class="bottom-search-btn" aria-label="검색">
-		        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-		          <path fill="currentColor"
-		            d="M10 4a6 6 0 104.47 10.03l4.25 4.25a1 1 0 001.41-1.41l-4.25-4.25A6 6 0 0010 4zm0 2a4 4 0 110 8 4 4 0 010-8z"/>
-		        </svg>
-		      </button>
-		    </div>
-		  </div>   
+			  <a href="${pageContext.request.contextPath}/reviews.sp?sort=recent&searchWord=${fn:escapeXml(searchWord)}#allReviews"
+			     class="${sort eq 'recent' ? 'active' : ''}">최신순</a>
+			
+			  <a href="${pageContext.request.contextPath}/reviews.sp?sort=rating&searchWord=${fn:escapeXml(searchWord)}#allReviews"
+			     class="${sort eq 'rating' ? 'active' : ''}">별점 높은순</a>
+			
+			  <span class="divider">|</span>
+			
+			  <a href="javascript:void(0);" id="btnToggleSearch">직접검색</a>
+			
+			  <button type="button" class="bottom-search-btn" aria-label="검색" id="btnSearchIcon">
+			    (SVG는 너 기존 그대로)
+			  </button>
+			</div>
 
+		  </div>   
+		  <div id="searchBox" style="display:none; margin-top:10px;">
+			  <form method="get" action="${pageContext.request.contextPath}/reviews.sp">
+			    <input type="hidden" name="sort" value="${sort}" />
+			    <input type="text" name="searchWord" value="${fn:escapeXml(searchWord)}" placeholder="제목/내용 검색" />
+			    <button type="submit">검색</button>
+			  </form>
+		  </div>
+		  
 
             <c:forEach var="r" items="${allReviews}">
                 <div class="review-item">
@@ -890,9 +908,10 @@
                     <div class="r-left">
                         <div style="display:flex; gap:8px; align-items:center;">
                             <div style="font-weight:700; color:#111;">${r.writer}</div>
-                            <c:if test="${r.verified}">
-                                <span class="pill">구매 인증</span>
-                            </c:if>
+                            <c:if test="${r.verified == 1}">
+							    <span class="pill">구매 인증</span>
+							</c:if>
+
                         </div>
                         <div>${r.date}</div>
                     </div>
@@ -920,7 +939,7 @@
                             <span class="prodcode">${r.productCode}</span>
                         </div>
 
-                        <div class="r-content">${r.content}</div>
+                        <div class="r-content">${r.review_content}</div>
 
                         <c:if test="${not empty r.photos}">
                             <div class="r-photos">
@@ -943,14 +962,17 @@
                         </c:if>
 
                         <div class="r-actions">
-                            <a href="#">💬 댓글 1</a>
-                            <a href="#">⚑ 신고</a>
-                        </div>
+						  <a>💬 댓글 ${r.commentCount}</a>
+						  <a href="#">⚑ 신고</a>
+						</div>
+						
+						<c:if test="${not empty r.adminReply}">
+						  <div class="admin-reply">
+						    ${r.adminReply}
+						    <div class="admin-name">카린 올림</div>
+						  </div>
+						</c:if>
 
-                        <div class="admin-reply">
-                            ${r.adminReply}
-                            <div class="admin-name">카린 올림</div>
-                        </div>
                     </div>
 
                 </div>
@@ -960,33 +982,50 @@
         
         <!-- ====== 하단 페이지네이션 + 버튼 ====== -->
 		<div class="pager" style="margin-top:26px;">
-		  <a class="arrow" href="#" aria-label="이전">&lsaquo;</a>
 		
-		  <c:forEach var="p" begin="1" end="10">
+		  <c:choose>
+		    <c:when test="${currentShowPageNo > 1}">
+		      <a class="arrow"
+		         href="${pageContext.request.contextPath}/reviews.sp?sort=${sort}&searchWord=${fn:escapeXml(searchWord)}&currentShowPageNo=${currentShowPageNo-1}#allReviews"
+		         aria-label="이전">&lsaquo;</a>
+		    </c:when>
+		    <c:otherwise>
+		      <span class="arrow" aria-label="이전">&lsaquo;</span>
+		    </c:otherwise>
+		  </c:choose>
+		
+		  <c:forEach var="p" begin="1" end="${totalPage}">
 		    <c:choose>
-		      <c:when test="${p == 3}">
+		      <c:when test="${p == currentShowPageNo}">
 		        <span class="active">${p}</span>
 		      </c:when>
 		      <c:otherwise>
-		        <a href="#">${p}</a>
+		        <a href="${pageContext.request.contextPath}/reviews.sp?sort=${sort}&searchWord=${fn:escapeXml(searchWord)}&currentShowPageNo=${p}#allReviews">${p}</a>
 		      </c:otherwise>
 		    </c:choose>
 		  </c:forEach>
 		
-		  <a class="arrow" href="#" aria-label="다음">&rsaquo;</a>
-		</div>
+		  <c:choose>
+		    <c:when test="${currentShowPageNo < totalPage}">
+		      <a class="arrow"
+		         href="${pageContext.request.contextPath}/reviews.sp?sort=${sort}&searchWord=${fn:escapeXml(searchWord)}&currentShowPageNo=${currentShowPageNo+1}#allReviews"
+		         aria-label="다음">&rsaquo;</a>
+		    </c:when>
+		    <c:otherwise>
+		      <span class="arrow" aria-label="다음">&rsaquo;</span>
+		    </c:otherwise>
+		  </c:choose>
 		
-		<div class="bottom-row">
-		  <a href="#" style="color:#777;">운영정책</a>
 		</div>
-		
-		<!-- ====== 하단 페이지네이션 + 버튼 ====== -->
+		<!-- ====== 하단 페이지네이션 + 버튼 끝 ====== -->
 		
 		
         <!-- ✅ 우측 하단 플로팅 리뷰 작성 버튼 -->
-		<a href="#" class="btn btn-dark shadow review-float-btn" id="reviewFloatBtn">
+		<a href="${pageContext.request.contextPath}/reviewWrite.sp"
+		   class="btn btn-dark shadow review-float-btn" id="reviewFloatBtn">
 		  리뷰 작성
 		</a>
+
         
 
     </div>
@@ -1169,6 +1208,22 @@
     window.addEventListener('scroll', update, {passive:true});
     window.addEventListener('resize', update);
   });
+})();
+
+
+//✅ 직접검색 토글
+(function(){
+  const toggleBtn = document.getElementById('btnToggleSearch');
+  const iconBtn = document.getElementById('btnSearchIcon');
+  const box = document.getElementById('searchBox');
+  if(!box) return;
+
+  function toggle(){
+    box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+  }
+
+  if(toggleBtn) toggleBtn.addEventListener('click', toggle);
+  if(iconBtn) iconBtn.addEventListener('click', toggle);
 })();
 
 </script>

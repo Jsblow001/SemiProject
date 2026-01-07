@@ -44,6 +44,37 @@
 	    background-color: #2f2b2a !important;
 	}
 	
+	/* ===== 회원 조회 ===== */
+	.search-area{background:#fff;padding:30px;border-radius:4px;margin-bottom:40px;box-shadow:0 4px 12px rgba(0,0,0,0.05);}
+	.search-area h3{margin-bottom:20px;font-size:16px;font-weight:600;}
+	.search-area form{display:flex;gap:10px;}
+	.search-area select,.search-area input{padding:10px 12px;border:1px solid #ccc;border-radius:3px;font-size:14px;}
+	.search-area input{flex:1;}
+	.search-area button{padding:10px 18px;border:none;background:#6d4c41;color:#fff;font-weight:600;cursor:pointer;border-radius:3px;}
+	.search-area button:hover{background:#5d4037;}
+	
+	/* ===== 전체목록 버튼 (밝은 배경 + 흰 글씨) ===== */
+	a.reset-btn,
+	a.reset-btn:link,
+	a.reset-btn:visited {
+	    display:inline-block;
+	    padding:10px 18px;
+	    background:#9a9693 !important;          /* 밝은 브라운/베이지 */
+	    color:#ffffff !important;    /* 흰색 글씨 */
+	    font-size:14px;
+	    font-weight:600;
+	    border-radius:3px;
+	    text-decoration:none;
+	    transition:background-color 0.2s ease;
+	}
+	
+	/* hover / active */
+	a.reset-btn:hover,
+	a.reset-btn:active {
+	    background:#a89288;          /* 살짝 진해짐 */
+	    color:#ffffff !important;
+	}
+
 	/* ===== 테이블 ===== */
 	table {
 	    width: 100%;
@@ -134,6 +165,30 @@
             메인페이지로
         </a>
     </div>
+
+	<%-- ===============================
+     회원 조회 영역
+   =============================== --%>
+	<div class="search-area">
+	    <h3>회원 조회</h3>
+	    <form action="<%=ctxPath%>/admin/memberList.sp" method="get">
+	        <select name="searchType">
+	            <option value="userid">아이디</option>
+	            <option value="name">이름</option>
+	        </select>
+	        <input type="text" name="searchWord" placeholder="검색어 입력">
+	        <button type="submit">조회</button>
+	        
+	        <!--  검색했을 때만 전체 목록 버튼 노출 -->
+	        <c:if test="${not empty param.searchWord}">
+	            <a href="<%=ctxPath%>/admin/memberList.sp" class="reset-btn">
+	                전체 목록 보기
+	            </a>
+	        </c:if>
+	    </form>
+	</div>
+	
+	
 
     <%-- ===============================
          회원 목록 테이블

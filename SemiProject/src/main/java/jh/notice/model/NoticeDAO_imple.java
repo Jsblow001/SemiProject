@@ -361,5 +361,48 @@ public class NoticeDAO_imple implements NoticeDAO {
         return n;
     }
     
+    // 공지글 총개수 구하기 구현
+    @Override
+    public int getTotalNoticeCount(Map<String, String> paraMap) throws SQLException {
+
+        int totalNoticeCount = 0;
+
+        String searchType = paraMap.get("searchType");
+        String searchWord = paraMap.get("searchWord");
+        if(searchType == null) searchType = "";
+        if(searchWord == null) searchWord = "";
+        searchWord = searchWord.trim();
+
+        try {
+            conn = ds.getConnection();
+
+            String sql =
+                " select count(*) " +
+                " from tbl_notice " +
+                " where is_fixed = 0 ";
+
+            if(!searchType.isBlank() && !searchWord.isBlank()) {
+                sql += buildSearchWhere(searchType); // 너가 이미 만들어둔 그 함수 그대로 사용
+            }
+
+            pstmt = conn.prepareStatement(sql);
+
+            int bindIndex = 1;
+            if(!searchType.isBlank() && !searchWord.isBlank()) {
+                bindIndex = bindSearchParams(pstmt, bindIndex, searchType, searchWord);
+            }
+
+            rs = pstmt.executeQuery();
+            rs.next();
+            totalNoticeCount = rs.getInt(1);
+
+        } finally {
+            close();
+        }
+
+        return totalNoticeCount;
+    }
+
+    
     
 }

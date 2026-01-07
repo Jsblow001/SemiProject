@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import hk.member.domain.AddressDTO;
 import hk.member.domain.MemberCountDTO;
 import hk.member.domain.MemberDTO;
 
@@ -15,7 +16,7 @@ import hk.member.domain.MemberDTO;
 public interface MemberDAO {
 
     // 회원가입
-    int registerMember(MemberDTO member) throws SQLException;
+    int registerMember(MemberDTO member, AddressDTO address) throws SQLException;
     
     // 회원가입 內 이메일 중복검사 
  	boolean isUseridExists(String userid) throws SQLException;
