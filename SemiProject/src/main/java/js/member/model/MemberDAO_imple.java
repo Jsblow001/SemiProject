@@ -42,6 +42,7 @@ public class MemberDAO_imple implements MemberDAO {
         }
     }
 	
+    // 회원 업데이트
 	@Override
 	public int updateMember(MemberDTO member) throws SQLException {
 	    int result = 0;

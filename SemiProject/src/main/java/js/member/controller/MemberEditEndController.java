@@ -29,8 +29,7 @@ public class MemberEditEndController extends AbstractController {
                 return;
             }
 
-            // 1. 데이터 받아오기 (member_id로 통일)
-            String userid = request.getParameter("userid");
+            // 1. 데이터 받아오기 
             String name = request.getParameter("name");
             String email = request.getParameter("email");
             String mobile = request.getParameter("mobile");
@@ -55,7 +54,6 @@ public class MemberEditEndController extends AbstractController {
 
             // 3. DTO 객체 생성 및 데이터 담기
             MemberDTO member = new MemberDTO();
-            member.setUserid(userid); // DTO 필드명과 일치
             member.setName(name);
             member.setEmail(email);
             member.setMobile(mobile);

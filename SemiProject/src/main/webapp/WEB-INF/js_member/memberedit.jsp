@@ -136,8 +136,8 @@
                 <label class="form-label">생년월일</label>
 
                 <fmt:parseDate value="${sessionScope.loginuser.birthday}"
-                               pattern="yy/MM/dd"
-                               var="birthDate" />
+				               pattern="yyyy-MM-dd"
+				               var="birthDate" />
 
                 <fmt:formatDate value="${birthDate}"
                                 pattern="yyyy-MM-dd"
