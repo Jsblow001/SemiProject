@@ -858,11 +858,11 @@ public class MemberDAO_imple implements MemberDAO {
 
 	            member.setUserid(rs.getString("member_id"));
 	            member.setName(rs.getString("name"));
-	            member.setGender(rs.getString("gender"));       // 1 / 2 / null
-	            member.setEmail(aes.decrypt(rs.getString("email"))); // 이메일 복호화
+	            member.setGender(rs.getString("gender"));             // 1 / 2 / null
+	            member.setEmail(aes.decrypt(rs.getString("email")));  // 이메일 복호화
 	            member.setMobile(aes.decrypt(rs.getString("mobile")));
 	            member.setRegisterday(rs.getString("registerday"));
-	            member.setStatus(rs.getInt("status"));          // 1:정상 / 0:탈퇴
+	            member.setStatus(rs.getInt("status"));               // 1:정상 / 0:탈퇴
 	        }
 
 	    } catch (Exception e) {

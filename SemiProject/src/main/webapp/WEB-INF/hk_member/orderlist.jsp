@@ -119,7 +119,6 @@ body {
     border-color:#3b2f2a;
 }
 
-
 /* ===== 페이지네이션 ===== */
 .pagination {
     justify-content:center;
@@ -138,7 +137,8 @@ body {
 
     <!-- 탭 -->
     <div class="order-tabs">
-        <a href="#" class="active">주문내역 (${orderList.size()})</a>
+        <!-- 총 주문 건수로 표시 -->
+        <a href="#" class="active">주문내역 (${totalCount})</a>
         <a href="#">취소/교환/반품 내역 (0)</a>
     </div>
 
@@ -146,38 +146,37 @@ body {
     <div class="filter-box">
         <div class="filter-left">
             <form method="get" action="<%=ctxPath%>/shop/orderList.sp">
-			    <select name="status" onchange="this.form.submit()">
-			        <option value="" ${empty status ? 'selected' : ''}>전체 주문처리상태</option>
-					<option value="1" ${status == '1' ? 'selected' : ''}>결제완료</option>
-					<option value="0" ${status == '0' ? 'selected' : ''}>결제대기</option>
-					<option value="2" ${status == '2' ? 'selected' : ''}>결제취소</option>
-			    </select>
-			</form>
-
+                <select name="status" onchange="this.form.submit()">
+                    <option value="" ${empty status ? 'selected' : ''}>전체 주문처리상태</option>
+                    <option value="1" ${status == '1' ? 'selected' : ''}>결제완료</option>
+                    <option value="0" ${status == '0' ? 'selected' : ''}>결제대기</option>
+                    <option value="2" ${status == '2' ? 'selected' : ''}>결제취소</option>
+                </select>
+            </form>
         </div>
 
         <div class="filter-right">
-		    <form method="get" action="<%=ctxPath%>/shop/orderList.sp" style="display:flex;align-items:center;gap:6px;">
-		
-		        <!-- 빠른 기간 버튼 -->
-		        <button type="submit" name="range" value="today">오늘</button>
-		        <button type="submit" name="range" value="7d">1주일</button>
-		        <button type="submit" name="range" value="1m">1개월</button>
-		        <button type="submit" name="range" value="3m">3개월</button>
-		        <button type="submit" name="range" value="6m">6개월</button>
-		
-		        <!-- 직접 날짜 선택 -->
-		        <input type="date" name="startDate" value="${startDate}">
-		        <span>~</span>
-		        <input type="date" name="endDate" value="${endDate}">
-		
-		        <button type="submit">조회</button>
-		
-		        <!-- 상태값 유지 -->
-		        <input type="hidden" name="status" value="${status}">
-		    </form>
-		</div>
+            <form method="get" action="<%=ctxPath%>/shop/orderList.sp"
+                  style="display:flex;align-items:center;gap:6px;">
 
+                <!-- 빠른 기간 버튼 -->
+                <button type="submit" name="range" value="today">오늘</button>
+                <button type="submit" name="range" value="7d">1주일</button>
+                <button type="submit" name="range" value="1m">1개월</button>
+                <button type="submit" name="range" value="3m">3개월</button>
+                <button type="submit" name="range" value="6m">6개월</button>
+
+                <!-- 직접 날짜 선택 -->
+                <input type="date" name="startDate" value="${startDate}">
+                <span>~</span>
+                <input type="date" name="endDate" value="${endDate}">
+
+                <button type="submit">조회</button>
+
+                <!-- 상태값 유지 -->
+                <input type="hidden" name="status" value="${status}">
+            </form>
+        </div>
     </div>
 
     <!-- 안내 -->
@@ -190,7 +189,7 @@ body {
     <table class="order-table">
         <thead>
             <tr>
-            	<th style="width:5%">No</th>
+                <th style="width:5%">No</th>
                 <th style="width:18%">주문일자<br>[주문번호]</th>
                 <th>상품정보</th>
                 <th style="width:8%">수량</th>
@@ -201,72 +200,93 @@ body {
             </tr>
         </thead>
         <tbody>
-			<c:choose>
-			    <c:when test="${not empty requestScope.orderList}">
-			        <c:forEach var="o" items="${requestScope.orderList}" varStatus="status">
-			            <tr>
-			                <td>
-			                    ${status.count}
-			                </td>
-			                <!-- 주문일자 / 주문번호 -->
-			                <td>
-			                    <fmt:formatDate value="${o.odrDate}" pattern="yyyy-MM-dd"/><br>
-			                    <span style="color:#999;">[${o.odrCode}]</span>
-			                </td>
-			
-			                <!-- 상품정보 -->
-			                <td>
-			                    ${o.productName}
-			                </td>
-			
-			                <!-- 수량 -->
-			                <td>
-			                    ${o.totalQty}
-			                </td>
-			
-			                <!-- 금액 -->
-			                <td>
-			                    <fmt:formatNumber value="${o.odrTotalPrice}" pattern="#,###"/>원
-			                </td>
-			
-			                <!-- 주문상태 -->
-			                <td>
-			                    ${o.paymentStatusName}
-			                </td>
-			
-			                <!-- 취소/교환/반품 -->
-			                <td>
-			                    <a href="#" style="font-size:12px;color:#999;">신청</a>
-			                </td>
-			                
-			                <td>
-							    <a href="<%=ctxPath%>/orderDetail.sp?odrcode=${o.odrCode}"
-							       class="btn-order-detail">
-							       주문상세
-							    </a>
-							</td>
-			            </tr>
-			        </c:forEach>
-			    </c:when>
-			
-			    <c:otherwise>
-			        <tr>
-			            <td colspan="6" class="empty-msg">
-			                주문 내역이 없습니다.
-			            </td>
-			        </tr>
-			    </c:otherwise>
-			</c:choose>
-		</tbody>
+            <c:choose>
+                <c:when test="${not empty orderList}">
+                    <c:forEach var="o" items="${orderList}" varStatus="st">
+                        <tr>
+                            <!-- 페이지 기준 번호 -->
+                            <td>
+                                ${(page - 1) * 10 + st.count}
+                            </td>
 
+                            <!-- 주문일자 / 주문번호 -->
+                            <td>
+                                <fmt:formatDate value="${o.odrDate}" pattern="yyyy-MM-dd"/><br>
+                                <span style="color:#999;">[${o.odrCode}]</span>
+                            </td>
+
+                            <!-- 상품정보 -->
+                            <td>${o.productName}</td>
+
+                            <!-- 수량 -->
+                            <td>${o.totalQty}</td>
+
+                            <!-- 금액 -->
+                            <td>
+                                <fmt:formatNumber value="${o.odrTotalPrice}" pattern="#,###"/>원
+                            </td>
+
+                            <!-- 주문상태 -->
+                            <td>${o.paymentStatusName}</td>
+
+                            <!-- 취소/교환/반품 -->
+                            <td>
+                                <a href="#" style="font-size:12px;color:#999;">신청</a>
+                            </td>
+
+                            <!-- 주문상세 -->
+                            <td>
+                                <a href="<%=ctxPath%>/orderDetail.sp?odrcode=${o.odrCode}"
+                                   class="btn-order-detail">
+                                    주문상세
+                                </a>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                </c:when>
+
+                <c:otherwise>
+                    <tr>
+                        <td colspan="8" class="empty-msg">
+                            주문 내역이 없습니다.
+                        </td>
+                    </tr>
+                </c:otherwise>
+            </c:choose>
+        </tbody>
     </table>
 
-    <!-- 페이지네이션 -->
+        <!-- 페이지네이션 -->
     <ul class="pagination">
-        <li class="page-item disabled"><a class="page-link" href="#">‹</a></li>
-        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-        <li class="page-item disabled"><a class="page-link" href="#">›</a></li>
+
+        <!-- 이전 -->
+        <li class="page-item ${page == 1 ? 'disabled' : ''}">
+            <a class="page-link"
+               href="<%=ctxPath%>/shop/orderList.sp?page=${page - 1}&status=${empty status ? '' : status}&startDate=${empty startDate ? '' : startDate}&endDate=${empty endDate ? '' : endDate}&range=${empty range ? '' : range}">
+                ‹
+            </a>
+        </li>
+
+        <!-- 페이지 번호 -->
+        <c:forEach begin="1" end="${totalPage}" var="i">
+            <li class="page-item ${page == i ? 'active' : ''}">
+                <a class="page-link"
+                   href="<%=ctxPath%>/shop/orderList.sp?page=${i}&status=${empty status ? '' : status}&startDate=${empty startDate ? '' : startDate}&endDate=${empty endDate ? '' : endDate}&range=${empty range ? '' : range}">
+                    ${i}
+                </a>
+            </li>
+        </c:forEach>
+
+        <!-- 다음 -->
+        <li class="page-item ${page == totalPage ? 'disabled' : ''}">
+            <a class="page-link"
+               href="<%=ctxPath%>/shop/orderList.sp?page=${page + 1}&status=${empty status ? '' : status}&startDate=${empty startDate ? '' : startDate}&endDate=${empty endDate ? '' : endDate}&range=${empty range ? '' : range}">
+                ›
+            </a>
+        </li>
+
     </ul>
+
 
 </div>
 
