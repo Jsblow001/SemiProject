@@ -14,12 +14,17 @@
     body { background-color:#fff; font-family:'Pretendard', sans-serif; color:#333; }
     .register-container { max-width:550px; margin:60px auto; padding:20px; }
     .title { text-align:center; font-size:26px; font-weight:700; margin-bottom:50px; letter-spacing:5px; }
-    .section-title { font-size:14px; font-weight:bold; margin:40px 0 20px; }
+    .section-title { font-size:14px; font-weight:bold; margin:40px 0 20px; border-bottom:1px solid #000; }
     .form-label { font-size:13px; font-weight:600; margin-bottom:8px; display:block; }
     .guide-text { font-size:12px; color:#888; margin-bottom:10px; }
     .form-control { border-radius:0; border:1px solid #ddd; padding:12px; }
     .btn-black { background:#000; color:#fff; border-radius:0; padding:16px; width:100%; font-weight:bold; }
     .btn-post { background:#f8f8f8; border:1px solid #ddd; border-radius:0; font-size:13px; }
+    .section-title::after, 
+    .section-title::before {
+        content: none !important; /* 내용 삭제 */
+        display: none !important; /* 공간 삭제 */
+    }
     
 </style>
 
