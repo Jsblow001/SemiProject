@@ -124,6 +124,45 @@ body {
     justify-content:center;
     margin-top:40px;
 }
+.pagination .page-item .page-link {
+    color: #3b2f2a;                 /* 기본 텍스트 */
+    border: 1px solid #e3e0dc;      /* 연한 베이지 테두리 */
+    background-color: #fff;
+    margin: 0 3px;
+    padding: 6px 12px;
+    font-size: 13px;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+}
+
+/* hover */
+.pagination .page-item .page-link:hover {
+    background-color: #f5f3ef;      /* 연베이지 */
+    border-color: #3b2f2a;
+    color: #3b2f2a;
+}
+
+/* 활성 페이지 */
+.pagination .page-item.active .page-link {
+    background-color: #3b2f2a;      /* 우드 브라운 */
+    border-color: #3b2f2a;
+    color: #fff;
+    font-weight: 500;
+}
+
+/* 비활성(disabled) */
+.pagination .page-item.disabled .page-link {
+    color: #bbb;
+    background-color: #fafafa;
+    border-color: #eee;
+    pointer-events: none;
+}
+
+/* 이전/다음 화살표도 동일 톤 */
+.pagination .page-item:first-child .page-link,
+.pagination .page-item:last-child .page-link {
+    font-weight: 600;
+}
 </style>
 </head>
 
