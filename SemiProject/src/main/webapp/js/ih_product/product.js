@@ -71,26 +71,38 @@ function goCart(productId, qty, contextPath) {
     });
 }
 
-function updateQty(cartId, change, contextPath) {
-    // change : +1 또는 -1
-    
+function updateQty(cart_id, change, ctxPath) {
+
+    const $row = $("input[value='" + cart_id + "']").closest("tr");
+    const $qtyInput = $row.find(".qty-input");
+    let currentQty = parseInt($qtyInput.val());
+
     $.ajax({
-        url: contextPath + "/product/cartUpdateQty.sp",
+        url: ctxPath + "/product/cartUpdateQty.sp",
         type: "POST",
-        data: {"cart_id": cartId,
-               "change": change},  // 1 혹은 -1
-        dataType: "JSON",
+        data: { "cart_id": cart_id, "change": change },
+        dataType: "json",
         success: function(json) {
-            // {"result": 1, "message": "수량이 변경되었습니다."}
-            
             if(json.result == 1) {
-                location.reload(); // 성공 -> 새로고침
+
+                let newQty = currentQty + parseInt(change);
+                $qtyInput.val(newQty); 
+
+                const unitPrice = parseInt($row.find(".chk").data("unit-price"));
+                const newRowTotal = unitPrice * newQty;
+                
+                $row.find("td:eq(5)").html(newRowTotal.toLocaleString() + "원");
+                
+                $row.find(".chk").attr("data-price", newRowTotal);
+                
+                calculateTotal();
+                
             } else {
-                alert(json.message);
+                alert(json.message || "수량 변경이 불가능합니다.");
             }
         },
         error: function() {
-            alert("수량 변경 중 오류가 발생했습니다.");
+            alert("서버 통신 오류가 발생했습니다.");
         }
     });
 }

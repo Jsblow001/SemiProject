@@ -168,7 +168,7 @@
                 </a>
             </div>
             <div class="col-md-3 mb-4">
-                <a href="<%= ctxPath %>/customer/qnaList.sp" class="btn-mypage-card">
+                <a href="<%= ctxPath %>/customer/myQnaList.sp" class="btn-mypage-card">
                     <div class="card-icon">💬</div>
                     <div class="card-title">나의문의</div>
                     <div class="card-desc">1:1 문의 내역 확인</div>
