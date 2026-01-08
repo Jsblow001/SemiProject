@@ -100,4 +100,4 @@ replay_pid*
 /SemiProject/src/main/webapp/WEB-INF/lib
 /SemiProject/src/main/webapp/Command.properties
 /SemiProject/src/main/webapp/WEB-INF/web.xml
-/SemiProject/src/main/webapp/WEB-INF/SQL/SemiProject.sql
+/SemiProject/src/main/webapp/WEB-INF/SQL
