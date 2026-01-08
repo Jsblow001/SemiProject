@@ -185,7 +185,8 @@
             <table class="table" style="font-size: 14px; border-top: 2px solid #5D4037; background: #fff;">
                 <thead class="bg-light text-center text-muted">
                     <tr>
-                        <th style="width: 20%;">날짜</th>
+                    	<th style="width: 10%;">번호</th>
+                        <th style="width: 15%;">날짜</th>
                         <th>상품명</th>
                         <th style="width: 15%;">결제금액</th>
                         <th style="width: 15%;">상태</th>
@@ -196,8 +197,9 @@
 				
 				        <%-- 최근 주문이 있는 경우 --%>
 				        <c:when test="${not empty recentOrderList}">
-				            <c:forEach var="o" items="${recentOrderList}" end="4">
+				            <c:forEach var="o" items="${recentOrderList}" varStatus="status" end="4">
 				                <tr>
+				                	<td>${status.count}</td>
 				                    <td>
 				                        <fmt:formatDate value="${o.odrDate}" pattern="yyyy-MM-dd"/>
 				                    </td>
@@ -217,7 +219,7 @@
 				        <%-- 최근 주문이 없는 경우 --%>
 				        <c:otherwise>
 				            <tr>
-				                <td colspan="4" class="py-5 text-muted">
+				                <td colspan="5" class="py-5 text-muted">
 				                    최근 30일 내에 주문하신 내역이 없습니다.
 				                </td>
 				            </tr>

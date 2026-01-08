@@ -18,7 +18,7 @@
     body { background-color:#fff; font-family:'Pretendard', sans-serif; color:#333; }
     .edit-container { max-width:550px; margin:120px auto; padding:20px; }
     .title { text-align:center; font-size:26px; font-weight:700; margin-bottom:50px; letter-spacing:5px; }
-    .section-title { font-size:14px; font-weight:bold; margin:40px 0 20px; border-bottom:1px solid #000; padding-bottom:10px; }
+    .section-title { font-size:14px; font-weight:bold; margin:40px 0 20px; border-bottom:1px solid #000;}
     .form-label { font-size:13px; font-weight:600; margin-bottom:8px; display:block; }
     .guide-text { font-size:12px; color:#888; margin-bottom:10px; }
     .form-control { border-radius:0; border:1px solid #ddd; padding:12px; height:auto; }
@@ -26,6 +26,12 @@
     .btn-black { background:#000; color:#fff; border-radius:0; padding:16px; width:100%; font-weight:bold; border:none; }
     .btn-black:hover { background:#333; }
     .btn-post { background:#f8f8f8; border:1px solid #ddd; border-radius:0; font-size:13px; padding:0 15px; }
+    .section-title::after, 
+    .section-title::before {
+        content: none !important; /* 내용 삭제 */
+        display: none !important; /* 공간 삭제 */
+    }
+    
 </style>
 
 <div class="container">
@@ -39,7 +45,7 @@
                    value="${sessionScope.loginuser.userid}">
 
             <!-- ================= 비밀번호 ================= -->
-            <div class="section-title">PASSWORD CHANGE</div>
+            <div class="section-title" >PASSWORD CHANGE</div>
 
             <div class="form-group mb-4">
                 <label class="form-label">새 비밀번호</label>
@@ -149,16 +155,16 @@
             </div>
 
             <!-- 버튼 -->
-            <button type="button" class="btn-black mb-2" onclick="goEdit()">
+            <button type="button" class="btn-black mb-3 mt-4" onclick="goEdit()">
                 UPDATE ACCOUNT
             </button>
-
-            <button type="button"
-                    class="btn btn-outline-danger btn-block border-0"
-                    style="border-radius:0; padding:15px; font-weight:bold;"
-                    onclick="history.back()">
-                CANCEL
-            </button>
+			
+			<button type="button"
+			        class="btn btn-danger btn-block"
+			        style="border-radius:0; padding:16px; font-weight:bold; border:none; text-decoration:none !important; color:#fff !important;"
+			        onclick="history.back()">
+			    CANCEL
+			</button>
         </form>
     </div>
 </div>

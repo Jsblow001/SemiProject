@@ -20,7 +20,7 @@ public class MemberEditController extends AbstractController {
 	        // 로그인이 안 된 상태라면 접근 불가
 	        request.setAttribute("message", "먼저 로그인을 하세요.");
 	        request.setAttribute("loc", request.getContextPath() + "/login.sp");
-	        request.getRequestDispatcher("/msg.jsp").forward(request, response);
+	        request.getRequestDispatcher("/WEB-INF/msg.jsp").forward(request, response);
 	        return;
 	    }
 
