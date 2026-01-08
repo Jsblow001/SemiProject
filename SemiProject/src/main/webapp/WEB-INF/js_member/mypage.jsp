@@ -147,10 +147,10 @@
         <%-- 메뉴 카드 영역 --%>
         <div class="row text-center mb-5">
             <div class="col-md-3 mb-4">
-                <a href="<%= ctxPath %>/shop/orderList.sp" class="btn-mypage-card">
-                    <div class="card-icon">📦</div>
-                    <div class="card-title">주문내역</div>
-                    <div class="card-desc">최근 주문 현황 확인</div>
+                <a href="<%= ctxPath %>/reviewWrite.sp" class="btn-mypage-card">
+                    <div class="card-icon">📝</div>
+                    <div class="card-title">리뷰작성</div>
+                    <div class="card-desc">상품리뷰 작성</div>
                 </a>
             </div>
             <div class="col-md-3 mb-4">
@@ -196,7 +196,7 @@
 				
 				        <%-- 최근 주문이 있는 경우 --%>
 				        <c:when test="${not empty recentOrderList}">
-				            <c:forEach var="o" items="${recentOrderList}">
+				            <c:forEach var="o" items="${recentOrderList}" end="4">
 				                <tr>
 				                    <td>
 				                        <fmt:formatDate value="${o.odrDate}" pattern="yyyy-MM-dd"/>
