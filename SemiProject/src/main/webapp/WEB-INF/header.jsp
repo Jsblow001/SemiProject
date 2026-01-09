@@ -4,8 +4,7 @@
 
 <% String ctxPath = request.getContextPath(); %>
 
-<!DOCTYPE html>
-<html lang="ko">
+
 <head>
     <meta charset="utf-8">
     <title>CARIN</title>
@@ -90,6 +89,60 @@
             body { padding-top: 95px; }
             .center-logo h1 { font-size: 1.5rem; }
         }
+        
+        /* ------------------------------------------------- */
+        
+         /* 헤더 아래 검색 패널 */
+      .header-search-panel{
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 100%;               /* fixed-top-header 바로 아래 */
+        background: #fff;
+        border-bottom: 1px solid #eee;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+        z-index: 1999;
+      
+        /* 슬라이드 애니메이션 */
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(-8px);
+        transition: max-height .25s ease, opacity .2s ease, transform .25s ease;
+      }
+      
+      .header-search-panel.is-open{
+        max-height: 360px;       /* 결과 영역 포함 높이 */
+        opacity: 1;
+        transform: translateY(0);
+      }
+      
+      .search-row{
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      
+      .search-result{
+        max-height: 260px;
+        overflow: auto;
+      }
+      
+      /* 결과 아이템 */
+      .search-item{
+        display:flex;
+        gap:12px;
+        padding:10px 0;
+        border-top:1px solid #f1f1f1;
+      }
+      .search-item:first-child{ border-top:none; }
+      .search-thumb{
+        width:56px; height:56px; object-fit:cover; border-radius:10px;
+      }
+      .search-meta .name{ font-weight:600; color:#222; }
+      .search-meta .price{ font-size:.9rem; color:#666; }
+      .search-empty{ color:#888; padding:12px 0; }
+        
     </style>
 </head>
 
@@ -157,16 +210,42 @@
                     
                     <div class="collapse navbar-collapse mr-lg-4">
                         <div class="navbar-nav">
-                            <a href="/stockist" class="nav-item nav-link text-nowrap mr-lg-3">BRAND</a>
-                            <a href="/customer" class="nav-item nav-link text-nowrap">COMMUNITY</a>
+                        
+                        	<li class="nav-item dropdown" style="list-style: none;">
+		                   		<a class="nav-link dropdown-toggle menufont_size text-primary" href="#" id="navbarDropdown" data-toggle="dropdown">BRAND</a>
+		                   		<div class="dropdown-menu dropdown-menu-right shadow border-0" aria-labelledby="navbarDropdown">
+		                   			<a class="dropdown-item text-primary" href="<%= ctxPath%>/introduction.sp">Brand Story</a>
+
+		                   		</div>
+		                   	</li>
+                        
+	                       	<li class="nav-item dropdown" style="list-style: none;">
+		                   		<a class="nav-link dropdown-toggle menufont_size text-primary" href="#" id="navbarDropdown" data-toggle="dropdown">COMMUNITY</a>
+		                   		<div class="dropdown-menu dropdown-menu-right shadow border-0" aria-labelledby="navbarDropdown">
+		                   			<a class="dropdown-item text-primary" href="<%= ctxPath%>/noticeList.sp">Notice</a>
+		                   			<a class="dropdown-item text-primary" href="<%= ctxPath%>/reviews.sp">Review</a>
+		                   			<a class="dropdown-item text-primary" href="<%= ctxPath%>/qnaList.sp">QnA</a>
+		                   			<a class="dropdown-item text-primary" href="<%= ctxPath%>">매장찾기</a>
+		                   		</div>
+		                   	</li>
+                    	
                         </div>
                     </div>
 
                     <div class="d-inline-flex align-items-center">
                         <div class="dropdown d-inline-block mr-3">
+                        
+                        
+                            <!--
                             <button class="btn btn-link text-wood p-0" type="button" data-toggle="dropdown">
                                 <i class="fa fa-search"></i>
-                            </button>
+                            </button> -->
+                            
+                            
+                            <button id="btnHeaderSearch" class="btn btn-link text-wood p-0" type="button">
+		                       <i class="fa fa-search"></i>
+		                     </button>
+                            
                             <div class="dropdown-menu dropdown-menu-right p-3 shadow border-0" style="width: 250px;">
                                 <div class="input-group">
                                     <input type="text" class="form-control" placeholder="Search">
@@ -198,7 +277,103 @@
                 </div>
             </nav>
         </div>
-    </div> 
+        
+      	<div id="headerSearchPanel" class="header-search-panel">
+        <div class="container-fluid px-xl-5 py-3" style="display:flex; flex-direction:column; align-items:center;">
+      
+        <!-- form이 flex 컨테이너 역할까지 하게 -->
+        <form id="headerSearchForm"
+              method="get"
+              action="<%=ctxPath%>/productSearchResult.sp"
+              class="search-row"
+              style="width:33.333%; min-width:320px; max-width:520px; gap:8px;">
     
+         <input id="headerSearchInput" name="q" type="text" class="form-control"
+                 placeholder="상품명을 입력하세요" autocomplete="off"
+                 style="font-size:0.9rem; padding:6px 10px; height:36px;" />
+    
+         <!-- 검색 실행 버튼(선택: 있으면 UX 좋아짐) -->
+         <button type="submit" class="btn btn-wood"
+                 style="font-size:0.85rem; padding:6px 12px; height:36px; white-space:nowrap;">
+            검색
+         </button>
+    
+        </form>
+    
+        <!-- 결과 -->
+        <div id="headerSearchResult" class="search-result mt-3"
+             style="width:33.333%; min-width:320px; max-width:520px;">
+        </div>
+      </div>   
+    </div>
+  </div> 
+    
+<script type="text/javascript">
+
+$(function () {
+	  const $panel = $("#headerSearchPanel");
+	  const $input = $("#headerSearchInput");
+	  const $form  = $("#headerSearchForm");
+	  const $result = $("#headerSearchResult");
+	  const $btn = $("#btnHeaderSearch");
+
+	  function openPanel(){
+	    $panel.addClass("is-open");
+	    setTimeout(() => $input.trigger("focus"), 150);
+	  }
+	  function closePanel(){
+	    $panel.removeClass("is-open");
+	  }
+
+	  // 버튼 클릭: 토글
+	  $btn.on("click", function (e) {
+	    e.stopPropagation(); // 버튼 누른 클릭이 "바깥 클릭"으로 잡히지 않게
+	    $panel.toggleClass("is-open");
+	    if ($panel.hasClass("is-open")) openPanel();
+	  });
+
+	  // 패널 내부 클릭은 닫힘 방지
+	  $panel.on("click", function(e){
+	    e.stopPropagation();
+	  });
+
+	  // 문서 어디든 클릭: 패널이 열려있으면 닫기
+	  $(document).on("click", function(){
+	    closePanel();
+	  });
+
+	  // ESC 누르면 닫기
+	  $(document).on("keydown", function(e){
+	    if(e.key === "Escape") closePanel();
+	  });
+
+	  function adjustHeaderSearchWidth(){
+	    const isMobile = window.matchMedia("(max-width: 991px)").matches;
+
+	    const w = isMobile ? "92%" : "33.333%";
+	    const minW = isMobile ? "" : "320px";
+	    const maxW = isMobile ? "640px" : "520px";
+
+	    $form.css({ width: w, minWidth: minW, maxWidth: maxW });
+	    $result.css({ width: w, minWidth: minW, maxWidth: maxW });
+	  }
+
+	  adjustHeaderSearchWidth();
+	  $(window).on("resize", adjustHeaderSearchWidth);
+
+	  // submit 검증(2글자 미만 막기)
+	  $form.on("submit", function(e){
+	    const q = ($input.val() || "").trim();
+	    if(q.length < 2){
+	      e.preventDefault();
+	      alert("검색어는 2글자 이상 입력하세요.");
+	      $input.trigger("focus");
+	      return;
+	    }
+	    closePanel(); // 제출 시 닫기(선택)
+	  });
+	});
+
+</script>
+
 </body>
-</html>

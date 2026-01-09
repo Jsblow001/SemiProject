@@ -46,6 +46,8 @@ public class QnaWriteController extends AbstractController {
 		}
       
         if("GET".equalsIgnoreCase(request.getMethod())) {
+        	String myUrl = request.getParameter("myUrl");
+            request.setAttribute("myUrl", myUrl);
             super.setRedirect(false);
             super.setViewPage("/WEB-INF/jh_qna/qna_write.jsp");
             return;
@@ -122,8 +124,9 @@ public class QnaWriteController extends AbstractController {
             conn.commit();
 
             // 등록 후 QnA 목록으로(너 프로젝트 목록 URL로 수정)
+            String myUrl = request.getParameter("myUrl");
             super.setRedirect(true);
-            super.setViewPage(request.getContextPath() + "/qnaList.sp");
+            super.setViewPage(request.getContextPath() + myUrl);
 
         } catch(Exception e) {
             if(conn != null) conn.rollback();

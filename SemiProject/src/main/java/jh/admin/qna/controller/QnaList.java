@@ -45,9 +45,7 @@ public class QnaList extends AbstractController {
 
         // ✅✅ 여기 중요: 관리자 목록 컨트롤러 "자기 자신" URL로 통일
         String ctx = request.getContextPath();
-        String listUrl = ctx + "/qnaListAdmin.sp"; 
-        // ⚠️ 위 "/qnaListAdmin.sp" 를 properties 매핑에 맞게 바꿔라!
-        // (지금 네가 pageBar/form action에서 /qnaList.sp로 보내서 일반 목록으로 넘어가는 현상이 생김)
+        String listUrl = ctx + "/adminQnaList.sp"; 
 
         // 2) 파라미터 (드롭다운 방식 우선: searchType/searchWord)
         String searchType = request.getParameter("searchType");
