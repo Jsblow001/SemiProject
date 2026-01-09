@@ -130,8 +130,9 @@
                             </a>
                             <div class="collapse" id="memberSub">
                                 <div class="sub-menu-list">
+                             		<a href="<%= ctxPath %>/admin/memberList.sp">회원 목록</a>
                                     <a href="<%= ctxPath %>/admin/memberMain.sp">회원 관리</a>
-                                    <a href="<%= ctxPath %>/admin/memberList.sp">회원 목록</a>
+                                    <a href="<%= ctxPath %>/memberGradeList.sp">회원 등급 관리</a>
                                 </div>
                             </div>
                         </div>
