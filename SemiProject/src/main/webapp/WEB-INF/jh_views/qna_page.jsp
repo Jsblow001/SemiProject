@@ -155,7 +155,7 @@
     </table>
 
     <div class="btn-row">
-      <a class="btn-write" href="<%=request.getContextPath()%>/qnaWrite.sp">글쓰기</a>
+      <a class="btn-write" href="<%=request.getContextPath()%>/qnaWrite.sp?myUrl=/qnaList.sp">글쓰기</a>
     </div>
 
     <!-- ✅ pageBar 출력 -->

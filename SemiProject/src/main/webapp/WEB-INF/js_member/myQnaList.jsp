@@ -87,7 +87,7 @@
           <c:forEach var="qna" items="${qnaList}" varStatus="status">
             <tr>
               <td>
-                ${requestScope.totalQnaCount - (requestScope.currentShowPageNo-1)*requestScope.sizePerPage - status.index}
+                ${vno - status.index}
               </td>
 
               <td>
@@ -128,7 +128,7 @@
     </table>
 
     <div class="btn-row">
-      <a class="btn-write" href="<%=request.getContextPath()%>/qnaWrite.sp">새 문의하기</a>
+      <a class="btn-write" href="<%=request.getContextPath()%>/qnaWrite.sp?myUrl=/customer/myQnaList.sp">새 문의하기</a>
     </div>
 
     <ul class="pagebar">
