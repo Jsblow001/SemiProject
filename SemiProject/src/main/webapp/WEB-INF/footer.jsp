@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
+<% String ctxPath = request.getContextPath(); %>
+
 <div class="container-fluid border-top mt-5" style="background-color: var(--light-bg); color: #333;">
     <div class="container-fluid py-5 px-xl-5">
         
@@ -65,8 +67,8 @@
                     <a class="text-dark mb-2" href="#">배송조회</a>
                     <a class="text-dark mb-2" href="#">A/S 접수</a>
                     <a class="text-dark mb-2" href="#">매장찾기</a>
-                    <a class="text-dark mb-2" href="#">이용약관</a>
-                    <a class="text-dark mb-2" href="#">개인정보처리방침</a>
+                    <a class="text-dark mb-2" href="<%= ctxPath %>/terms.sp">이용약관</a>
+                    <a class="text-dark mb-2" href="<%= ctxPath %>/information.sp">개인정보처리방침</a>
                 </div>
             </div>
 

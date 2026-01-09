@@ -147,10 +147,10 @@
         <%-- 메뉴 카드 영역 --%>
         <div class="row text-center mb-5">
             <div class="col-md-3 mb-4">
-                <a href="<%= ctxPath %>/shop/orderList.sp" class="btn-mypage-card">
-                    <div class="card-icon">📦</div>
-                    <div class="card-title">주문내역</div>
-                    <div class="card-desc">최근 주문 현황 확인</div>
+                <a href="<%= ctxPath %>/reviewWrite.sp" class="btn-mypage-card">
+                    <div class="card-icon">📝</div>
+                    <div class="card-title">리뷰작성</div>
+                    <div class="card-desc">상품리뷰 작성</div>
                 </a>
             </div>
             <div class="col-md-3 mb-4">
@@ -185,7 +185,8 @@
             <table class="table" style="font-size: 14px; border-top: 2px solid #5D4037; background: #fff;">
                 <thead class="bg-light text-center text-muted">
                     <tr>
-                        <th style="width: 20%;">날짜</th>
+                    	<th style="width: 10%;">번호</th>
+                        <th style="width: 15%;">날짜</th>
                         <th>상품명</th>
                         <th style="width: 15%;">결제금액</th>
                         <th style="width: 15%;">상태</th>
@@ -196,8 +197,9 @@
 				
 				        <%-- 최근 주문이 있는 경우 --%>
 				        <c:when test="${not empty recentOrderList}">
-				            <c:forEach var="o" items="${recentOrderList}">
+				            <c:forEach var="o" items="${recentOrderList}" varStatus="status" end="4">
 				                <tr>
+				                	<td>${status.count}</td>
 				                    <td>
 				                        <fmt:formatDate value="${o.odrDate}" pattern="yyyy-MM-dd"/>
 				                    </td>
@@ -217,7 +219,7 @@
 				        <%-- 최근 주문이 없는 경우 --%>
 				        <c:otherwise>
 				            <tr>
-				                <td colspan="4" class="py-5 text-muted">
+				                <td colspan="5" class="py-5 text-muted">
 				                    최근 30일 내에 주문하신 내역이 없습니다.
 				                </td>
 				            </tr>
