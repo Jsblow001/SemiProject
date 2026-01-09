@@ -35,7 +35,7 @@
                <div class="card dashboard-card p-4" style="border-left: 5px solid var(--dark-wood) !important;">
                    <p class="text-muted mb-2">Total Members</p>
                    <h2 class="font-weight-bold">${(totalCount != null) ? totalCount : 0} 명</h2>
-                   <a href="#" class="small text-wood font-weight-bold mt-2">상세 명단 보기 ></a>
+                   <a href="<%= ctxPath %>/admin/memberList.sp" class="small text-wood font-weight-bold mt-2">상세 명단 보기 ></a>
                </div>
            </div>
            <div class="col-md-4 mb-4">
