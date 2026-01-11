@@ -1,7 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 
-
+<!DOCTYPE html>
+<html lang="ko">
 
 <jsp:include page="header.jsp"/>
 <!-- Customized Bootstrap Stylesheet -->
@@ -45,15 +46,7 @@
     <div class="container-fluid">
         <div class="row border-top pt-10 px-xl-5">
             <div class="col-lg">
-                <nav class="navbar navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-0">
-                    <a href="" class="text-decoration-none d-block d-lg-none">
-                        <h1 class="m-0 display-5 font-weight-semi-bold"><span class="text-primary font-weight-bold border px-3 mr-1">E</span>CARIN</h1>
-                    </a>
-                    <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    
-                </nav>
+                
                 <div id="header-carousel" class="carousel slide" data-ride="carousel">
                     <div class="carousel-inner">
 					    <div class="carousel-item active">
@@ -462,14 +455,9 @@
 
 
     <!-- Back to Top -->
-    <a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
+    <a href="/SemiProject/" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
 
 
-    <!-- JavaScript Libraries -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
-    <script src="lib/easing/easing.min.js"></script>
-    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
 
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
@@ -481,22 +469,19 @@
           	  interval :2000
           	});
 
-          	$('.carousel .carousel-item').each(function(){
-          	    var next = $(this).next();
-          	    if (!next.length) {
-          	        next = $(this).siblings(':first');
-          	    }
-          	    next.children(':first-child').clone().appendTo($(this));
-          	    
-          	    for (var i=0;i<2;i++) {
-          	        next=next.next();
-          	        if (!next.length) {
-          	        	next = $(this).siblings(':first');
-          	      	}
-          	        
-          	        next.children(':first-child').clone().appendTo($(this));
-          	      }
-          	});
+        	$('#recipeCarousel .carousel-item').each(function(){
+        	    var next = $(this).next();
+        	    if (!next.length) next = $(this).siblings(':first');
+
+        	    next.children(':first-child').clone().appendTo($(this));
+
+        	    for (var i=0;i<2;i++) {
+        	        next = next.next();
+        	        if (!next.length) next = $(this).siblings(':first');
+        	        next.children(':first-child').clone().appendTo($(this));
+        	    }
+        	});
+
           	
         });
   </script>

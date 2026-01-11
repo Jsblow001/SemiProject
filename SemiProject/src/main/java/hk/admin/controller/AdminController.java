@@ -2,15 +2,19 @@ package hk.admin.controller;
 
 import sp.common.controller.AbstractController;
 import hk.member.domain.MemberDTO;
+import hk.member.model.MemberDAO;
+import hk.member.model.MemberDAO_imple;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 public class AdminController extends AbstractController {
 
+   MemberDAO mdao = new MemberDAO_imple();
+   
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
-    	
+       
         // ===============================
         // 관리자 로그인 여부 체크
         // ===============================
@@ -38,6 +42,12 @@ public class AdminController extends AbstractController {
             return;
         }
 
+        // 1. DB에서 값을 가져와 자바 변수(totalCount)에 할당
+        int totalCount  = mdao.getTotalMemberCount(); 
+
+        // 2. JSP에서 사용할 이름("totalCount")으로 request 영역에 저장
+        request.setAttribute("totalCount", totalCount); 
+        
         // ===============================
         // 관리자 메인 페이지 보여주기 (껍데기)
         // ===============================

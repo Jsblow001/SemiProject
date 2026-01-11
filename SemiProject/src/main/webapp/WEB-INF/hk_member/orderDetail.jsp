@@ -26,6 +26,40 @@
 .detail-table th {
     background:#fafafa;
 }
+/* ===== 버튼 공통 ===== */
+.btn-box {
+    margin-top: 40px;
+    text-align: center;
+}
+
+.admin-btn {
+    display: inline-block;
+    padding: 10px 22px;
+    background: #3e3a39;
+    color: #fff;
+    font-size: 14px;
+    border-radius: 3px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.admin-btn:hover {
+    background: #2f2b2a;
+}
+
+/* ===== 보조 버튼 (목록으로) ===== */
+a.admin-btn.light,
+a.admin-btn.light:link,
+a.admin-btn.light:visited {
+    background: #e6e4e1;
+    color: #3e3a39 !important;
+    text-decoration: none;
+}
+
+a.admin-btn.light:hover {
+    background: #d8d5d1;
+    color: #2f2b2a !important;
+}
 </style>
 </head>
 
@@ -72,9 +106,12 @@
         </tbody>
     </table>
 
-    <div style="margin-top:30px;">
-        <a href="javascript:history.back()">← 주문목록으로</a>
-    </div>
+    <div class="btn-box">
+	    <a href="javascript:history.back()"
+	       class="admin-btn light">
+	        주문목록으로
+	    </a>
+	</div>
 
 </div>
 

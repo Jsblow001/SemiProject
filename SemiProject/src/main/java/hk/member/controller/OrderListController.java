@@ -38,10 +38,24 @@ public class OrderListController extends AbstractController {
         /* ===============================
            2. 파라미터 받기
         =============================== */
+        // 필터
         String status    = request.getParameter("status");     // 결제상태
         String startDate = request.getParameter("startDate");  // yyyy-MM-dd
         String endDate   = request.getParameter("endDate");    // yyyy-MM-dd
         String range     = request.getParameter("range");      // today, 7d, 1m, 3m, 6m
+        
+        // 페이징 처리
+        String pageStr = request.getParameter("page");
+        int page = 1;        // 기본 1페이지
+        int size = 10;       // 한 페이지 10개
+
+        if(pageStr != null) {
+            try {
+                page = Integer.parseInt(pageStr);
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+        }
 
         /* ===============================
            3. 빠른 기간(range) 처리
@@ -79,19 +93,38 @@ public class OrderListController extends AbstractController {
         }
 
         /* ===============================
-           4. 주문 목록 조회
+        4. 페이징 계산
+     	=============================== */
+        int startRow = (page - 1) * size + 1;
+        int endRow   = page * size;
+        
+        /* ===============================
+        5. 총 건수
+     	=============================== */
+        int totalCount =
+            odao.getOrderTotalCount(userid, status, startDate, endDate);
+
+        int totalPage = (int)Math.ceil((double)totalCount / size);
+        
+        /* ===============================
+           6. 주문 목록 조회
         =============================== */
         List<OrderDTO> orderList =
-            odao.selectMyOrderList(userid, status, startDate, endDate);
+            odao.selectMyOrderList(userid, status, startDate, endDate, startRow, endRow);
 
         /* ===============================
-           5. request 영역에 저장 (값 유지용)
+           7. request 영역에 저장 (값 유지용)
         =============================== */
         request.setAttribute("orderList", orderList);
         request.setAttribute("status", status);
         request.setAttribute("startDate", startDate);
         request.setAttribute("endDate", endDate);
         request.setAttribute("range", range);
+        
+        // 페이징 처리
+        request.setAttribute("page", page);
+        request.setAttribute("totalPage", totalPage);
+        request.setAttribute("totalCount", totalCount);
 
         /* ===============================
            6. JSP 이동

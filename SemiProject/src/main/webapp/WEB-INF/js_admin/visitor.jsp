@@ -121,7 +121,7 @@
                             <p class="text-muted mb-1 font-weight-bold">평균 이탈률</p>
                             <h3 class="font-weight-bold text-dark">${bounceRate}%</h3>
                             <div class="progress mt-2" style="height: 6px; background-color: rgba(0,0,0,0.05);">
-                                <div class="progress-bar bg-danger" role="progressbar" style="width: 74.2%" aria-valuenow="74.2" aria-valuemin="0" aria-valuemax="100"></div>
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: ${empty bounceRate ? 0 : bounceRate}%"aria-valuenow="${bounceRate}" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
                             <small class="text-muted d-block mt-1">단일 페이지 방문 비율</small>
                         </div>

@@ -55,7 +55,9 @@
       <input type="file" name="files" multiple>
       <div class="help">첨부가 없어도 글 등록 가능합니다.</div>
     </div>
-
+    
+	<input type="hidden" name="myUrl" value="${myUrl}">
+	
     <div class="btns">
       <button type="button" class="btn ghost" onclick="history.back()">취소</button>
       <button type="submit" class="btn primary">등록</button>

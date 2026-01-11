@@ -38,14 +38,16 @@ public class MyPageController extends AbstractController {
         String userid = loginuser.getUserid();
 
         /* ===============================
-           3. 최근 30일 주문 조회
-        =============================== */
-        LocalDate today = LocalDate.now();
-        String startDate = today.minusDays(30).toString();
-        String endDate   = today.toString();
-
-        List<OrderDTO> recentOrderList =
-            odao.selectMyOrderList(userid, null, startDate, endDate);
+        3. 최근 30일 주문 조회
+	    =============================== */
+	    LocalDate today = LocalDate.now();
+	    String startDate = today.minusDays(30).toString();
+	    String endDate   = today.toString();
+	
+	    int startRow = 1;
+	     int endRow   = 5;
+	    
+	    List<OrderDTO> recentOrderList = odao.selectMyOrderList(userid, null, startDate, endDate, startRow, endRow);
 
         /* ===============================
            4. request 영역에 저장
