@@ -23,6 +23,7 @@
 	<script src="<%= ctxPath%>/js/main.js"></script>
 	
 	<script src="<%= ctxPath%>/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js" type="text/javascript"></script>
+    
     <script src="lib/easing/easing.min.js"></script>
     <script src="lib/owlcarousel/owl.carousel.min.js"></script>
     
