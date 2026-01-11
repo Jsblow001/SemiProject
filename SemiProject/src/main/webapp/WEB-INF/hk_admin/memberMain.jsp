@@ -10,132 +10,49 @@
 
 <style>
 /* ===== 공통 ===== */
-body{font-family:'Pretendard',Arial,sans-serif;background:#f7f6f3;color:#333;}
-.wrap { /* 반응형 웹 */
-    max-width:1100px;
-    width:100%;
-    margin:60px auto;
-    padding:0 16px;     /* 모바일 여백 */
-    box-sizing:border-box;
-}s
-h2{font-size:23px!important;font-weight:700;letter-spacing:-0.3px;color:#2f2b2a;margin-bottom:40px;}
+body{font-family:'Pretendard',Arial,sans-serif;background:#f7f6f3;color:#333}
+.wrap{max-width:1100px;width:100%;margin:60px auto;padding:0 16px;box-sizing:border-box}
+h2{font-size:23px!important;font-weight:700;letter-spacing:-.3px;color:#2f2b2a;margin-bottom:40px}
 
 /* ===== 대시보드 상단 ===== */
-.dashboard{display:flex;gap:20px;margin-bottom:50px;}
-.dashboard-sub h2{font-size:15px;font-weight:600;color:#2f2b2a;margin-bottom:15px;}
-.card-area.main-cards{flex:3;display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
-.card{background:#fff;border-radius:4px;padding:25px 20px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,0.06);transition:.15s;}
-.card:hover{transform:translateY(-4px);}
-.card h3{font-size:14px;color:#777;margin-bottom:15px;font-weight:500;}
-.card p{font-size:30px;font-weight:700;color:#3e3a39;}
-.side-card{flex:1.2;background:#fff;border-radius:4px;padding:30px 25px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,0.08);border-left:5px solid #a1887f;}
-.side-card h3{font-size:15px;margin-bottom:20px;color:#6d4c41;font-weight:600;}
-.side-card p{font-size:36px;font-weight:800;color:#4e342e;}
-
+.dashboard{display:flex;gap:20px;margin-bottom:50px}
+.dashboard-sub h2{font-size:15px;font-weight:600;color:#2f2b2a;margin-bottom:15px}
+.card-area.main-cards{flex:3;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card{background:#fff;border-radius:4px;padding:25px 20px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.06);transition:.15s}
+.card:hover{transform:translateY(-4px)}
+.card h3{font-size:14px;color:#777;margin-bottom:15px;font-weight:500}
+.card p{font-size:30px;font-weight:700;color:#3e3a39}
+.side-card{flex:1.2;background:#fff;border-radius:4px;padding:30px 25px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.08);border-left:5px solid #a1887f}
+.side-card h3{font-size:15px;margin-bottom:20px;color:#6d4c41;font-weight:600}
+.side-card p{font-size:36px;font-weight:800;color:#4e342e}
 
 /* ===== 하단 버튼 ===== */
-.btn-area a{display:inline-block;padding:12px 24px;background:#3e3a39;color:#fff;text-decoration:none;font-size:14px;font-weight:600;border-radius:3px;}
-.btn-area a:hover{background:#2f2b2a;}
+.btn-area a{display:inline-block;padding:12px 24px;background:#3e3a39;color:#fff;text-decoration:none;font-size:14px;font-weight:600;border-radius:3px}
+.btn-area a:hover{background:#2f2b2a}
 
-/* ===============================
-   확장 지표 영역
-   =============================== */
-.dashboard-sub{margin-top:50px;}   
-.dashboard-sub h4{font-size:15px;font-weight:600;color:#2f2b2a;margin-bottom:15px;}
-.sub-cards{display:flex;gap:20px;margin-bottom:30px;}
-.card.small{padding:20px;margin-bottom:40px;}
-.sub-lists{display:flex;gap:30px;margin-bottom:30px;}
-.list-box{flex:1;background:#fff;padding:20px;border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,0.05);}
-.recent-members{background:#fff;padding:20px;border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,0.05);}
+/* =============================== 확장 지표 영역 =============================== */
+.dashboard-sub{margin-top:50px}
+.dashboard-sub h4{font-size:15px;font-weight:600;color:#2f2b2a;margin-bottom:15px}
+.sub-cards{display:flex;gap:20px;margin-bottom:30px}
+.card.small{padding:20px;margin-bottom:40px}
+.sub-lists{display:flex;gap:30px;margin-bottom:30px}
+.list-box,.recent-members{flex:1;background:#fff;padding:20px;border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,.05)}
 
 /* ===== 최근 가입 회원 TOP ===== */
-.recent-members {
-    background:#fff;
-    padding:25px;
-    border-radius:4px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.05);
-}
+.recent-members{padding:25px}
+.recent-members h4{font-size:15px;font-weight:700;margin-bottom:18px}
+.recent-members p{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;margin:0 0 8px;background:#faf7f2;border-radius:3px;font-size:14px;font-weight:500;color:#3e3a39;transition:.15s}
+.recent-members p:last-child{margin-bottom:0}
+.recent-members p:hover{background:#f1ebe6;transform:translateX(3px)}
+.recent-members p::before{content:"👤";margin-right:8px}
+.recent-members p span{font-size:12px;color:#8d6e63}
 
-.recent-members h4 {
-    font-size:15px;
-    font-weight:700;
-    margin-bottom:18px;
-}
-
-.recent-members p {
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:12px 14px;
-    margin:0 0 8px;
-    background:#faf7f2;
-    border-radius:3px;
-    font-size:14px;
-    font-weight:500;
-    color:#3e3a39;
-    transition:0.15s;
-}
-
-.recent-members p:last-child {
-    margin-bottom:0;
-}
-
-.recent-members p:hover {
-    background:#f1ebe6;
-    transform:translateX(3px);
-}
-
-/* 아이디 강조 */
-.recent-members p::before {
-    content:"👤";
-    margin-right:8px;
-}
-
-/* 날짜 스타일 */
-.recent-members p span {
-    font-size:12px;
-    color:#8d6e63;
-}
-
-/* ===== 등급별 회원수/ 성별 회원수 스타일 ===== */
-/* 왼쪽 라벨 */
-.stat-list{
-    list-style:none;
-    padding:0;
-    margin:0;
-}
-
-/* 숫자 뱃지 */
-.stat-list li{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:10px 12px;
-    border-bottom:1px solid #eee;
-    font-size:14px;
-}
-
-/* ===== 성별 색상 ===== */
-.stat-list li.male .label::before{
-    content:'';
-    display:inline-block;
-    width:8px;
-    height:8px;
-    background:#4a90e2;
-    border-radius:50%;
-    margin-right:8px;
-}
-
-.stat-list li.female .label::before{
-    content:'';
-    display:inline-block;
-    width:8px;
-    height:8px;
-    background:#e91e63;
-    border-radius:50%;
-    margin-right:8px;
-}
-
+/* ===== 등급별 / 성별 ===== */
+.stat-list{list-style:none;padding:0;margin:0}
+.stat-list li{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid #eee;font-size:14px}
+.stat-list li.male .label::before,.stat-list li.female .label::before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px}
+.stat-list li.male .label::before{background:#4a90e2}
+.stat-list li.female .label::before{background:#e91e63}
 </style>
 
 </head>

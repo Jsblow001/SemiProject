@@ -12,169 +12,46 @@
 <title>관리자 | 회원 상세</title>
 
 <style>
-    body {
-        font-family: 'Pretendard', Arial, sans-serif;
-        background-color: #f7f6f3;
-        color: #333;
-    }
+body{font-family:'Pretendard',Arial,sans-serif;background:#f7f6f3;color:#333}
+.container{width:900px;margin:60px auto;background:#fff;padding:40px;border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,.06)}
+h3{font-size:18px;font-weight:700;margin-bottom:30px;color:#2f2b2a}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{width:160px;background:#f2f1ee;text-align:left;padding:14px;border-bottom:1px solid #ccc;color:#555}
+td{padding:14px;border-bottom:1px solid #d5d5d5}
+.btn-box{margin-top:40px;text-align:center}
+.btn{display:inline-block;padding:10px 18px;font-size:14px;border-radius:4px;text-decoration:none;margin:0 5px}
+.btn-list{background:#3e3a39;color:#fff}
+.btn-list:hover{background:#2f2b2a}
 
-    .container {
-        width: 900px;
-        margin: 60px auto;
-        background-color: #fff;
-        padding: 40px;
-        border-radius: 4px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-    }
+/* ===== 관리자 SMS 박스 ===== */
+.admin-action th{vertical-align:top}
+.sms-box{background:#faf9f6;border:1px solid #ddd;padding:20px;border-radius:4px}
 
-    h3 {
-        font-size: 18px;
-        font-weight: 700;
-        margin-bottom: 30px;
-        color: #2f2b2a;
-    }
+/* 공통 필드 */
+.sms-field{margin-bottom:18px}
+.sms-field label{display:block;font-weight:600;font-size:14px;margin-bottom:8px;color:#2f2b2a}
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 14px;
-    }
+/* 예약 발송 인라인 */
+.sms-inline{display:flex;align-items:center;gap:10px}
+.sms-inline input[type=date],.sms-inline input[type=time]{padding:6px 8px;font-size:13px}
+.sms-hint{font-size:12px;color:#888}
 
-    th {
-        width: 160px;
-        background: #f2f1ee;
-        text-align: left;
-        padding: 14px;
-        border-bottom: 1px solid #ddd;
-        color: #555;
-    }
+/* textarea */
+#smsContent{width:100%;resize:none;padding:10px;font-size:13px;border:1px solid #ccc;border-radius:3px;box-sizing:border-box}
 
-    td {
-        padding: 14px;
-        border-bottom: 1px solid #eee;
-    }
+/* 버튼 영역 */
+.sms-btn-area{display:flex;align-items:center;gap:15px}
+.sms-result{font-size:13px;color:#2f6f4e;display:none}
 
-    .btn-box {
-        margin-top: 40px;
-        text-align: center;
-    }
+/* ===== 관리자 버튼 커스터마이징 ===== */
+.admin-btn{display:inline-block;padding:10px 22px;background:#3e3a39;color:#fff;font-size:14px;border-radius:3px;cursor:pointer;text-decoration:none}
+.admin-btn:hover{background:#2f2b2a}
 
-    .btn {
-        display: inline-block;
-        padding: 10px 18px;
-        font-size: 14px;
-        border-radius: 4px;
-        text-decoration: none;
-        margin: 0 5px;
-    }
-
-    .btn-list {
-        background: #3e3a39;
-        color: #fff;
-    }
-
-    .btn-list:hover {
-        background: #2f2b2a;
-    }
-    /* ===== 관리자 SMS 박스 ===== */
-	.admin-action th {
-	    vertical-align: top;
-	}
-	
-	.sms-box {
-	    background: #faf9f6;
-	    border: 1px solid #ddd;
-	    padding: 20px;
-	    border-radius: 4px;
-	}
-	
-	/* 공통 필드 */
-	.sms-field {
-	    margin-bottom: 18px;
-	}
-	
-	.sms-field label {
-	    display: block;
-	    font-weight: 600;
-	    font-size: 14px;
-	    margin-bottom: 8px;
-	    color: #2f2b2a;
-	}
-	
-	/* 예약 발송 인라인 */
-	.sms-inline {
-	    display: flex;
-	    align-items: center;
-	    gap: 10px;
-	}
-	
-	.sms-inline input[type="date"],
-	.sms-inline input[type="time"] {
-	    padding: 6px 8px;
-	    font-size: 13px;
-	}
-	
-	.sms-hint {
-	    font-size: 12px;
-	    color: #888;
-	}
-	
-	/* textarea */
-	#smsContent {
-	    width: 100%;
-	    resize: none;
-	    padding: 10px;
-	    font-size: 13px;
-	    border: 1px solid #ccc;
-	    border-radius: 3px;
-	    box-sizing: border-box;
-	}
-	
-	/* 버튼 영역 */
-	.sms-btn-area {
-	    display: flex;
-	    align-items: center;
-	    gap: 15px;
-	}
-	
-	.sms-result {
-	    font-size: 13px;
-	    color: #2f6f4e;
-	    display: none;
-	}
-	
-	/* ===== 관리자 버튼 커스터마이징 ===== */
-	.admin-btn {
-    display: inline-block;
-    padding: 10px 22px;
-    background: #3e3a39;
-    color: #fff;
-    font-size: 14px;
-    border-radius: 3px;
-    cursor: pointer;
-    text-decoration: none;
-	}
-	
-	.admin-btn:hover {
-	    background: #2f2b2a;
-	}
-	
-	/* ===== 보조 버튼 (목록으로) ===== */
-	a.admin-btn.light,
-	a.admin-btn.light:link,
-	a.admin-btn.light:visited {
-	    background: #e6e4e1;
-	    color: #3e3a39 !important;
-	    text-decoration: none;
-	}
-	
-	/* hover */
-	a.admin-btn.light:hover {
-	    background: #d8d5d1;
-	    color: #2f2b2a !important;
-	}	
-	    
+/* ===== 보조 버튼 (목록으로) ===== */
+a.admin-btn.light,a.admin-btn.light:link,a.admin-btn.light:visited{background:#e6e4e1;color:#3e3a39!important;text-decoration:none}
+a.admin-btn.light:hover{background:#d8d5d1;color:#2f2b2a!important}
 </style>
+
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
@@ -282,6 +159,12 @@ $(function(){
                     <c:when test="${member.status == 1}">정상</c:when>
                     <c:otherwise>탈퇴</c:otherwise>
                 </c:choose>
+            </td>
+        </tr>
+        <tr>
+            <th>회원등급</th>
+            <td>
+			   ${member.grade_name}
             </td>
         </tr>
     </table>

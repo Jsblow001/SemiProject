@@ -9,8 +9,11 @@ public class OrderDetailDTO {
     private int odrPrice;           // ODRPRICE
     private int deliveryStatus;     // DELIVERYSTATUS
     private String deliveryDate;    // DELIVERYDATE
+    
+    private String productImage;    // 추가 (이미지 조회용)
 
-    // ===== 조회용 =====
+  
+	// ===== 조회용 =====
     private String productName;
     private String deliveryStatusName;
 
@@ -40,4 +43,13 @@ public class OrderDetailDTO {
 
     public String getDeliveryStatusName() { return deliveryStatusName; }
     public void setDeliveryStatusName(String deliveryStatusName) { this.deliveryStatusName = deliveryStatusName; }
+
+
+    // 추가 (이미지 조회용)
+    public String getProductImage() {
+  		return productImage;
+  	}
+  	public void setProductImage(String productImage) {
+  		this.productImage = productImage;
+  	}
 }

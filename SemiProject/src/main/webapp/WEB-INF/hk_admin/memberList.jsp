@@ -10,113 +10,37 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script> <%-- jquery 추가 --%>
 
 <style>
-	body {
-	    font-family: 'Pretendard', Arial, sans-serif;
-	    background-color: #f7f6f3;
-	    color: #333;
-	}
-	
-	.container {
-	    width: 1100px;
-	    margin: 60px auto;
-	    background-color: #fff;
-	    padding: 40px;
-	    border-radius: 4px;
-	    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-	}
-	
-	/* ===== 상단 타이틀 영역 ===== */
-	h3 {
-	    font-size: 18px;
-	    font-weight: 700;
-	    letter-spacing: -0.3px;
-	    color: #2f2b2a;
-	    margin-bottom: 0;
-	}
-	
-	/* 상단 버튼 */
-	.container > div a {
-	    background-color: #3e3a39 !important;
-	    transition: background-color 0.2s ease;
-	}
-	
-	.container > div a:hover {
-	    background-color: #2f2b2a !important;
-	}
-	
-	/* ===== 회원 조회 ===== */
-	.search-area{background:#fff;padding:30px;border-radius:4px;margin-bottom:40px;box-shadow:0 4px 12px rgba(0,0,0,0.05);}
-	.search-area h3{margin-bottom:20px;font-size:16px;font-weight:600;}
-	.search-area form{display:flex;gap:10px;}
-	.search-area select,.search-area input{padding:10px 12px;border:1px solid #ccc;border-radius:3px;font-size:14px;}
-	.search-area input{flex:1;}
-	.search-area button{padding:10px 18px;border:none;background:#6d4c41;color:#fff;font-weight:600;cursor:pointer;border-radius:3px;}
-	.search-area button:hover{background:#5d4037;}
-	
-	/* ===== 전체목록 버튼 (밝은 배경 + 흰 글씨) ===== */
-	a.reset-btn,
-	a.reset-btn:link,
-	a.reset-btn:visited {
-	    display:inline-block;
-	    padding:10px 18px;
-	    background:#9a9693 !important;          /* 밝은 브라운/베이지 */
-	    color:#ffffff !important;    /* 흰색 글씨 */
-	    font-size:14px;
-	    font-weight:600;
-	    border-radius:3px;
-	    text-decoration:none;
-	    transition:background-color 0.2s ease;
-	}
-	
-	/* hover / active */
-	a.reset-btn:hover,
-	a.reset-btn:active {
-	    background:#a89288;          /* 살짝 진해짐 */
-	    color:#ffffff !important;
-	}
+body{font-family:'Pretendard',Arial,sans-serif;background:#f7f6f3;color:#333}
+.container{width:1100px;margin:60px auto;background:#fff;padding:40px;border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,.06)}
+h3{font-size:18px;font-weight:700;letter-spacing:-.3px;color:#2f2b2a;margin-bottom:0}
+.container>div a{background:#3e3a39!important;transition:.2s}
+.container>div a:hover{background:#2f2b2a!important}
 
-	/* ===== 테이블 ===== */
-	table {
-	    width: 100%;
-	    border-collapse: collapse;
-	    margin-top: 30px;
-	    font-size: 14px;
-	}
-	
-	thead th {
-	    background-color: #f2f1ee;
-	    font-weight: 600;
-	    color: #555;
-	    padding: 14px 10px;
-	    border-bottom: 2px solid #ddd;
-	}
-	
-	tbody td {
-	    padding: 14px 10px;
-	    border-bottom: 1px solid #eee;
-	    color: #444;
-	}
-	
-	tbody tr:hover {
-	    background-color: #faf9f7;
-	}
-	
-	/* 상태 컬럼 강조 */
-	tbody td:last-child {
-	    font-weight: 600;
-	}
-	
-	/* 탈퇴 회원 */
-	tbody tr td:last-child:contains("탈퇴") {
-	    color: #b71c1c;
-	}
-	
-	/* 회원 없을 때 */
-	tbody tr td[colspan] {
-	    padding: 30px 0;
-	    color: #777;
-	    font-size: 14px;
-	}
+/* ===== 회원 조회 ===== */
+.search-area{background:#fff;padding:30px;border-radius:4px;margin-bottom:40px;box-shadow:0 4px 12px rgba(0,0,0,.05)}
+.search-area h3{margin-bottom:20px;font-size:16px;font-weight:600}
+.search-area form{display:flex;gap:10px}
+.search-area select,.search-area input{padding:10px 12px;border:1px solid #ccc;border-radius:3px;font-size:14px}
+.search-area input{flex:1}
+.search-area button{padding:10px 18px;border:none;background:#6d4c41;color:#fff;font-weight:600;cursor:pointer;border-radius:3px}
+.search-area button:hover{background:#5d4037}
+
+/* ===== 전체목록 버튼 ===== */
+a.reset-btn,a.reset-btn:link,a.reset-btn:visited{display:inline-block;padding:10px 18px;background:#9a9693!important;color:#fff!important;font-size:14px;font-weight:600;border-radius:3px;text-decoration:none;transition:.2s}
+a.reset-btn:hover,a.reset-btn:active{background:#a89288;color:#fff!important}
+
+/* ===== 테이블 ===== */
+table{width:100%;border-collapse:collapse;margin-top:30px;font-size:14px}
+thead th{background:#f2f1ee;font-weight:600;color:#555;padding:14px 10px;border-bottom:2px solid #ddd}
+tbody td{padding:14px 10px;border-bottom:1px solid #eee;color:#444}
+tbody tr:hover{background:#faf9f7}
+tbody td:last-child{font-weight:600}
+tbody tr td[colspan]{padding:30px 0;color:#777;font-size:14px}
+
+/* ===== 페이지 바 ===== */
+.pagination .page-item .page-link{color:#3b2f2a;border:1px solid #e3e0dc;background:#fff;margin:0 3px;padding:6px 12px;font-size:13px;border-radius:20px;transition:.2s}
+.pagination .page-link:hover{background:#f5f3ef!important;border-color:#3b2f2a!important;color:#3b2f2a!important}
+.pagination .page-item.active .page-link{background:#3b2f2a!important;border-color:#3b2f2a!important;color:#fff!important}
 </style>
 
 <script type="text/javascript">
@@ -275,7 +199,47 @@
         </tbody>
     </table>
 
+	<!-- 페이지네이션 -->
+	<ul class="pagination justify-content-center mt-4">
+	
+	    <!-- 이전 -->
+	    <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+	        <a class="page-link"
+	           href="<%=ctxPath%>/admin/memberList.sp?pageNo=${currentPage - 1}">
+	            ‹
+	        </a>
+	    </li>
+	
+	    <!-- 페이지 번호 -->
+	    <c:forEach begin="1" end="${totalPage}" var="i">
+	        <li class="page-item ${currentPage == i ? 'active' : ''}">
+	            <a class="page-link"
+	               href="<%=ctxPath%>/admin/memberList.sp?pageNo=${i}">
+	                ${i}
+	            </a>
+	        </li>
+	    </c:forEach>
+	
+	    <!-- 다음 -->
+	    <li class="page-item ${currentPage == totalPage ? 'disabled' : ''}">
+	        <a class="page-link"
+	           href="<%=ctxPath%>/admin/memberList.sp?pageNo=${currentPage + 1}">
+	            ›
+	        </a>
+	    </li>
+	
+	</ul>
+
+	
+
 </div>
+
+<!-- 회원 더미 추가 버튼 -->
+<a href="<%=ctxPath%>/admin/dummyMember50.sp"
+   onclick="return confirm('더미 회원 50명을 생성하시겠습니까?');"
+   style="padding:8px 14px;background:#5d4037;color:#fff;border-radius:4px;text-decoration:none;">
+   더미회원 50명 생성(비번 1234 통일)
+</a>
 
 <%-- 폼태그 추가 --%>
 <form name="memberOneDetailFrm">
