@@ -51,6 +51,7 @@
   const OPEN = "11:00";
   const CLOSE = "20:00";
   const POLL_MS = 3000;
+  const EMPTY_TEXT = "비어있음(클릭하면 30분 막기)";
   let timer = null;
 
   $(function(){
@@ -59,7 +60,7 @@
     const yyyy = today.getFullYear();
     const mm = String(today.getMonth()+1).padStart(2,'0');
     const dd = String(today.getDate()).padStart(2,'0');
-    $("#date").val(`${yyyy}-${mm}-${dd}`);
+    $("#date").val(yyyy + "-" + mm + "-" + dd);
 
     buildGrid();
     fetchAndRender();
@@ -73,12 +74,14 @@
     $("#timeGrid").on("click", ".cell[data-empty='1']", function(){
       const storeId = $("#storeId").val();
       const date = $("#date").val();
-      const startTime = $(this).data("time"); // HH:mm
+      const startTime = $(this).attr("data-time"); // HH:mm
 
-      if(!confirm(`${date} ${startTime} ~ (30분) 막기 처리할까요?`)) return;
+      if(!confirm(date + " " + startTime + " ~ (30분) 막기 처리할까요?")) return;
 
       $.post("<%=ctxPath%>/admin/blockSlot.sp", {
-        storeId, date, startTime,
+        storeId: storeId,
+        date: date,
+        startTime: startTime,
         durationMin: 30,
         memo: "관리자 막기"
       }).done(function(res){
@@ -94,7 +97,7 @@
       const blockId = $(this).data("blockid");
       if(!confirm("막기를 해제할까요?")) return;
 
-      $.post("<%=ctxPath%>/admin/unblockSlot.sp", { blockId })
+      $.post("<%=ctxPath%>/admin/unblockSlot.sp", { blockId: blockId })
         .done(function(res){
           const data = (typeof res === "string") ? JSON.parse(res) : res;
           if(data.ok) fetchAndRender();
@@ -107,7 +110,7 @@
       e.stopPropagation();
       const phone = $(this).data("phone");
       const name = $(this).data("name");
-      const msg = prompt(`${name}(${phone})에게 보낼 문자를 입력하세요`);
+      const msg = prompt(name + "(" + phone + ")에게 보낼 문자를 입력하세요");
       if(msg == null) return;
 
       // 너가 이미 가진 AdminMemberSmsSend 활용
@@ -119,14 +122,13 @@
         alert("전송 결과: " + JSON.stringify(data));
       });
     });
-    
+
     // 메모 버튼 클릭시 이벤트
     $("#timeGrid").on("click", ".btn-note", function(e){
-   	  e.stopPropagation();
-   	  const memo = $(this).data("memo");
-   	  alert("예약 메모:\n\n" + memo);
-   	});
-
+      e.stopPropagation();
+      const memo = $(this).data("memo");
+      alert("예약 메모:\n\n" + memo);
+    });
   });
 
   function buildGrid(){
@@ -134,17 +136,20 @@
     grid.empty();
 
     const times = makeTimes(OPEN, CLOSE, 30); // 11:00~19:30 시작
-    times.forEach(t => {
-      const row = $(`
-        <div class="row">
-          <div class="time">${t}</div>
-          <div class="cell" data-time="${t}" data-empty="1">
-            <span class="muted">비어있음(클릭하면 30분 막기)</span>
-          </div>
-        </div>
-      `);
-      grid.append(row);
-    });
+    for(let i=0; i<times.length; i++){
+      const t = times[i];
+
+      const $row = $("<div>").addClass("row");
+      const $time = $("<div>").addClass("time").text(t);
+      const $cell = $("<div>")
+        .addClass("cell")
+        .attr("data-time", t)
+        .attr("data-empty", "1")
+        .append($("<span>").addClass("muted").text(EMPTY_TEXT));
+
+      $row.append($time).append($cell);
+      grid.append($row);
+    }
   }
 
   function fetchAndRender(){
@@ -152,14 +157,14 @@
     const date = $("#date").val();
     $("#statusText").text("불러오는 중...");
 
-    $.get("<%=ctxPath%>/admin/scheduleBoard.sp", { storeId, date })
+    $.get("<%=ctxPath%>/admin/scheduleBoard.sp", { storeId: storeId, date: date })
       .done(function(res){
         const data = (typeof res === "string") ? JSON.parse(res) : res;
         if(!data.ok){
           $("#statusText").text(data.message || "조회 실패");
           return;
         }
-        $("#statusText").text(`업데이트: ${new Date().toLocaleTimeString()}`);
+        $("#statusText").text("업데이트: " + new Date().toLocaleTimeString());
         renderEvents(data.events || []);
       })
       .fail(function(){
@@ -167,76 +172,106 @@
       });
   }
 
+  function setEmptyCell($cell){
+    $cell.attr("data-empty","1").empty()
+      .append($("<span>").addClass("muted").text(EMPTY_TEXT));
+  }
+
   function renderEvents(events){
     // 그리드 초기화(비어있음 상태로)
     $("#timeGrid .cell").each(function(){
-      $(this).attr("data-empty","1").html(`<span class="muted">비어있음(클릭하면 30분 막기)</span>`);
+      setEmptyCell($(this));
     });
 
     // 이벤트를 30분 단위 슬롯에 매핑해서 표시
-    events.forEach(ev => {
-      const start = ev.startAt.substring(11,16); // HH:mm
-      const end = ev.endAt.substring(11,16);     // HH:mm
-      const slots = makeTimes(start, end, 30);   // 시작 포함, 종료 직전까지
+    for(let i=0; i<events.length; i++){
+      const ev = events[i];
 
-      slots.forEach(t => {
-        const cell = $("#timeGrid .cell[data-time='"+t+"']");
-        if(cell.length === 0) return;
-        cell.attr("data-empty","0");
+      const start = ev.startAt ? ev.startAt.substring(11,16) : "";
+      const end   = ev.endAt ? ev.endAt.substring(11,16) : "";
+
+      if(!start || !end) continue;
+
+      const slots = makeTimes(start, end, 30); // 시작 포함, 종료 직전까지
+
+      for(let k=0; k<slots.length; k++){
+        const t = slots[k];
+        const $cell = $("#timeGrid .cell[data-time='" + t + "']");
+        if($cell.length === 0) continue;
+
+        $cell.attr("data-empty","0").empty();
 
         if(ev.type === "BLOCK"){
-          cell.html(`
-            <span class="badge b-block">
-              🔒 막기 ${start}~${end} ${ev.memo ? ("- "+escapeHtml(ev.memo)) : ""}
-              <button class="btn btn-unblock" data-blockid="${ev.id}">해제</button>
-            </span>
-          `);
+          const $badge = $("<span>").addClass("badge b-block");
+
+          // 🔒 막기 11:00~11:30 - memo
+          const memoText = (ev.memo && String(ev.memo).trim().length > 0) ? (" - " + ev.memo) : "";
+          $badge.append(document.createTextNode("🔒 막기 " + start + "~" + end + memoText));
+
+          const $btn = $("<button>")
+            .addClass("btn btn-unblock")
+            .text("해제")
+            .data("blockid", ev.id);
+
+          $badge.append($btn);
+          $cell.append($badge);
+
         } else {
-        	  const label = `${ev.reason} ${start}~${end} / ${escapeHtml(ev.name)} (${escapeHtml(ev.phone)})`;
+          const reason = ev.reason ? String(ev.reason) : "예약";
+          const name = ev.name ? String(ev.name) : "";
+          const phone = ev.phone ? String(ev.phone) : "";
 
-        	  const memo = (ev.message && ev.message.trim().length>0) ? ev.message : (ev.memo || "");
-        	  const hasMemo = memo && memo.trim().length > 0;
+          const label = reason + " " + start + "~" + end + " / " + name + " (" + phone + ")";
 
-        	  cell.html(`
-        	    <span class="badge b-res" title="${hasMemo ? escapeHtml(memo) : ''}">
-        	      ✅ ${label}
-        	      ${hasMemo ? `<button class="btn btn-note" data-memo="${escapeHtml(memo)}">메모</button>` : ``}
-        	      <button class="btn btn-sms" data-phone="${ev.phone}" data-name="${ev.name}">문자</button>
-        	    </span>
-        	  `);
-        	}
-      });
-    });
+          const memo = (ev.message && String(ev.message).trim().length>0)
+                        ? String(ev.message)
+                        : (ev.memo ? String(ev.memo) : "");
+          const hasMemo = memo && memo.trim().length > 0;
+
+          const $badge = $("<span>").addClass("badge b-res");
+          if(hasMemo) $badge.attr("title", memo);
+
+          $badge.append(document.createTextNode("✅ " + label));
+
+          if(hasMemo){
+            const $btnNote = $("<button>")
+              .addClass("btn btn-note")
+              .text("메모")
+              .data("memo", memo);
+            $badge.append($btnNote);
+          }
+
+          const $btnSms = $("<button>")
+            .addClass("btn btn-sms")
+            .text("문자")
+            .data("phone", phone)
+            .data("name", name);
+
+          $badge.append($btnSms);
+          $cell.append($badge);
+        }
+      }
+    }
   }
 
   function makeTimes(startHHmm, endHHmm, stepMin){
-    // endHHmm은 "끝 시각" (그 직전 슬롯까지)
-    const [sh, sm] = startHHmm.split(":").map(Number);
-    const [eh, em] = endHHmm.split(":").map(Number);
+    const s = String(startHHmm).split(":");
+    const e = String(endHHmm).split(":");
+    const sh = Number(s[0]), sm = Number(s[1]);
+    const eh = Number(e[0]), em = Number(e[1]);
 
-    let cur = sh*60+sm;
-    const end = eh*60+em;
+    let cur = sh*60 + sm;
+    const end = eh*60 + em;
 
     const out = [];
     while(cur < end){
       const h = String(Math.floor(cur/60)).padStart(2,'0');
       const m = String(cur%60).padStart(2,'0');
-      out.push(`${h}:${m}`);
+      out.push(h + ":" + m);
       cur += stepMin;
     }
     return out;
   }
-
-  function escapeHtml(s){
-    if(!s) return "";
-    return String(s)
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
-  }
-  
 </script>
 </body>
 </html>

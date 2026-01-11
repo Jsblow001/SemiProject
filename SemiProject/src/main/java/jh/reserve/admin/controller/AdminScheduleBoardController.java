@@ -8,8 +8,10 @@ import java.util.Map;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import hk.member.domain.MemberDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import sp.common.controller.AbstractController;
 import jh.reserve.model.ReservationDAO;
 import jh.reserve.model.ReservationDAO_imple;
@@ -22,6 +24,32 @@ public class AdminScheduleBoardController extends AbstractController {
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
+    	HttpSession session = request.getSession();
+
+        // ===== 테스트 모드 =====
+        boolean testMode = true; // 테스트 끝나면 false
+        MemberDTO loginuser = (MemberDTO) session.getAttribute("loginuser");
+        if (testMode && loginuser == null) {
+            loginuser = new MemberDTO();
+            loginuser.setUserid("admin");
+            session.setAttribute("loginuser", loginuser);
+        }
+
+        // 1) 관리자 체크
+        if (loginuser == null || !"admin".equals(loginuser.getUserid())) {
+
+            JSONObject json = new JSONObject();
+            json.put("ok", false);
+            json.put("message", "관리자만 접근 가능(로그인 필요)");
+
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            request.setAttribute("json", json.toString());
+            super.setRedirect(false);
+            super.setViewPage("/WEB-INF/hk_admin/jsonview.jsp");
+            return;
+        }
+
+        
         String storeId = request.getParameter("storeId");
         String date = request.getParameter("date"); // yyyy-MM-dd
 

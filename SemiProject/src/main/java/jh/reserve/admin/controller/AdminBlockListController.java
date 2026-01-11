@@ -22,6 +22,7 @@ public class AdminBlockListController extends AbstractController {
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
+    	
         String storeId = request.getParameter("storeId");
         String date = request.getParameter("date"); // yyyy-MM-dd
 
