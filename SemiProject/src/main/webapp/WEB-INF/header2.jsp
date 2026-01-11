@@ -149,7 +149,7 @@
                                 <div class="sub-menu-list">
                                     <a href="<%= ctxPath %>/admin/allproductList.sp">상품 전체목록</a>
                                     <a href="<%= ctxPath %>/admin/productRegister.sp">상품 등록</a>
-                                    <a href="<%= ctxPath %>/admin/allproductList.sp">주문 현황</a>
+                                    <a href="<%= ctxPath %>/admin/adminOrderList.sp">주문 현황</a>
                                     <a href="<%= ctxPath %>/admin/allproductList.sp">배송 현황</a>
                                 </div>
                             </div>
