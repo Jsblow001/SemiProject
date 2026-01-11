@@ -12,4 +12,10 @@ public interface AdminOrderDAO {
     
     // 주문 상태 변경 (Ajax용)
     int updateOrderStatus(String odrcode, String status) throws SQLException;
+
+    // 주문 메인 정보 조회 (회원 정보 포함)
+    AdminOrderDTO selectOneOrder(String odrcode) throws SQLException;
+
+    // 주문 상세 상품 목록 조회 (상품 정보 포함)
+    List<AdminOrderDTO> selectOrderDetailList(String odrcode) throws SQLException;
 }
