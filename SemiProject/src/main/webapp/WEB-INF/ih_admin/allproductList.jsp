@@ -2,163 +2,266 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <% String ctxPath = request.getContextPath(); %>
-<jsp:include page="../header2.jsp" />
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>관리자 | 상품관리</title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <style>
-    /* 이미지 높이 및 크기 고정 */
-    .admin-prod-img {
-        width: 70px;
-        height: 70px;
-        object-fit: cover; 
-        border-radius: 8px;
-        transition: transform 0.2s;
-    }
-    .admin-prod-img:hover {
-        transform: scale(1.1);
-    }
-   
-    /* 테이블 행 높이 및 중앙 정렬 */
-    .table td {
-        vertical-align: middle !important;
-        height: 90px;
-    }
-
-    /* 카테고리 필터 버튼 스타일 */
-    .filter-container {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        margin-bottom: 30px;
-    }
-    .filter-btn {
-        min-width: 120px;
-        border-radius: 25px;
-        font-weight: 600;
-        transition: all 0.3s;
-    }
-    .filter-btn:hover {
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    body {
+        font-family: 'Pretendard', Arial, sans-serif;
+        background-color: #f7f6f3;
+        color: #333;
     }
     
-    /* 테이블 커스텀 */
-    .table-container {
-        background: white;
-        padding: 20px;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    .container-custom {
+        width: 1200px;
+        margin: 60px auto;
+        background-color: #fff;
+        padding: 40px;
+        border-radius: 4px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
     }
-</style>
 
-<div class="container-fluid mt-5 px-5">
-    <div class="d-flex justify-content-between align-items-center mb-5">
-        <h2 class="font-weight-bold"><i class="fas fa-user mr-2"></i>상품관리 (상품 전체 목록)</h2>
-        <a href="${pageContext.request.contextPath}/admin/productRegister.sp" class="btn btn-dark px-4 shadow-sm">
-            <i class="fas fa-plus mr-1"></i> 상품 등록
+    /* ===== 상단 타이틀 영역 ===== */
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+    }
+    
+    .admin-header h3 {
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: -0.3px;
+        color: #2f2b2a;
+        margin: 0;
+    }
+
+    .btn-register {
+        padding: 10px 18px;
+        background-color: #3e3a39 !important;
+        color: #fff !important;
+        text-decoration: none;
+        border-radius: 3px;
+        font-size: 14px;
+        font-weight: 600;
+        transition: background-color 0.2s ease;
+    }
+    
+    .btn-register:hover {
+        background-color: #2f2b2a !important;
+    }
+
+    .filter-area {
+        background: #fff;
+        padding: 20px;
+        border-radius: 4px;
+        margin-bottom: 30px;
+        border: 1px solid #eee;
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .filter-btn {
+        padding: 8px 20px;
+        border: 1px solid #ddd;
+        background: #fff;
+        color: #666;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 20px;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .filter-btn:hover {
+        background: #f2f1ee;
+        color: #333;
+    }
+
+    .filter-btn.active {
+        background: #6d4c41;
+        color: #fff;
+        border-color: #6d4c41;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+    
+    thead th {
+        background-color: #f2f1ee;
+        font-weight: 600;
+        color: #555;
+        padding: 14px 10px;
+        border-bottom: 2px solid #ddd;
+    }
+    
+    tbody td {
+        padding: 15px 10px;
+        border-bottom: 1px solid #eee;
+        color: #444;
+        vertical-align: middle;
+        text-align: center;
+    }
+    
+    tbody tr:hover {
+        background-color: #faf9f7;
+    }
+
+    /* 상품 이미지 */
+    .admin-prod-img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 4px;
+        border: 1px solid #eee;
+    }
+
+    /* 재고/상태 뱃지 */
+    .badge-custom {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 3px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .status-soldout { background: #f8d7da; color: #b71c1c; }
+    .status-warning { background: #fff3cd; color: #856404; }
+    .status-normal { background: #e2e3e5; color: #383d41; }
+
+    /* 관리 버튼 */
+    .action-btns {
+        display: flex;
+        gap: 5px;
+        justify-content: center;
+    }
+    .btn-edit, .btn-del {
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 3px;
+        cursor: pointer;
+        border: 1px solid #ddd;
+        background: #fff;
+        font-weight: 600;
+    }
+    .btn-edit:hover { background: #f2f1ee; color: #2f2b2a; }
+    .btn-del { color: #b71c1c; }
+    .btn-del:hover { background: #fff5f5; }
+
+    a.prod-link { color: #333; text-decoration: none; font-weight: 600; }
+    a.prod-link:hover { text-decoration: underline; }
+</style>
+</head>
+
+<body>
+
+<jsp:include page="../header2.jsp" />
+
+<div class="container-custom">
+    
+    <div class="admin-header">
+        <h3>상품 관리</h3>
+        <a href="${pageContext.request.contextPath}/admin/productRegister.sp" class="btn-register">
+            <i class="fas fa-plus mr-1"></i> 신규 상품 등록
         </a>
     </div>
 
-    <div class="filter-container">
-        <%-- currentCategory는 Controller에서 넘겨준 값 --%>
-        <a href="allproductList.sp" 
-           class="btn filter-btn ${empty currentCategory ? 'btn-dark' : 'btn-outline-dark'}">전체보기</a>
-        
-        <a href="allproductList.sp?category=1" 
-           class="btn filter-btn ${currentCategory == '1' ? 'btn-dark' : 'btn-outline-dark'}">SUNGLASSES</a>
-        
-        <a href="allproductList.sp?category=2" 
-           class="btn filter-btn ${currentCategory == '2' ? 'btn-dark' : 'btn-outline-dark'}">EYEGLASSES</a>
-        
-        <a href="allproductList.sp?category=3" 
-           class="btn filter-btn ${currentCategory == '3' ? 'btn-dark' : 'btn-outline-dark'}">ACCESSORY</a>
-        
-        <a href="allproductList.sp?category=4" 
-           class="btn filter-btn ${currentCategory == '4' ? 'btn-dark' : 'btn-outline-dark'}">COLLABORATION</a>
+    <div class="filter-area">
+        <a href="allproductList.sp" class="filter-btn ${empty currentCategory ? 'active' : ''}">전체보기</a>
+        <a href="allproductList.sp?category=1" class="filter-btn ${currentCategory == '1' ? 'active' : ''}">SUNGLASSES</a>
+        <a href="allproductList.sp?category=2" class="filter-btn ${currentCategory == '2' ? 'active' : ''}">EYEGLASSES</a>
+        <a href="allproductList.sp?category=3" class="filter-btn ${currentCategory == '3' ? 'active' : ''}">ACCESSORY</a>
+        <a href="allproductList.sp?category=4" class="filter-btn ${currentCategory == '4' ? 'active' : ''}">COLLABORATION</a>
     </div>
 
-    <div class="table-container">
-        <table class="table table-hover text-center">
-            <thead class="thead-light">
-                <tr>
-                    <th style="width: 80px;">ID</th>
-                    <th style="width: 200px;">이미지</th>
-                    <th style="width: 400px;">상품명</th>
-                    <th style="width: 150px;">판매가</th>
-                    <th style="width: 120px;">재고</th>
-                    <th style="width: 200px;">관리</th>
-                </tr>
-            </thead>
-            <tbody>
-                <c:if test="${not empty productList}">
-                    <c:forEach var="p" items="${productList}">
-                        <tr>
-                            <td>${p.product_id}</td>
-                            <td>
-							    <a href="${pageContext.request.contextPath}/product/productDetail.sp?product_id=${p.product_id}">
-							        <img src="${pageContext.request.contextPath}/img/${p.pimage}" class="admin-prod-img border shadow-sm">
-							    </a>
-							</td>
-                            <td class="text-left">
-							    <span class="badge badge-secondary mb-1">${p.fk_category_id}</span><br>
-							    <a href="${pageContext.request.contextPath}/product/productDetail.sp?product_id=${p.product_id}" class="text-dark font-weight-bold" style="text-size: 1.1rem; text-decoration: none;">
-							        ${p.product_name}
-							    </a>
-							</td>
-                            <td>
-                                <span class="text-muted small" style="text-decoration: line-through;">
-                                    <fmt:formatNumber value="${p.list_price}" pattern="#,###"/>원
-                                </span><br>
-                                <span class="text-danger font-weight-bold">
-                                    <fmt:formatNumber value="${p.sale_price}" pattern="#,###"/>원
-                                </span>
-                            </td>
-                            <td>
-                                <c:choose>
-                                    <c:when test="${p.stock == 0}">
-                                        <span class="badge badge-danger p-2">품절</span>
-                                    </c:when>
-                                    <c:when test="${p.stock <= 5}">
-                                        <span class="badge badge-warning p-2">임박 (${p.stock})</span>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <span class="font-weight-bold">${p.stock}</span>개
-                                    </c:otherwise>
-                                </c:choose>
-                            </td>
-                            <td>
-                                <div class="btn-group">
-                                    <button class="btn btn-sm btn-outline-primary px-3" 
-                                            onclick="location.href='<%= ctxPath%>/admin/productUpdate.sp?product_id=${p.product_id}'">
-                                        <i class="fas fa-edit mr-1"></i>수정
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger px-3" 
-                                            onclick="delProduct('${p.product_id}', '${p.product_name}')">
-                                        <i class="fas fa-trash-alt mr-1"></i>삭제
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    </c:forEach>
-                </c:if>
-                <c:if test="${empty productList}">
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 70px;">ID</th>
+                <th style="width: 100px;">이미지</th>
+                <th>상품명</th>
+                <th style="width: 150px;">판매가</th>
+                <th style="width: 120px;">재고</th>
+                <th style="width: 160px;">관리</th>
+            </tr>
+        </thead>
+        <tbody>
+            <c:if test="${not empty productList}">
+                <c:forEach var="p" items="${productList}">
                     <tr>
-                        <td colspan="6" class="py-5 text-muted">
-                            <i class="fas fa-box-open fa-3x mb-3"></i><br>
-                            해당 조건에 맞는 상품이 없습니다.
+                        <td>${p.product_id}</td>
+                        <td>
+                            <a href="${pageContext.request.contextPath}/product/productDetail.sp?product_id=${p.product_id}">
+                                <img src="${pageContext.request.contextPath}/img/${p.pimage}" class="admin-prod-img">
+                            </a>
+                        </td>
+                        <td style="text-align: left; padding-left: 20px;">
+                            <small style="color:#999; font-weight: 600;">CAT ${p.fk_category_id}</small><br>
+                            <a href="${pageContext.request.contextPath}/product/productDetail.sp?product_id=${p.product_id}" class="prod-link">
+                                ${p.product_name}
+                            </a>
+                        </td>
+                        <td>
+                            <span style="text-decoration: line-through; color: #bbb; font-size: 12px;">
+                                <fmt:formatNumber value="${p.list_price}" pattern="#,###"/>
+                            </span><br>
+                            <span style="font-weight: 700; color: #2f2b2a;">
+                                <fmt:formatNumber value="${p.sale_price}" pattern="#,###"/>원
+                            </span>
+                        </td>
+                        <td>
+                            <c:choose>
+                                <c:when test="${p.stock == 0}">
+                                    <span class="badge-custom status-soldout">품절</span>
+                                </c:when>
+                                <c:when test="${p.stock <= 5}">
+                                    <span class="badge-custom status-warning">재고임박 (${p.stock})</span>
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="badge-custom status-normal">${p.stock}개</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </td>
+                        <td>
+                            <div class="action-btns">
+                                <button type="button" class="btn-edit" onclick="location.href='<%= ctxPath%>/admin/productUpdate.sp?product_id=${p.product_id}'">수정</button>
+                                <button type="button" class="btn-del" onclick="delProduct('${p.product_id}', '${p.product_name}')">삭제</button>
+                            </div>
                         </td>
                     </tr>
-                </c:if>
-            </tbody>
-        </table>
-    </div>
+                </c:forEach>
+            </c:if>
+            <c:if test="${empty productList}">
+                <tr>
+                    <td colspan="6" style="padding: 60px 0; color: #999;">
+                        <i class="fas fa-box-open fa-2x mb-3"></i><br>
+                        등록된 상품이 없습니다.
+                    </td>
+                </tr>
+            </c:if>
+        </tbody>
+    </table>
 </div>
 
 <script>
 function delProduct(id, name) {
     if(confirm("[" + name + "] 상품을 정말 삭제하시겠습니까?")) {
-        // 실제 삭제를 처리할 Controller 주소로 이동
         location.href = "${pageContext.request.contextPath}/admin/productDelete.sp?product_id=" + id;
     }
 }
 </script>
 
 <jsp:include page="../footer2.jsp" />
+
+</body>
+</html>

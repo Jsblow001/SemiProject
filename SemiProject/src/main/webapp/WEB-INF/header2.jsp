@@ -15,6 +15,9 @@
     
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+        
+    <script src="lib/easing/easing.min.js"></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
     
     <style>
         :root {
@@ -146,7 +149,7 @@
                                 <div class="sub-menu-list">
                                     <a href="<%= ctxPath %>/admin/allproductList.sp">상품 전체목록</a>
                                     <a href="<%= ctxPath %>/admin/productRegister.sp">상품 등록</a>
-                                    <a href="<%= ctxPath %>/admin/allproductList.sp">주문 현황</a>
+                                    <a href="<%= ctxPath %>/admin/adminOrderList.sp">주문 현황</a>
                                     <a href="<%= ctxPath %>/admin/allproductList.sp">배송 현황</a>
                                 </div>
                             </div>
