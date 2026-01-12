@@ -4,24 +4,29 @@
 
 <% String ctxPath = request.getContextPath(); %>
 
-
 <head>
     <meta charset="utf-8">
     <title>CARIN</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <link rel="preconnect" href="https://fonts.gstatic.com">
+	
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"> 
+	
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+	
+	<link href="<%= ctxPath%>/css/style.css" rel="stylesheet">
+	
+	
+	<script src="<%= ctxPath%>/js/jquery-3.7.1.min.js"></script>
+	<script src="<%= ctxPath%>/js/main.js"></script>
+	
+	<script src="<%= ctxPath%>/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js" type="text/javascript"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"> 
-
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-
-    <link href="<%= ctxPath%>/css/style.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="<%= ctxPath%>/css/index/index.css" />
+    <script src="lib/easing/easing.min.js"></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
     
-    <script src="<%= ctxPath%>/js/jquery-3.7.1.min.js"></script>
-    
-    <script src="<%= ctxPath%>/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js" type="text/javascript"></script>
     <style>
         :root {
             --dark-wood: #5D4037;   /* 짙은 밤나무색 */
