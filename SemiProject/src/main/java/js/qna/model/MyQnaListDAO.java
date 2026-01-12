@@ -12,5 +12,11 @@ public interface MyQnaListDAO {
 
     // 로그인한 사용자의 문의글 목록을 페이징 처리하여 조회
     List<QnaDTO> selectMyQnaList(Map<String, String> paraMap) throws SQLException;
+    
+    // 답변 미완료된 qna 갯수 확인
+    int noCommentCnt() throws SQLException;
+
+    // 미답변 목록 조회
+    List<QnaDTO> selectNoCommentList(Map<String, String> paraMap) throws SQLException;
 
 }

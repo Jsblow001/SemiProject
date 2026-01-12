@@ -22,144 +22,41 @@
 
 <style>
 /* ===============================
-    핵심: body 배경 통일
+   핵심: body 배경 통일
    =============================== */
-body {
-    background-color: #FBFAF8 !important;
-}
+body{background:#fbfaf8!important}
 
 /* ===============================
    콘텐츠 영역
    =============================== */
-.login-select-bg {
-    padding-top: 40px !important;
-    padding-bottom: 20px !important;
-}
+.login-select-bg{padding-top:40px!important;padding-bottom:20px!important}
 
 /* 로그인 카드 */
-.login-select-wrapper {
-    max-width: 420px !important;
-    margin: 0 auto !important;
-    background: #ffffff !important;
-    padding: 40px 35px !important;
-    border-radius: 14px !important;
-    box-shadow: 0 8px 28px rgba(0,0,0,0.07) !important;
-    text-align: center !important;
-}
+.login-select-wrapper{max-width:420px!important;margin:0 auto!important;background:#fff!important;padding:40px 35px!important;border-radius:14px!important;box-shadow:0 8px 28px rgba(0,0,0,.07)!important;text-align:center!important}
+.login-title{font-size:1.8rem!important;font-weight:600!important;color:#5d4037!important;margin-bottom:10px!important}
+.login-desc{font-size:.9rem!important;color:#777!important;margin-bottom:30px!important}
 
-.login-title {
-    font-size: 1.8rem !important;
-    font-weight: 600 !important;
-    color: #5D4037 !important;
-    margin-bottom: 10px !important;
-}
+/* 버튼 */
+.btn-login{width:100%!important;padding:12px!important;font-size:.95rem!important;border-radius:6px!important;margin-bottom:12px!important;font-weight:500!important}
+.btn-member{background:#5d4037!important;color:#fff!important}
+.btn-member:hover{background:#4a322b!important;color:#fff!important}
+.btn-admin{background:#fff!important;border:1px solid #5d4037!important;color:#5d4037!important}
+.btn-admin:hover{background:#5d4037!important;color:#fff!important}
 
-.login-desc {
-    font-size: 0.9rem !important;
-    color: #777 !important;
-    margin-bottom: 30px !important;
-}
+/* 구분선 */
+.divider{margin:25px 0!important;font-size:.85rem!important;color:#999!important;position:relative!important}
+.divider::before,.divider::after{content:""!important;position:absolute!important;top:50%!important;width:40%!important;height:1px!important;background:#ddd!important}
+.divider::before{left:0!important}
+.divider::after{right:0!important}
 
-.btn-login {
-    width: 100% !important;
-    padding: 12px !important;
-    font-size: 0.95rem !important;
-    border-radius: 6px !important;
-    margin-bottom: 12px !important;
-    font-weight: 500 !important;
-}
-
-.btn-member {
-    background-color: #5D4037 !important;
-    color: #fff !important;
-}
-
-.btn-member:hover {
-    background-color: #4a322b !important;
-    color: #fff !important;
-}
-
-.btn-admin {
-    background-color: #ffffff !important;
-    border: 1px solid #5D4037 !important;
-    color: #5D4037 !important;
-}
-
-.btn-admin:hover {
-    background-color: #5D4037 !important;
-    color: #fff !important;
-}
-
-.divider {
-    margin: 25px 0 !important;
-    font-size: 0.85rem !important;
-    color: #999 !important;
-    position: relative !important;
-}
-
-.divider::before,
-.divider::after {
-    content: "" !important;
-    position: absolute !important;
-    top: 50% !important;
-    width: 40% !important;
-    height: 1px !important;
-    background: #ddd !important;
-}
-
-.divider::before { left: 0 !important; }
-.divider::after { right: 0 !important; }
-
-.social-btn {
-    width: 100% !important;
-    padding: 11px !important;
-    border-radius: 6px !important;
-    font-size: 0.9rem !important;
-    margin-bottom: 10px !important;
-    font-weight: 500 !important;
-}
-
-.btn-naver {
-    background-color: #03C75A !important;
-    color: #fff !important;
-}
-
-.btn-kakao {
-    background-color: #FEE500 !important;
-    color: #3C1E1E !important;
-}
-
-/* ===============================
-    footer 흰 여백 제거
-   =============================== */
-footer,
-.footer,
-#footer {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-}
+/* footer 흰 여백 제거 */
+footer,.footer,#footer{margin-top:0!important;padding-top:0!important}
 
 /* ===============================
    회원가입 버튼
    =============================== */
-.btn-register {
-    width: 100% !important;
-    padding: 12px !important;
-    font-size: 0.95rem !important;
-    border-radius: 6px !important;
-    font-weight: 500 !important;
-
-    background-color: #ffffff !important;
-    border: 1px solid #bdbdbd !important;
-    color: #5D4037 !important;
-}
-
-.btn-register:hover {
-    background-color: #5D4037 !important;
-    border-color: #5D4037 !important;
-    color: #ffffff !important;
-}
-
+.btn-register{width:100%!important;padding:12px!important;font-size:.95rem!important;border-radius:6px!important;font-weight:500!important;background:#fff!important;border:1px solid #bdbdbd!important;color:#5d4037!important}
+.btn-register:hover{background:#5d4037!important;border-color:#5d4037!important;color:#fff!important}
 </style>
 
 </head>

@@ -7,6 +7,7 @@
 
 <link rel="stylesheet" as="style" crossorigin
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+            
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script src="<%=ctxPath%>/js/jquery-3.7.1.min.js"></script>
 
@@ -25,6 +26,10 @@
         content: none !important; /* 내용 삭제 */
         display: none !important; /* 공간 삭제 */
     }
+    /* 이용약관 */
+    .terms-box { border:1px solid #ddd; height:240px; width:100%; margin-bottom:15px; }
+	.terms-iframe { width:100%; height:100%;  border:none; }
+	.terms-agree { font-size:13px; margin-bottom:30px; }
     
 </style>
 
@@ -55,7 +60,8 @@ function execDaumPostcode() {
 function goRegister() {
 
     const frm = document.registerFrm;
-
+    const agree = document.getElementById("agreeTerms");
+    
     if (frm.userid.value.trim() === "") {
         alert("아이디를 입력하세요.");
         frm.userid.focus();
@@ -93,6 +99,11 @@ function goRegister() {
 
     if (frm.postcode.value.trim() === "") {
         alert("주소를 입력하세요.");
+        return;
+    }
+    
+    if(!agree.checked){
+        alert("이용약관에 동의하셔야 가입이 가능합니다.");
         return;
     }
 
@@ -187,6 +198,20 @@ function checkId() {
         <input type="text" name="address" class="form-control mb-2" readonly>
         <input type="text" name="detailaddress" class="form-control mb-2">
         <input type="text" name="extraaddress" class="form-control">
+
+		<!-- 이용약관 -->
+		<div class="section-title">TERMS & CONDITIONS</div>
+
+			<div class="terms-box">
+			    <iframe src="<%=ctxPath%>/terms_iframe.sp" class="terms-iframe"></iframe>
+			</div>
+			
+			<div class="terms-agree">
+			    <label>
+			        <input type="checkbox" id="agreeTerms">
+			        <span>이용약관 및 개인정보처리방침에 동의합니다. (필수)</span>
+			    </label>
+			</div>	
 
         <div class="section-title">ADDITIONAL INFO</div>
 

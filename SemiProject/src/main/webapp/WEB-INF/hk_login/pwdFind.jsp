@@ -19,80 +19,49 @@
 <link rel="stylesheet" href="<%=ctxPath%>/bootstrap-4.6.2-dist/css/bootstrap.min.css">
 
 <style>
-body {
-    font-family: 'Poppins', sans-serif !important;
-    background-color: #FBFAF8 !important;
-}
+body{font-family:'Poppins',sans-serif!important;background:#fbfaf8!important}
 
-/* 박스 */
-.login-wrap {
-    max-width: 420px !important;
-    margin: 120px auto !important;
-    padding: 40px !important;
-    background: #fff !important;
-    border: 1px solid #eee !important;
+/* 카드 */
+.login-wrap{
+    max-width:420px!important;
+    margin:120px auto!important;
+    padding:40px!important;
+    background:#fff!important;
+    border:1px solid #ddd!important;
+    box-shadow:0 8px 20px rgba(0,0,0,.06)!important
 }
 
 /* 타이틀 */
-.login-title {
-    text-align: center !important;
-    font-size: 24px !important;
-    font-weight: 500 !important;
-    margin-bottom: 30px !important;
-    letter-spacing: 1.5px !important;
-}
+.login-title{text-align:center!important;font-size:24px!important;font-weight:500!important;margin-bottom:30px!important;letter-spacing:1.5px!important}
 
 /* input */
-.form-control {
-    height: 48px !important;
-    border-radius: 0 !important;
-}
+.form-control{height:48px!important;border-radius:0!important}
 
 /* 메인 버튼 */
-.btn-login {
-    height: 48px !important;
-    border-radius: 0 !important;
-    font-weight: 500 !important;
-
-    background-color: #5D4037 !important;
-    color: #ffffff !important;
-    border: none !important;
+.btn-login{
+    height:48px!important;
+    background:#4a322b!important;
+    color:#fff!important;
+    border-radius:0!important;
+    font-weight:500!important
 }
+.btn-login:hover{background:#3e2723!important}
 
-.btn-login:hover {
-    background-color: #4a322b !important;
-    color: #ffffff !important;
+/* 인증 버튼 */
+.btn-cert{
+    height:48px!important;
+    background:#fff!important;
+    border:1px solid #bdbdbd!important;
+    color:#5d4037!important;
+    border-radius:0!important;
+    font-weight:500!important
 }
+.btn-cert:hover{background:#5d4037!important;border-color:#5d4037!important;color:#fff!important}
 
-/* 인증코드 버튼은 살짝 구분 */
-.btn-cert {
-    background-color: #ffffff !important;
-    border: 1px solid #bdbdbd !important;
-    color: #5D4037 !important;
-}
-
-.btn-cert:hover {
-    background-color: #5D4037 !important;
-    color: #ffffff !important;
-    border-color: #5D4037 !important;
-}
-
-/* 링크 영역 */
-.link-area {
-    text-align: center !important;
-    font-size: 0.9rem !important;
-    margin-top: 20px !important;
-}
-
-.link-area a {
-    color: #555 !important;
-    margin: 0 8px !important;
-    text-decoration: none !important;
-}
-
-.link-area a:hover {
-    color: #5D4037 !important;
-}
+/* 링크 */
+.link-area{text-align:center!important;font-size:.9rem!important;margin-top:20px!important}
+.link-area a{color:#555!important;margin:0 8px!important;text-decoration:none!important}
+.link-area a:hover{color:#5d4037!important}
 </style>
 
 <script>

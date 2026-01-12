@@ -7,10 +7,13 @@ import hk.member.model.MemberDAO_imple;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import js.qna.model.MyQnaListDAO;
+import js.qna.model.MyQnaListDAO_imple;
 
 public class AdminController extends AbstractController {
 
    MemberDAO mdao = new MemberDAO_imple();
+   MyQnaListDAO mydao = new MyQnaListDAO_imple();
    
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -42,11 +45,13 @@ public class AdminController extends AbstractController {
             return;
         }
 
-        // 1. DB에서 값을 가져와 자바 변수(totalCount)에 할당
-        int totalCount  = mdao.getTotalMemberCount(); 
+        // 1. DB에서 값을 가져와 자바 변수에 할당
+        int totalCount  = mdao.getTotalMemberCount();
+        int newQnACount = mydao.noCommentCnt();
 
-        // 2. JSP에서 사용할 이름("totalCount")으로 request 영역에 저장
+        // 2. JSP에서 사용할 이름으로 request 영역에 저장
         request.setAttribute("totalCount", totalCount); 
+        request.setAttribute("newQnACount", newQnACount);
         
         // ===============================
         // 관리자 메인 페이지 보여주기 (껍데기)

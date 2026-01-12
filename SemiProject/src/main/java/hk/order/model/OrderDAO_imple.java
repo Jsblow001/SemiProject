@@ -16,12 +16,13 @@ import hk.order.domain.OrderDetailDTO;
 
 public class OrderDAO_imple implements OrderDAO {
 
+	// 필드 선언
     private DataSource ds;
     private Connection conn;
     private PreparedStatement pstmt;
     private ResultSet rs;
 
-    // === 생성자 : DataSource 연결 ===
+    // 생성자 : DataSource 연결 
     public OrderDAO_imple() {
         try {
             Context initContext = new InitialContext();
@@ -30,6 +31,13 @@ public class OrderDAO_imple implements OrderDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    // 자원 반납
+    private void close() {
+        try { if (rs != null) rs.close(); } catch (Exception e) {}
+        try { if (pstmt != null) pstmt.close(); } catch (Exception e) {}
+        try { if (conn != null) conn.close(); } catch (Exception e) {}
     }
 
     // ==================================================
@@ -198,7 +206,7 @@ public class OrderDAO_imple implements OrderDAO {
     }
 
     // ==================================================
-    // 3. 주문 상세 조회 (주문번호 기준)
+    // 3. 주문 상세 조회 (주문번호 기준) + 이미지 추가
     // ==================================================
     @Override
     public List<OrderDetailDTO> selectOrderDetail(int odrCode) {
@@ -212,6 +220,7 @@ public class OrderDAO_imple implements OrderDAO {
                 " SELECT d.odrdetailno, d.odrqty, d.odrprice, " +
                 "        d.deliverystatus, d.deliverydate, " +
                 "        p.product_name, " +
+                "        p.pimage,        " +
                 "        CASE d.deliverystatus " +
                 "            WHEN 0 THEN '배송준비중' " +
                 "            WHEN 1 THEN '배송중' " +
@@ -237,6 +246,7 @@ public class OrderDAO_imple implements OrderDAO {
                 dto.setDeliveryStatusName(rs.getString("delivery_status_name"));
                 dto.setDeliveryDate(rs.getString("deliverydate"));
                 dto.setProductName(rs.getString("product_name"));
+                dto.setProductImage(rs.getString("pimage"));
 
                 list.add(dto);
             }
@@ -250,12 +260,4 @@ public class OrderDAO_imple implements OrderDAO {
         return list;
     }
 
-    // ==================================================
-    // 자원 반납
-    // ==================================================
-    private void close() {
-        try { if (rs != null) rs.close(); } catch (Exception e) {}
-        try { if (pstmt != null) pstmt.close(); } catch (Exception e) {}
-        try { if (conn != null) conn.close(); } catch (Exception e) {}
-    }
 }

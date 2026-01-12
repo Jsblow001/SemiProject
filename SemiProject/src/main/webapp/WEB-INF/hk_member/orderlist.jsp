@@ -166,6 +166,18 @@ body {
 </style>
 </head>
 
+<script type="text/javaScript">
+	
+	/* 취소 교환 반품 팝업창 */
+	function openCancelPopup(odrCode, status){
+	    window.open(
+	        "<%=ctxPath%>/orderCancelPopup.sp?odrcode=" + odrCode + "&status=" + status,
+	        "cancelPopup",
+	        "width=500,height=600,scrollbars=yes"
+	    );
+	}
+</script>
+
 <body>
 
 <jsp:include page="../header.jsp"/>
@@ -268,10 +280,14 @@ body {
                             <!-- 주문상태 -->
                             <td>${o.paymentStatusName}</td>
 
-                            <!-- 취소/교환/반품 -->
+                            <!-- 취소/교환/반품 신청 (팝업창) -->
                             <td>
-                                <a href="#" style="font-size:12px;color:#999;">신청</a>
-                            </td>
+							    <a href="javascript:void(0);" 
+							       onclick="openCancelPopup('${o.odrCode}','${o.paymentStatusName}')"
+							       style="font-size:12px;color:#999;">
+							       신청
+							    </a>
+						    </td>
 
                             <!-- 주문상세 -->
                             <td>

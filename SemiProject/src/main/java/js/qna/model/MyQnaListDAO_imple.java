@@ -109,4 +109,81 @@ public class MyQnaListDAO_imple implements MyQnaListDAO {
         return qnaList;
     }
 
+	@Override
+	public int noCommentCnt() throws SQLException {
+		
+		int cnt = 0;
+		
+		try {
+			conn = ds.getConnection();
+			
+			String sql = "SELECT COUNT(*) FROM tbl_qna "
+		 			   + " WHERE answer IS NULL OR DBMS_LOB.GETLENGTH(answer) = 0 ";
+			
+			
+	        pstmt = conn.prepareStatement(sql);
+	        rs = pstmt.executeQuery();
+	        
+	        if (rs.next()) {
+	            cnt = rs.getInt(1); // 첫 번째 컬럼(COUNT(*))의 값을 가져옴
+	        }
+			
+		} finally {
+			close();
+		}
+
+		return cnt;
+	}
+
+	// 미답변 목록 조회
+	@Override
+    public List<QnaDTO> selectNoCommentList(Map<String, String> paraMap) throws SQLException {
+        List<QnaDTO> qnaList = new ArrayList<>();
+
+        try {
+            conn = ds.getConnection();
+
+            // [Oracle 페이징 쿼리] answer가 없거나 길이가 0인 데이터만 추출
+            String sql = " SELECT QNA_ID, FK_MEMBER_ID, SUBJECT, REGDATE " +
+                         " FROM ( " +
+                         "    SELECT row_number() over(order by QNA_ID desc) AS rno, " +
+                         "           QNA_ID, FK_MEMBER_ID, SUBJECT, REGDATE " +
+                         "    FROM tbl_qna " +
+                         "    WHERE answer IS NULL OR DBMS_LOB.GETLENGTH(answer) = 0 " +
+                         " ) V " +
+                         " WHERE rno BETWEEN ? AND ? ";
+
+            pstmt = conn.prepareStatement(sql);
+
+            // 페이징 파라미터 설정
+            int currentShowPageNo = Integer.parseInt(paraMap.get("currentShowPageNo"));
+            int sizePerPage = Integer.parseInt(paraMap.get("sizePerPage"));
+            
+            pstmt.setInt(1, (currentShowPageNo - 1) * sizePerPage + 1);
+            pstmt.setInt(2, currentShowPageNo * sizePerPage);
+
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                QnaDTO qdto = new QnaDTO();
+                qdto.setQnaId(rs.getLong("QNA_ID"));
+                qdto.setFkMemberId(rs.getString("FK_MEMBER_ID")); // 작성자 ID 세팅
+                qdto.setSubject(rs.getString("SUBJECT"));
+                qdto.setRegDate(rs.getDate("REGDATE")); 
+                
+                // 미답변 목록이므로 답변 상태는 무조건 false
+                qdto.setAnswered(false);
+
+                qnaList.add(qdto);
+            }
+
+        } finally {
+            close();
+        }
+
+        return qnaList;
+    }
+	
+	
+	
 }

@@ -19,41 +19,32 @@
 <link rel="stylesheet" href="<%=ctxPath%>/bootstrap-4.6.2-dist/css/bootstrap.min.css">
 
 <style>
-body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #FBFAF8;
+body{font-family:'Poppins',sans-serif;background:#fbfaf8}
+
+/* 카드 */
+.reset-wrap{
+    max-width:420px;
+    margin:120px auto;
+    padding:40px;
+    background:#fff;
+    border:1px solid #ddd;
+    box-shadow:0 8px 20px rgba(0,0,0,.06)
 }
 
-.reset-wrap {
-    max-width: 420px;
-    margin: 120px auto;
-    padding: 40px;
-    background: #fff;
-    border: 1px solid #eee;
-}
+/* 타이틀 */
+.reset-title{text-align:center;font-size:24px;margin-bottom:30px;font-weight:500}
 
-.reset-title {
-    text-align: center;
-    font-size: 24px;
-    margin-bottom: 30px;
-    font-weight: 500;
-}
+/* input */
+.form-control{height:48px;border-radius:0}
 
-.form-control {
-    height: 48px;
-    border-radius: 0;
+/* 버튼 */
+.btn-reset{
+    height:48px;
+    background:#4a322b;
+    color:#fff;
+    border-radius:0
 }
-
-.btn-reset {
-    height: 48px;
-    border-radius: 0;
-    background-color: #5D4037;
-    color: #fff;
-}
-
-.btn-reset:hover {
-    background-color: #4a322b;
-}
+.btn-reset:hover{background:#3e2723}
 </style>
 
 <script>

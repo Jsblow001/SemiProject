@@ -40,7 +40,7 @@ public interface MemberDAO {
 	int withdrawMember(String userid) throws SQLException;
 	
 	
-	// 관리자 페이지 內 메인 페이지 - 회원 요약 데이터 (오늘 회원가입 수)
+	// 관리자 페이지 內 메인 페이지 - 회원 요약 데이터 (전체 회원수) + 전체목록 조회 페이징 처리
 	int getTotalMemberCount() throws SQLException;
 	
 	// 관리자 페이지 內 메인 페이지 - 회원 요약 데이터 (정상회원 수)
@@ -49,33 +49,37 @@ public interface MemberDAO {
 	// 관리자 페이지 內 메인 페이지 - 회원 요약 데이터 (정상회원 수)
 	int getDeleteMemberCount() throws SQLException;
 	
-	// 관리자 페이지 內 회원 전체 목록 조회
-	List<MemberDTO> selectAllMemberForAdmin() throws SQLException;
-
+	// 관리자 페이지 內 회원 전체 목록 조회 (+ 페이징 처리)
+	List<MemberDTO> selectAllMemberForAdmin(int startRno, int endRno) throws SQLException;
+	
 	// 관리자 페이지 內 회원 검색 조회
 	List<MemberDTO> selectMemberBySearch(String searchType, String searchWord) throws SQLException;
 	
 	// 관리자 페이지 內 회원 상세 조회 (입력받은 userid 를 가지고 한명의 회원정보를 가져오기) 
 	MemberDTO selectOneMember(String userid);
 	
-	// 관리자 페이지 內
+	// 관리자 페이지 內 오늘자 가입회원 수
 	int getTodayRegisterCount() throws SQLException;
 
-	// 관리자 페이지 內 메인 페이지 - 최근 7일 가입자 수
+	// 관리자 페이지 內 최근 7일 가입자 수
 	int getLast7DaysRegisterCount() throws SQLException;
 	
-	// 관리자 페이지 內 메인 페이지 - 최근 7일 가입자 수(그래프)
+	// 관리자 페이지 內 최근 7일 가입자 수(그래프)
 	List<Map<String, Object>> getLast7DaysRegisterList() throws SQLException;;
 
-	// 관리자 페이지 內 메인 페이지 - 최근 가입 회원 TOP 5
+	// 관리자 페이지 內 최근 가입 회원 TOP 5
 	List<MemberDTO> getRecentMemberList(int topN) throws SQLException;;
 	
-	
-	// 관리자 페이지 內 메인 페이지 - 등급별 회원 수
+	// 관리자 페이지 內 등급별 회원 수
 	List<MemberCountDTO> getGradeCountList() throws SQLException;
 
-	// 관리자 페이지 內 메인 페이지 - 성별 회원 수
+	// 관리자 페이지 內 성별 회원 수
 	List<MemberCountDTO> getGenderCountList() throws SQLException;
+
+	// 관리자 페이지 內 회원 더미 50명 추가
+	int createDummyMembers(int i) throws SQLException;
+
+	
 
 	
 

@@ -9,35 +9,16 @@
 
 <style>
 .terms-wrap{
-    max-width:1100px;
-    margin:20px auto 120px;
-    padding:0 16px;
-    box-sizing:border-box;
+    max-width:1100px;margin:20px auto 120px;padding:0 16px;box-sizing:border-box
 }
-.terms-title{
-    font-size:26px;
-    font-weight:700;
-    margin-bottom:8px;
-}
-.terms-sub{
-    font-size:14px;
-    color:#666;
-    margin-bottom:24px;
-}
-.terms-box{
-    border:1px solid #ddd;
-    border-radius:12px;
-    background:#fff;
-    padding:24px;
-    font-size:14.5px;
-    line-height:1.9;
-    max-height:1500px;
-    overflow-y:auto;
+.terms-title{font-size:26px;font-weight:700;margin-bottom:8px}
+.terms-sub{font-size:14px;color:#666;margin-bottom:24px}
 
-    /* 줄바꿈/공백 유지 핵심 */
-    white-space:pre-line;
-}
-s
+.terms-box{
+    border:1px solid #ddd;border-radius:12px;background:#fff;
+    padding:24px;font-size:14.5px;line-height:1.9;
+    max-height:1500px;overflow-y:auto;
+    white-space:pre-line
 }
 </style>
 
