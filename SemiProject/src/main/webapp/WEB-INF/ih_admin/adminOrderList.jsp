@@ -63,11 +63,11 @@
                             <%-- select 클릭 시 상세페이지 이동 방지 (event.stopPropagation) --%>
                             <td onclick="event.stopPropagation();">
                                 <select class="status-select" data-order-no="${order.odrcode}">
-                                    <option value="1" ${order.delivery_status == 1 ? 'selected' : ''}>결제완료</option>
-                                    <option value="2" ${order.delivery_status == 2 ? 'selected' : ''}>배송중</option>
-                                    <option value="3" ${order.delivery_status == 3 ? 'selected' : ''}>배송완료</option>
-                                    <option value="4" ${order.delivery_status == 4 ? 'selected' : ''}>주문취소</option>
-                                </select>
+								    <option value="1" ${order.deliverystatus == 1 ? 'selected' : ''}>결제완료</option>
+								    <option value="2" ${order.deliverystatus == 2 ? 'selected' : ''}>배송중</option>
+								    <option value="3" ${order.deliverystatus == 3 ? 'selected' : ''}>배송완료</option>
+								    <option value="4" ${order.deliverystatus == 4 ? 'selected' : ''}>주문취소</option>
+								</select>
                             </td>
                         </tr>
                     </c:forEach>
