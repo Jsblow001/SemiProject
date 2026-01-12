@@ -109,4 +109,29 @@ public class MyQnaListDAO_imple implements MyQnaListDAO {
         return qnaList;
     }
 
+	@Override
+	public int noCommentCnt() throws SQLException {
+		
+		int cnt = 0;
+		
+		try {
+			conn = ds.getConnection();
+			
+			String sql = "SELECT COUNT(*) FROM tbl_qna "
+		 			   + " WHERE answer IS NULL OR DBMS_LOB.GETLENGTH(answer) = 0 ";
+			
+			
+	        pstmt = conn.prepareStatement(sql);
+	        rs = pstmt.executeQuery();
+	        
+	        if (rs.next()) {
+	            cnt = rs.getInt(1); // 첫 번째 컬럼(COUNT(*))의 값을 가져옴
+	        }
+			
+		} finally {
+			close();
+		}
+
+		return cnt;
+	}
 }
