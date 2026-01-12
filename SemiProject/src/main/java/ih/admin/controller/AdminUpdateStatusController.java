@@ -22,7 +22,7 @@ public class AdminUpdateStatusController extends AbstractController {
         String status = request.getParameter("status");
 
         AdminOrderDAO odao = new AdminOrderDAO_imple();
-        int n = odao.updateOrderStatus(orderNo, status); // 성공하면 1, 실패하면 0 반환
+        int n = odao.updateOrderStatus(orderNo, status); 
 
         JSONObject jsonObj = new JSONObject();
         jsonObj.put("result", n);
