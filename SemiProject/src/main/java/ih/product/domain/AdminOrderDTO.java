@@ -28,6 +28,7 @@ public class AdminOrderDTO {
     private int odrprice;      // 단가
     private int deliverystatus; // 배송상태
     
+    private String invoice_no;
     
     // Getter, Setter
     public String getOdrcode() {
@@ -161,6 +162,12 @@ public class AdminOrderDTO {
 	}
 	public void setDeliverystatus(int deliverystatus) {
 		this.deliverystatus = deliverystatus;
+	}
+	public String getInvoice_no() {
+		return invoice_no;
+	}
+	public void setInvoice_no(String invoice_no) {
+		this.invoice_no = invoice_no;
 	}
 	
 	
