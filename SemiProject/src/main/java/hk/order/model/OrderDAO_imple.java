@@ -262,7 +262,7 @@ public class OrderDAO_imple implements OrderDAO {
 
     
     
-    // 주문취소 팝업창 상품 목록 조회
+    // 주문취소/교환/반품 팝업창 상품 목록 조회
     @Override
     public List<OrderDetailDTO> getOrderDetailList(int odrcode) throws SQLException {
 
@@ -315,7 +315,7 @@ public class OrderDAO_imple implements OrderDAO {
 
     
     
-    // 주문취소
+    // 주문취소/교환/반품 신청
     @Override
     public int requestClaim(int odrDetailNo, String type, String reason) throws SQLException {
 
@@ -345,5 +345,85 @@ public class OrderDAO_imple implements OrderDAO {
 
         return result;
     }
+
+    
+    
+    // 주문취소/교환/반품 신청 요청목록 조회
+    @Override
+    public List<OrderDetailDTO> getClaimList() throws SQLException {
+
+        List<OrderDetailDTO> list = new ArrayList<>();
+
+        try {
+            conn = ds.getConnection();
+
+            String sql =
+                " SELECT d.odrdetailno " +
+                "      , d.fk_odrcode " +
+                "      , d.odrqty " +
+                "      , d.claim_type " +
+                "      , d.claim_status " +
+                "      , d.claim_reason " +
+                "      , p.product_name " +
+                " FROM tbl_order_detail d " +
+                " JOIN tbl_product p " +
+                "   ON d.fk_product_id = p.product_id " +
+                " WHERE d.claim_status = 'REQUEST' " +
+                " ORDER BY d.odrdetailno DESC ";
+
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+
+            while(rs.next()){
+                OrderDetailDTO dto = new OrderDetailDTO();
+                dto.setOdrDetailNo(rs.getInt("odrdetailno"));
+                dto.setOdrCode(rs.getInt("fk_odrcode"));
+                dto.setOdrQty(rs.getInt("odrqty"));
+                dto.setClaimType(rs.getString("claim_type"));
+                dto.setClaimStatus(rs.getString("claim_status"));
+                dto.setClaimReason(rs.getString("claim_reason"));
+                dto.setProductName(rs.getString("product_name"));
+
+                list.add(dto);
+            }
+
+        } finally {
+            close();
+        }
+
+        return list;
+    }
+
+
+    
+    // 주문취소/반품/교환 신청 승인/반려 처리
+    @Override
+    public int processClaim(int odrDetailNo, String action) throws SQLException {
+
+        int result = 0;
+
+        try {
+            conn = ds.getConnection();
+
+            String status = action.equals("APPROVE") ? "APPROVED" : "REJECTED";
+
+            String sql =
+                " UPDATE tbl_order_detail " +
+                " SET claim_status = ? " +
+                " WHERE odrdetailno = ? ";
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, status);
+            pstmt.setInt(2, odrDetailNo);
+
+            result = pstmt.executeUpdate();
+
+        } finally {
+            close();
+        }
+
+        return result;
+    }
+
 
 }
