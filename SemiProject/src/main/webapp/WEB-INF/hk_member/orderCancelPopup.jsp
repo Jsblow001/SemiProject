@@ -1,4 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
 <%
     String ctxPath = request.getContextPath();
 %>
@@ -55,8 +58,27 @@ function submitCancel(){
 </head>
 <body>
 
-<h3>주문번호 : ${odrcode}</h3>
-<p>현재상태 : ${status}</p>
+<h4>주문 상품 선택</h4>
+
+<table width="100%" border="1">
+<tr>
+   <th>선택</th>
+   <th>상품명</th>
+   <th>수량</th>
+</tr>
+
+<c:forEach var="d" items="${detailList}">
+<tr>
+  <td>
+     <input type="radio" name="odrdetailno" value="${d.odrDetailNo}">
+  </td>
+  <td>${d.productName}</td>
+  <td>${d.odrQty}</td>
+</tr>
+</c:forEach>
+</table>
+
+
 
 <div class="radio-group">
     <label><input type="radio" name="type" value="CANCEL" checked> 취소</label>

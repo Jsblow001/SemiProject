@@ -260,4 +260,57 @@ public class OrderDAO_imple implements OrderDAO {
         return list;
     }
 
+    
+    
+    // 팝업창 상품 목록 조회
+    @Override
+    public List<OrderDetailDTO> getOrderDetailList(int odrcode) throws SQLException {
+
+        List<OrderDetailDTO> list = new ArrayList<>();
+
+        try {
+            conn = ds.getConnection();
+
+            String sql =
+                " SELECT d.odrdetailno " +
+                "      , d.fk_odrcode " +
+                "      , d.fk_product_id " +
+                "      , d.odrqty " +
+                "      , d.odrprice " +
+                "      , d.deliverystatus " +
+                "      , TO_CHAR(d.deliverydate,'YYYY-MM-DD') AS deliverydate " +
+                "      , p.product_name " +
+                "      , p.pimage " +
+                " FROM tbl_order_detail d " +
+                " JOIN tbl_product p " +
+                "   ON d.fk_product_id = p.product_id " +
+                " WHERE d.fk_odrcode = ? " +
+                " ORDER BY d.odrdetailno ";
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, odrcode);
+
+            rs = pstmt.executeQuery();
+
+            while(rs.next()) {
+                OrderDetailDTO dto = new OrderDetailDTO();
+                dto.setOdrDetailNo(rs.getInt("odrdetailno"));
+                dto.setOdrCode(rs.getInt("fk_odrcode"));
+                dto.setProductId(rs.getInt("fk_product_id"));
+                dto.setOdrQty(rs.getInt("odrqty"));
+                dto.setOdrPrice(rs.getInt("odrprice"));
+                dto.setDeliveryStatus(rs.getInt("deliverystatus"));
+                dto.setDeliveryDate(rs.getString("deliverydate"));
+                dto.setProductName(rs.getString("product_name"));
+                dto.setProductImage(rs.getString("pimage"));
+                list.add(dto);
+            }
+
+        } finally {
+            close();
+        }
+
+        return list;
+    }
+
 }

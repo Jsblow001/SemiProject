@@ -15,6 +15,8 @@ public interface OrderDAO {
 
 	// 주문 총 건수 (페이지바용)
     int getOrderTotalCount(String userid, String status, String startDate, String endDate) throws SQLException;
+
+	List<OrderDetailDTO> getOrderDetailList(int odrcode) throws SQLException;
     
      
 }
