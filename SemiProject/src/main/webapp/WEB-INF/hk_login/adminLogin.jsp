@@ -52,6 +52,10 @@ body{font-family:'Poppins',sans-serif!important;background:#f3f3f3!important}
 
     <!-- 관리자 로그인 -->
     <form method="post" action="<%= ctxPath %>/login.sp">
+    
+    <!-- 추가 (관리자 로그인 실패시 관리자 로그인 페이지로 이동 위함) -->
+     <input type="hidden" name="mode" value="admin"> 
+     
         <div class="form-group">
             <input type="text"
                    class="form-control"

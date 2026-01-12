@@ -51,7 +51,14 @@ public class LoginController extends AbstractController {
 
 			String userid = request.getParameter("userid");   // name="userid"
 			String passwd = request.getParameter("passwd");   // pwd → passwd 변경
-
+			String mode   = request.getParameter("mode");     // 추가
+			
+			// 실패시 돌아갈 주소
+		    String failLoc = request.getContextPath() + "/login.sp";
+		    if ("admin".equals(mode)) {
+		        failLoc = request.getContextPath() + "/login.sp?mode=admin";
+		    }
+			
 			// Map 방식으로 DAO에 전달
 			Map<String, String> paraMap = new HashMap<>();
 			paraMap.put("userid", userid);
@@ -61,7 +68,7 @@ public class LoginController extends AbstractController {
 
 			if (loginuser == null) {
 				request.setAttribute("message", "아이디 또는 비밀번호가 틀렸습니다.");
-				request.setAttribute("loc", request.getContextPath() + "/login.sp");
+				request.setAttribute("loc", failLoc);         // 변경
 
 				super.setRedirect(false);
 				super.setViewPage("/WEB-INF/msg.jsp");
@@ -70,7 +77,7 @@ public class LoginController extends AbstractController {
 
 				if (loginuser.getStatus() == 0) {
 					request.setAttribute("message", "탈퇴한 회원입니다.");
-					request.setAttribute("loc", request.getContextPath() + "/login.sp");
+					request.setAttribute("loc", failLoc);
 
 					super.setRedirect(false);
 					super.setViewPage("/WEB-INF/msg.jsp");
@@ -79,7 +86,7 @@ public class LoginController extends AbstractController {
 
 				if (loginuser.getIdle() == 1) {
 					request.setAttribute("message", "휴면 상태의 계정입니다.");
-					request.setAttribute("loc", request.getContextPath() + "/login.sp");
+					request.setAttribute("loc", failLoc);
 
 					super.setRedirect(false);
 					super.setViewPage("/WEB-INF/msg.jsp");
