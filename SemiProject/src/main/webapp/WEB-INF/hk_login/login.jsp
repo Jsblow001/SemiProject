@@ -23,92 +23,47 @@
 <script src="<%=ctxPath%>/js/hk_login/login.js"></script>
 
 <style>
-body {
-    font-family: 'Poppins', sans-serif !important;
-    background-color: #FBFAF8 !important;
-}
+body{font-family:'Poppins',sans-serif!important;background:#fbfaf8!important}
 
-/* 로그인 박스 */
-.login-wrap {
-    max-width: 420px !important;
-    margin: 120px auto !important;
-    padding: 40px !important;
-    background: #fff !important;
-    border: 1px solid #eee !important;
+/* 카드 */
+.login-wrap{
+    max-width:420px!important;
+    margin:120px auto!important;
+    padding:40px!important;
+    background:#fff!important;
+    border:1px solid #ddd!important;
+    box-shadow:0 8px 20px rgba(0,0,0,.06)!important
 }
 
 /* 타이틀 */
-.login-title {
-    text-align: center !important;
-    font-size: 26px !important;
-    font-weight: 500 !important;
-    margin-bottom: 30px !important;
-    letter-spacing: 2px !important;
-}
+.login-title{text-align:center!important;font-size:26px!important;font-weight:500!important;margin-bottom:30px!important;letter-spacing:2px!important}
 
-/* input */
-.form-control {
-    height: 48px !important;
-    border-radius: 0 !important;
-}
+/* 입력 */
+.form-control{height:48px!important;border-radius:0!important}
 
-/* 로그인 버튼 */
-.btn-login {
-    background-color: #5D4037 !important;
-    color: #fff !important;
-    border-radius: 0 !important;
-    height: 48px !important;
-    font-weight: 500 !important;
-}
+/* 로그인 */
+.btn-login{height:48px!important;background:#4a322b!important;color:#fff!important;border-radius:0!important;font-weight:500!important}
+.btn-login:hover{background:#3e2723!important}
 
-.btn-login:hover {
-    background-color: #4a322b !important;
-    color: #fff !important;
-}
+/* 옵션 */
+.save-id{font-size:.9rem!important}
 
-/* 아이디 저장 */
-.save-id {
-    font-size: 0.9rem !important;
-}
+/* 링크 */
+.login-links{text-align:center!important;font-size:.9rem!important;margin-top:20px!important}
+.login-links a{color:#555!important;margin:0 8px!important;text-decoration:none!important}
+.login-links a:hover{color:#5d4037!important}
 
-/* 링크 영역 */
-.login-links {
-    text-align: center !important;
-    font-size: 0.9rem !important;
-    margin-top: 20px !important;
+/* 회원가입 */
+.btn-outline-secondary{
+    height:48px!important;
+    background:#fff!important;
+    border:1px solid #bdbdbd!important;
+    color:#5d4037!important;
+    border-radius:0!important;
+    font-weight:500!important
 }
-
-.login-links a {
-    color: #555 !important;
-    margin: 0 8px !important;
-    text-decoration: none !important;
-}
-
-.login-links a:hover {
-    color: #5D4037 !important;
-}
-
-/* ===============================
-   회원가입 버튼 (강제 통일)
-   =============================== */
-.btn-outline-secondary {
-    height: 48px !important;
-    border-radius: 0 !important;
-    font-weight: 500 !important;
-
-    background-color: #ffffff !important;
-    border: 1px solid #bdbdbd !important;
-    color: #5D4037 !important;
-}
-
-.btn-outline-secondary:hover {
-    background-color: #5D4037 !important;
-    border-color: #5D4037 !important;
-    color: #ffffff !important;
-}
+.btn-outline-secondary:hover{background:#5d4037!important;border-color:#5d4037!important;color:#fff!important}
 </style>
-
-
 
 </head>
 

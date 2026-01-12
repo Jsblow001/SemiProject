@@ -70,50 +70,116 @@ a.admin-btn.light:hover {
 <div class="detail-container">
 
     <h3 style="font-size:18px;font-weight:600;color:#333;margin-bottom:20px;">
-	    주문 상세내역 <span style="font-size:13px;color:#999;">(${odrCode})</span>
+	    주문 상세내역 <span style="font-size:13px;color:#999;">(주문번호:${odrCode})</span>
 	</h3>
 
     <table class="detail-table">
         <thead>
             <tr>
-                <th>상품명</th>
-                <th>수량</th>
-                <th>가격</th>
-                <th>배송상태</th>
-                <th>배송일</th>
+            	<th>No</th>
+                <th>이미지</th>
+			    <th>상품명</th>
+			    <th>수량</th>
+			    <th>단가</th>
+			    <th>합계</th>
+			    <th>배송상태</th>
+			    <th>배송일</th>
             </tr>
         </thead>
-        <tbody>
-            <c:forEach var="d" items="${detailList}">
-                <tr>
-                    <td>${d.productName}</td>
-                    <td>${d.odrQty}</td>
-                    <td>
-                        <fmt:formatNumber value="${d.odrPrice}" pattern="#,###"/>원
-                    </td>
-                    <td>${d.deliveryStatusName}</td>
-                    <td>${d.deliveryDate}</td>
-                </tr>
-            </c:forEach>
+       <tbody>
 
-            <c:if test="${empty detailList}">
-                <tr>
-                    <td colspan="5" style="padding:40px;color:#999;">
-                        주문 상세 정보가 없습니다.
-                    </td>
-                </tr>
-            </c:if>
-        </tbody>
+		<c:set var="totalPrice" value="0"/>
+		
+		<c:forEach var="d" items="${detailList}" varStatus="status">
+		    <c:set var="itemTotal" value="${d.odrPrice * d.odrQty}"/>
+		    <c:set var="totalPrice" value="${totalPrice + itemTotal}"/>
+		
+		    <tr>
+		    	<td>
+		           ${status.count}
+		        </td>
+		    
+		        <!-- 상품 이미지 -->
+		        <td>
+		            <img src="${pageContext.request.contextPath}/img/${d.productImage}"
+		                 style="width:70px;height:70px;object-fit:cover;border-radius:6px;">
+		        </td>
+		
+		        <!-- 상품명 -->
+		        <td>${d.productName}</td>
+		
+		        <!-- 수량 -->
+		        <td>${d.odrQty}</td>
+		
+		        <!-- 단가 -->
+		        <td>
+		            <fmt:formatNumber value="${d.odrPrice}" pattern="#,###"/>원
+		        </td>
+		
+		        <!-- 합계 -->
+		        <td>
+		            <strong>
+		                <fmt:formatNumber value="${itemTotal}" pattern="#,###"/>원
+		            </strong>
+		        </td>
+		
+		        <!-- 배송상태 -->
+		        <td>${d.deliveryStatusName}</td>
+		
+		        <!-- 배송일 -->
+		        <td>${d.deliveryDate}</td>
+		    </tr>
+		</c:forEach>
+		
+		<c:if test="${empty detailList}">
+		    <tr>
+		        <td colspan="7" style="padding:40px;color:#999;">
+		            주문 상세 정보가 없습니다.
+		        </td>
+		    </tr>
+		</c:if>
+		
+		</tbody>
+
     </table>
 
-    <div class="btn-box">
-	    <a href="javascript:history.back()"
-	       class="admin-btn light">
-	        주문목록으로
-	    </a>
+	<div style="margin-top:30px;text-align:right;font-size:15px;">
+	    <div>상품금액 :
+	        <strong>
+	            <fmt:formatNumber value="${totalPrice}" pattern="#,###"/>원
+	        </strong>
+	    </div>
+	
+	    <c:set var="deliveryFee" value="0"/>
+	    <c:if test="${totalPrice > 0 && totalPrice < 50000}">
+	        <c:set var="deliveryFee" value="3000"/>
+	    </c:if>
+	
+	    <div>배송비 :
+	        <strong>
+	            <fmt:formatNumber value="${deliveryFee}" pattern="#,###"/>원
+	        </strong>
+	    </div>
+	
+	    <hr style="margin:15px 0;">
+	
+	    <div style="font-size:18px;">
+	        총 결제금액 :
+	        <strong style="color:#c0392b;">
+	            <fmt:formatNumber value="${totalPrice + deliveryFee}" pattern="#,###"/>원
+	        </strong>
+	    </div>
 	</div>
-
-</div>
+		
+	
+	    <div class="btn-box">
+		    <a href="javascript:history.back()"
+		       class="admin-btn light">
+		        주문목록으로
+		    </a>
+		</div>
+	
+	</div>
 
 <jsp:include page="../footer.jsp"/>
 
