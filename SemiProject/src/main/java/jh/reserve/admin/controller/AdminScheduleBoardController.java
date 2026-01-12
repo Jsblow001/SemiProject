@@ -18,12 +18,13 @@ import jh.reserve.model.ReservationDAO_imple;
 
 public class AdminScheduleBoardController extends AbstractController {
 
-    private ReservationDAO dao = new ReservationDAO_imple();
 
     @SuppressWarnings("unchecked")
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
+    	ReservationDAO dao = new ReservationDAO_imple();
+    	
     	HttpSession session = request.getSession();
 
         // ===== 테스트 모드 =====

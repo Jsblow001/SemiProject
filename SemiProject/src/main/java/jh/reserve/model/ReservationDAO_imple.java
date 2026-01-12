@@ -437,7 +437,7 @@ public class ReservationDAO_imple implements ReservationDAO {
         return list;
     }
 
-    // 문자 로그 저장
+ // 문자 로그 저장
     @Override
     public int insertSmsLog(Map<String, String> paraMap) throws Exception {
 
@@ -446,26 +446,63 @@ public class ReservationDAO_imple implements ReservationDAO {
         try {
             conn = ds.getConnection();
 
+            // 필수값
             long reservationId = Long.parseLong(paraMap.get("reservationId"));
             int storeId = Integer.parseInt(paraMap.get("storeId"));
 
-            String toPhone = paraMap.get("toPhone");
-            String smsType = paraMap.get("smsType");
-            String content = paraMap.get("content");
-            String resultJson = paraMap.get("resultJson");
+            String mobile = paraMap.get("toPhone");     // ✅ MOBILE 컬럼
+            String smsType = paraMap.get("smsType");    // ✅ SMS_TYPE
+            String content = paraMap.get("content");    // ✅ CONTENT
+            String providerJson = paraMap.get("resultJson"); // ✅ PROVIDER_JSON (CLOB)
 
+            if (providerJson == null) providerJson = "";
+
+            // ===== providerJson에서 값 추출 (최소한 group_id, success_count, error_count) =====
+            String providerGroupId = null;
+            int successCount = 0;
+            int errorCount = 0;
+
+            try {
+                // JSON-simple 사용 가능(이미 org.json.simple 쓰고 있음)
+                org.json.simple.parser.JSONParser parser = new org.json.simple.parser.JSONParser();
+                Object obj = parser.parse(providerJson);
+                if (obj instanceof org.json.simple.JSONObject) {
+                    org.json.simple.JSONObject jo = (org.json.simple.JSONObject) obj;
+
+                    Object gid = jo.get("group_id");
+                    if (gid != null) providerGroupId = String.valueOf(gid);
+
+                    Object sc = jo.get("success_count");
+                    if (sc != null) successCount = Integer.parseInt(String.valueOf(sc));
+
+                    Object ec = jo.get("error_count");
+                    if (ec != null) errorCount = Integer.parseInt(String.valueOf(ec));
+                }
+            } catch (Exception ignore) {
+                // 파싱 실패해도 로그는 남기되, 카운트는 0으로 둠
+            }
+
+            // SEND_STATUS: 성공/실패
+            String sendStatus = (successCount > 0 && errorCount == 0) ? "SUCCESS" : "FAIL";
+
+            // ✅ tbl_sms_log 컬럼에 맞춘 INSERT
             String sql =
                 " INSERT INTO tbl_sms_log " +
-                " (fk_reservation_id, fk_store_id, to_phone, sms_type, sms_content, result_json, sent_at) " +
-                " VALUES (?, ?, ?, ?, ?, ?, SYSTIMESTAMP) ";
+                " (fk_store_id, fk_reservation_id, mobile, sms_type, content, " +
+                "  provider_group_id, success_count, error_count, send_status, provider_json, created_at) " +
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, SYSTIMESTAMP) ";
 
             pstmt = conn.prepareStatement(sql);
-            pstmt.setLong(1, reservationId);
-            pstmt.setInt(2, storeId);
-            pstmt.setString(3, toPhone);
+            pstmt.setInt(1, storeId);
+            pstmt.setLong(2, reservationId);
+            pstmt.setString(3, mobile);
             pstmt.setString(4, smsType);
             pstmt.setString(5, content);
-            pstmt.setString(6, resultJson);
+            pstmt.setString(6, providerGroupId);
+            pstmt.setInt(7, successCount);
+            pstmt.setInt(8, errorCount);
+            pstmt.setString(9, sendStatus);
+            pstmt.setString(10, providerJson);
 
             n = pstmt.executeUpdate();
 
@@ -475,6 +512,7 @@ public class ReservationDAO_imple implements ReservationDAO {
 
         return n;
     }
+
 
     // 회원예약취소기능
     // paraMap: reservationId, userid

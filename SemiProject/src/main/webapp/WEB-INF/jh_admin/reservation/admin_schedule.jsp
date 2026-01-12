@@ -70,26 +70,49 @@
       fetchAndRender();
     });
 
-    // 빈칸 클릭하면 막기(30분)
-    $("#timeGrid").on("click", ".cell[data-empty='1']", function(){
-      const storeId = $("#storeId").val();
-      const date = $("#date").val();
-      const startTime = $(this).attr("data-time"); // HH:mm
+ 	// ✅ 문자 보내기(예약) - 중복 바인딩 방지 버전
+    $("#timeGrid")
+      .off("click", ".btn-sms")           // ✅ 기존 중복 핸들러 제거
+      .on("click", ".btn-sms", function(e){
+        e.stopPropagation();
 
-      if(!confirm(date + " " + startTime + " ~ (30분) 막기 처리할까요?")) return;
+        const storeId = $("#storeId").val();
+        const reservationId = $(this).data("reservationid");
+        const phone = $(this).data("phone");
+        const name = $(this).data("name");
 
-      $.post("<%=ctxPath%>/admin/blockSlot.sp", {
-        storeId: storeId,
-        date: date,
-        startTime: startTime,
-        durationMin: 30,
-        memo: "관리자 막기"
-      }).done(function(res){
-        const data = (typeof res === "string") ? JSON.parse(res) : res;
-        if(data.ok) fetchAndRender();
-        else alert(data.message || "막기 실패");
-      });
-    });
+        const msg = prompt(name + "(" + phone + ")에게 보낼 문자를 입력하세요");
+        if(msg == null) return;
+
+        // ✅ 중복 전송 방지(연타/중복핸들러 안전장치)
+        const $btn = $(this);
+        if($btn.data("sending") === 1) return;
+        $btn.data("sending", 1);
+
+        $.ajax({
+          url: "<%=ctxPath%>/adminSendSms.sp",
+          type: "POST",
+          dataType: "json",              // ✅ JSON.parse 제거
+          data: {
+            reservationId: reservationId,
+            storeId: storeId,
+            toPhone: phone,
+            smsType: "ADMIN",
+            content: msg
+          }
+        })
+        .done(function(data){
+          alert(data.message || (data.ok ? "전송 완료" : "전송 실패"));
+        })
+        .fail(function(xhr){
+          console.log("SMS FAIL", xhr.status, xhr.responseText);
+          alert("문자 전송 요청 실패: " + xhr.status);
+        })
+        .always(function(){
+          $btn.data("sending", 0);
+        });
+      }); // end of $("#timeGrid")
+
 
     // 막기 해제
     $("#timeGrid").on("click", ".btn-unblock", function(e){
@@ -105,23 +128,7 @@
         });
     });
 
-    // 문자 보내기(예약)
-    $("#timeGrid").on("click", ".btn-sms", function(e){
-      e.stopPropagation();
-      const phone = $(this).data("phone");
-      const name = $(this).data("name");
-      const msg = prompt(name + "(" + phone + ")에게 보낼 문자를 입력하세요");
-      if(msg == null) return;
-
-      // 너가 이미 가진 AdminMemberSmsSend 활용
-      $.post("<%=ctxPath%>/adminMemberSmsSend.sp", {
-        mobile: phone,
-        smsContent: msg
-      }).done(function(res){
-        const data = (typeof res === "string") ? JSON.parse(res) : res;
-        alert("전송 결과: " + JSON.stringify(data));
-      });
-    });
+    
 
     // 메모 버튼 클릭시 이벤트
     $("#timeGrid").on("click", ".btn-note", function(e){
@@ -242,10 +249,11 @@
           }
 
           const $btnSms = $("<button>")
-            .addClass("btn btn-sms")
-            .text("문자")
-            .data("phone", phone)
-            .data("name", name);
+          .addClass("btn btn-sms")
+          .text("문자")
+          .data("phone", phone)
+          .data("name", name)
+          .data("reservationid", ev.id); // ✅ 예약 PK(=reservation_id)
 
           $badge.append($btnSms);
           $cell.append($badge);

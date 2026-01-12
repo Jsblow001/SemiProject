@@ -16,12 +16,13 @@ import jh.reserve.model.ReservationDAO_imple;
 
 public class AdminBlockSlotController extends AbstractController {
 
-    private ReservationDAO dao = new ReservationDAO_imple();
 
     @SuppressWarnings("unchecked")
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
+    	ReservationDAO dao = new ReservationDAO_imple();
+    	
         JSONObject json = new JSONObject();
 
         if(!"POST".equalsIgnoreCase(request.getMethod())) {
