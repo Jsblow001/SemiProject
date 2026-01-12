@@ -249,9 +249,6 @@ function goSearch(){
       </tbody>
     </table>
 
-    <div class="btn-row">
-      <a class="btn-write" href="${pageContext.request.contextPath}/qnaWrite.sp">글쓰기</a>
-    </div>
 
     <!-- ✅ 컨트롤러가 만들어준 pageBar 출력 (pageBar는 <li class='page-item'>... 형태여야 함) -->
     <ul class="pagination">

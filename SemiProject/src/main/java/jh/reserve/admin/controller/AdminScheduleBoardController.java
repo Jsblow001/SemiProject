@@ -25,32 +25,34 @@ public class AdminScheduleBoardController extends AbstractController {
 
     	ReservationDAO dao = new ReservationDAO_imple();
     	
-    	HttpSession session = request.getSession();
 
-        // ===== 테스트 모드 =====
+    	// testmode!
     	boolean testMode = false;
+
+    	HttpSession session = request.getSession();
     	MemberDTO loginuser = (MemberDTO) session.getAttribute("loginuser");
 
+    	// ✅ 테스트모드일 때만 "로컬 변수"로만 admin 부여 (세션에 넣지 말 것)
     	if (testMode && (loginuser == null || !"admin".equals(loginuser.getUserid()))) {
     	    loginuser = new MemberDTO();
     	    loginuser.setUserid("admin");
-    	    session.setAttribute("loginuser", loginuser);
     	}
 
+    	// ✅ 권한체크는 이렇게 (testMode=false일 때만 막기)
+    	if (!testMode && (loginuser == null || !"admin".equals(loginuser.getUserid()))) {
 
-        // 1) 관리자 체크
-        if (loginuser == null || !"admin".equals(loginuser.getUserid())) {
+    	    JSONObject json = new JSONObject();
+    	    json.put("ok", false);
+    	    json.put("message", "관리자만 접근 가능(로그인 필요)");
 
-            JSONObject json = new JSONObject();
-            json.put("ok", false);
-            json.put("message", "관리자만 접근 가능(로그인 필요)");
+    	    // 방법 A: 401 유지 (프론트에서 fail 처리 필요)
+    	    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
-            request.setAttribute("json", json.toString());
-            super.setRedirect(false);
-            super.setViewPage("/WEB-INF/hk_admin/jsonview.jsp");
-            return;
-        }
+    	    request.setAttribute("json", json.toString());
+    	    super.setRedirect(false);
+    	    super.setViewPage("/WEB-INF/hk_admin/jsonview.jsp");
+    	    return;
+    	}
 
         
         String storeId = request.getParameter("storeId");
