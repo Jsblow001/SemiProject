@@ -262,7 +262,7 @@ public class OrderDAO_imple implements OrderDAO {
 
     
     
-    // 팝업창 상품 목록 조회
+    // 주문취소 팝업창 상품 목록 조회
     @Override
     public List<OrderDetailDTO> getOrderDetailList(int odrcode) throws SQLException {
 
@@ -311,6 +311,39 @@ public class OrderDAO_imple implements OrderDAO {
         }
 
         return list;
+    }
+
+    
+    
+    // 주문취소
+    @Override
+    public int requestClaim(int odrDetailNo, String type, String reason) throws SQLException {
+
+        int result = 0;
+
+        try {
+            conn = ds.getConnection();
+
+            String sql =
+                " UPDATE tbl_order_detail " +
+                " SET CLAIM_TYPE = ?, " +
+                "     CLAIM_STATUS = 'REQUEST', " +
+                "     CLAIM_REASON = ? " +
+                " WHERE ODRDETAILNO = ? " +
+                "   AND CLAIM_TYPE IS NULL ";
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, type);
+            pstmt.setString(2, reason);
+            pstmt.setInt(3, odrDetailNo);
+
+            result = pstmt.executeUpdate();
+
+        } finally {
+            close();
+        }
+
+        return result;
     }
 
 }
