@@ -44,29 +44,31 @@ public class AdminOrderDAO_imple implements AdminOrderDAO {
         try {
             conn = ds.getConnection();
 
-            String sql = " SELECT O.odrcode, O.fk_member_id, M.name, P.product_name, O.odrtotalprice, O.odrdate, O.payment_status "
-                    + " FROM tbl_order O "
-                    + " JOIN tbl_member M ON O.fk_member_id = M.member_id "
-                    + " JOIN tbl_order_detail D ON O.odrcode = D.fk_odrcode " // 상세 테이블 필수
-                    + " JOIN tbl_product P ON D.fk_product_id = P.product_id " 
-                    + " ORDER BY O.odrdate DESC ";
+            String sql = " SELECT O.odrcode, O.fk_member_id, M.name, P.product_name, O.odrtotalprice, O.odrdate, O.payment_status, D.deliverystatus "
+                       + " FROM tbl_order O "
+                       + " JOIN tbl_member M ON O.fk_member_id = M.member_id "
+                       + " JOIN tbl_order_detail D ON O.odrcode = D.fk_odrcode " 
+                       + " JOIN tbl_product P ON D.fk_product_id = P.product_id " 
+                       + " ORDER BY O.odrdate DESC ";
             
             pstmt = conn.prepareStatement(sql);
             rs = pstmt.executeQuery();
             
             while(rs.next()) {
-            	AdminOrderDTO odto = new AdminOrderDTO();
+                AdminOrderDTO odto = new AdminOrderDTO();
                 odto.setOdrcode(rs.getString("odrcode"));
                 odto.setFk_userid(rs.getString("fk_member_id"));
                 odto.setName(rs.getString("name"));
-                odto.setpName(rs.getString("product_name")); // SQL의 product_name을 가져옴
-                odto.setTotalprice(rs.getInt("odrtotalprice")); // SQL의 odrtotalprice를 가져옴
+                odto.setpName(rs.getString("product_name"));
+                odto.setTotalprice(rs.getInt("odrtotalprice"));
                 odto.setOdrdate(rs.getString("odrdate"));
-                odto.setDelivery_status(rs.getInt("payment_status")); // 우선 결제상태를 배송상태 필드에 담음
+                odto.setPayment_status(rs.getInt("payment_status")); 
+                odto.setDeliverystatus(rs.getInt("deliverystatus"));
+                
                 orderList.add(odto);
             }
         } finally {
-        	close();
+            close();
         }
         return orderList;
     }
@@ -75,16 +77,27 @@ public class AdminOrderDAO_imple implements AdminOrderDAO {
     @Override
     public int updateOrderStatus(String odrcode, String status) throws SQLException {
         int result = 0;
+        
         try {
             conn = ds.getConnection();
+            
+            conn.setAutoCommit(false);
+            
             String sql = " UPDATE tbl_order_detail SET deliverystatus = ? WHERE fk_odrcode = ? ";
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, status);
             pstmt.setString(2, odrcode);
+            
             result = pstmt.executeUpdate();
             
+            if(result > 0) {
+                conn.commit(); 
+            }
+        } catch(SQLException e) {
+        	if(conn != null) conn.rollback(); 
+            e.printStackTrace();
         } finally {
-        	close();
+            close();
         }
         return result;
     }
@@ -152,7 +165,7 @@ public class AdminOrderDAO_imple implements AdminOrderDAO {
         try {
             conn = ds.getConnection();
             
-            String sql = " SELECT D.odrdetailno, P.product_name, D.odrqty, D.odrprice, D.deliverystatus " +
+            String sql = " SELECT D.odrdetailno, P.product_name, D.odrqty, D.odrprice, D.deliverystatus, D.invoice_no" +
                          " FROM tbl_order_detail D JOIN tbl_product P " +
                          " ON D.fk_product_id = P.product_id " +
                          " WHERE D.fk_odrcode = ? ";
@@ -164,14 +177,20 @@ public class AdminOrderDAO_imple implements AdminOrderDAO {
             while(rs.next()) {
                 AdminOrderDTO odto = new AdminOrderDTO();
                 odto.setOdrdetailno(rs.getInt("odrdetailno"));
-                
                 odto.setPname(rs.getString("product_name")); 
-                
                 odto.setOdrqty(rs.getInt("odrqty"));
                 odto.setOdrprice(rs.getInt("odrprice"));
                 odto.setDeliverystatus(rs.getInt("deliverystatus"));
-                
-                // odto.setPimage("no-image.png"); 
+                String dbInvoice = rs.getString("invoice_no");
+
+                // DB에 송장번호가 null이면 테스트용 랜덤 번호
+                if(dbInvoice == null || dbInvoice.trim().isEmpty()) {
+
+                    int randomNum = (int)(Math.random() * 899999) + 100000;
+                    odto.setInvoice_no("TEST-" + randomNum);
+                } else {
+                    odto.setInvoice_no(dbInvoice);
+                }
                 
                 detailList.add(odto);
             }
@@ -179,5 +198,56 @@ public class AdminOrderDAO_imple implements AdminOrderDAO {
             close();
         }
         return detailList;
+    }
+	
+    // 배송 상태별 건수 조회 (대시보드용)
+    @Override
+    public Map<String, Integer> getDeliveryStatusCount() throws SQLException {
+        Map<String, Integer> statusMap = new HashMap<>();
+        statusMap.put("count1", 0);
+        statusMap.put("count2", 0);
+        statusMap.put("count3", 0);
+        statusMap.put("count4", 0);
+
+        try {
+
+            conn = ds.getConnection(); 
+
+            String sql = " SELECT deliverystatus, count(*) AS cnt " +
+                         " FROM tbl_order_detail " +
+                         " GROUP BY deliverystatus ";
+            
+            pstmt = conn.prepareStatement(sql); 
+            rs = pstmt.executeQuery();
+            
+            while(rs.next()) {
+                int status = rs.getInt("deliverystatus");
+                int cnt = rs.getInt("cnt");
+                statusMap.put("count" + status, cnt);
+            }
+        } finally {
+            close(); 
+        }
+        return statusMap;
+    }
+    
+    // 운송장 업데이트
+    public int updateInvoice(String odrdetailno, String invoice_no) throws SQLException {
+        int result = 0;
+        try {
+            conn = ds.getConnection();
+            // 송장을 넣으면 배송상태도 '2(배송중)'으로 함께 바꾸는 것이 실무 정석입니다.
+            String sql = " update tbl_order_detail set invoice_no = ?, deliverystatus = 2 " +
+                         " where odrdetailno = ? ";
+            
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, invoice_no);
+            pstmt.setString(2, odrdetailno);
+            
+            result = pstmt.executeUpdate();
+        } finally {
+            close();
+        }
+        return result;
     }
 }
