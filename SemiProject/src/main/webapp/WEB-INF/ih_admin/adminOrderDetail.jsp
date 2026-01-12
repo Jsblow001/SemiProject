@@ -29,6 +29,7 @@
     .order-summary-text { font-size: 0.95rem; line-height: 1.8; }
     .price-total { font-size: 1.4rem; color: #d9534f; }
 </style>
+
 <body>
 	<div class="container-fluid pt-5 mt-3">
 	    <div class="row px-xl-5">
