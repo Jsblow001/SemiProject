@@ -2,6 +2,7 @@ package ih.product.model;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import ih.product.domain.AdminOrderDTO;
 
@@ -18,4 +19,10 @@ public interface AdminOrderDAO {
 
     // 주문 상세 상품 목록 조회 (상품 정보 포함)
     List<AdminOrderDTO> selectOrderDetailList(String odrcode) throws SQLException;
+
+    // 배송 상태별 건수 조회
+	Map<String, Integer> getDeliveryStatusCount() throws SQLException;
+
+	// 운송장 업데이트
+	int updateInvoice(String odrdetailno, String invoice_no) throws SQLException;
 }
