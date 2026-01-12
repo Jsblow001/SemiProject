@@ -4,31 +4,37 @@
 
 <% String ctxPath = request.getContextPath(); %>
 
-
 <head>
     <meta charset="utf-8">
     <title>CARIN</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <link rel="preconnect" href="https://fonts.gstatic.com">
+	
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"> 
+	
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+	
+	<link href="<%= ctxPath%>/css/style.css" rel="stylesheet">
+	
+	<script src="<%= ctxPath%>/js/jquery-3.7.1.min.js"></script>
+	<script src="<%= ctxPath%>/js/main.js"></script>
+	
+	<script src="<%= ctxPath%>/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js" type="text/javascript"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"> 
-
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-
-    <link href="<%= ctxPath%>/css/style.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="<%= ctxPath%>/css/index/index.css" />
+    <script src="lib/easing/easing.min.js"></script>
     
-    <script src="<%= ctxPath%>/js/jquery-3.7.1.min.js"></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
     
-    <script src="<%= ctxPath%>/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js" type="text/javascript"></script>
     <style>
         :root {
-            --dark-wood: #5D4037;  
+            --dark-wood: #5D4037;   /* 짙은 밤나무색 */
             --text-brown: #5D4037; 
-            --light-bg: #EFEBE9;    
+            --light-bg: #EFEBE9;    /* 연한 베이지 브라운 */
         }
 
+        /* 헤더 상단 고정 스타일 */
         .fixed-top-header {
             position: fixed;
             top: 0;
@@ -42,6 +48,7 @@
             padding-top: 105px; /* 공지바(35px) + 내비바(70px) 합산 높이 */
         }
 
+        /* 상단 공지 슬라이드 수정 */
 		.top-announcement-bar {
 		    background-color: var(--dark-wood);
 		    height: 35px;
@@ -63,7 +70,7 @@
 		.nav-item.dropdown {
 		    list-style: none;
 		}
-
+        /* 내비게이션 바 및 로고 정중앙 고정 */
         .center-logo {
             position: absolute;
             left: 50%;
@@ -90,12 +97,12 @@
         
         /* ------------------------------------------------- */
         
-      
+         /* 헤더 아래 검색 패널 */
       .header-search-panel{
         position: absolute;
         left: 0;
         right: 0;
-        top: 100%;               
+        top: 100%;               /* fixed-top-header 바로 아래 */
         background: #fff;
         border-bottom: 1px solid #eee;
         box-shadow: 0 6px 20px rgba(0,0,0,0.06);
@@ -110,7 +117,7 @@
       }
       
       .header-search-panel.is-open{
-        max-height: 360px;   
+        max-height: 360px;       /* 결과 영역 포함 높이 */
         opacity: 1;
         transform: translateY(0);
       }
@@ -126,6 +133,7 @@
         overflow: auto;
       }
       
+      /* 결과 아이템 */
       .search-item{
         display:flex;
         gap:12px;
@@ -139,177 +147,10 @@
       .search-meta .name{ font-weight:600; color:#222; }
       .search-meta .price{ font-size:.9rem; color:#666; }
       .search-empty{ color:#888; padding:12px 0; }
-      
-/* --------------- */
-:root{
-  --fixedHeaderH: 105px; /* 기본값(대충). JS가 실제 높이로 갱신 */
-}
-
-.fixed-top-header{
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%;
-  z-index: 2000;
-}
-
-.sidenav{
-  width: 0;
-  position: fixed;
-  left: 0;
-
-  top: var(--fixedHeaderH);
-  height: calc(100% - var(--fixedHeaderH));
-
-  background: var(--light-bg);            /* 연베이지 */
-  color: var(--text-brown);               /* 우드 텍스트 */
-  overflow-x: hidden;
-  transition: 0.5s;
-  z-index: 1500;      /* ✅ header(2000)보다 낮게 */
-  padding-top: 20px;  /* 기존 60px 과하면 줄이기 */
-}
-a.upper{
-  padding: 10px 16px 10px 24px;
-  text-decoration: none;
-  font-size: 20px;
-  color: var(--text-brown);
-  font-weight: 500;
-  display: block;
-}
-a.lower{
-  padding: 10px 16px 10px 24px;
-  text-decoration: none;
-  font-size: 20px;
-  color: var(--text-brown);
-  font-weight: 500;
-  display: inline;
-}
-.sidenav a:hover{ 
-  background: rgba(93,64,55,.08);         /* 우드빛 하이라이트 */
-  color: var(--dark-wood);
-}
-
-.sidenav .closebtn{
-  color: var(--text-brown);
-  position: absolute;
-  top: 0;
-  right: 18px;
-  font-size: 36px;
-}
-.sidenav .closebtn:hover{
-  color: var(--dark-wood);
-}
-/* 버튼 기본(bootstrap 토글버튼처럼 보이게) */
-.side-toggle{
-  border: none;
-  background: transparent;
-  padding: .25rem .5rem;
-  outline: none;
-}
-
-/* 3줄 햄버거 */
-.hamburger{
-  display:inline-block;
-  cursor:pointer;
-}
-
-.hamburger .bar1,
-.hamburger .bar2,
-.hamburger .bar3{
-  display:block;
-  width: 28px;
-  height: 3px;
-  background-color: #333;
-  margin: 6px 0;
-  transition: 0.35s;
-  border-radius: 2px;
-}
-
-.side-toggle.is-open .bar1{
-  transform: translate(0, 9px) rotate(-45deg);
-}
-.side-toggle.is-open .bar2{
-  opacity: 0;
-}
-.side-toggle.is-open .bar3{
-  transform: translate(0, -9px) rotate(45deg);
-}
-
-#btnSideToggle:focus,
-#btnSideToggle:active,
-#btnSideToggle:focus-visible{
-  outline: none !important;
-  box-shadow: none !important; 
-}
-
-#btnSideToggle{
-  border: 0 !important;
-  background: transparent !important;
-}
-
-.rs-modal-overlay{
-  position:fixed; inset:0;
-  background: rgba(0,0,0,.45);
-  z-index: 9999;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding: 18px;
-}
-
-.rs-modal{
-  width: min(1100px, 96vw);
-  height: min(860px, 92vh);
-  background:#fff;
-  border-radius: 16px;
-  overflow:hidden;
-  box-shadow: 0 20px 60px rgba(0,0,0,.35);
-  display:flex;
-  flex-direction:column;
-}
-
-.rs-modal-top{
-  height:52px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding: 0 14px;
-  border-bottom:1px solid #eee;
-  background:#fafafa;
-}
-.rs-modal-title{ font-weight:900; }
-.rs-modal-x{
-  width:40px; height:40px;
-  border:1px solid #ddd;
-  background:#fff;
-  border-radius:10px;
-  font-size:22px;
-  cursor:pointer;
-}
-
-.rs-modal-frame{
-  width:100%;
-  flex:1;
-  border:0;
-}
-
-/* --------------- */
         
     </style>
 </head>
-<%------------%>
-<!-- ===== Reservation Modal (iframe) ===== -->
-<div id="rsModalOverlay" class="rs-modal-overlay" style="display:none;">
-  <div class="rs-modal">
-    <div class="rs-modal-top">
-      <div class="rs-modal-title">안경원 방문예약</div>
-      <button type="button" class="rs-modal-x" id="rsModalCloseBtn" aria-label="닫기">×</button>
-    </div>
 
-    <iframe id="rsModalFrame" class="rs-modal-frame"
-            src="about:blank" frameborder="0"></iframe>
-  </div>
-</div>
-<%------------%>
 <body>
     <div class="fixed-top-header">
         <div class="container-fluid top-announcement-bar p-0">
@@ -345,17 +186,10 @@ a.lower{
                         <a href="<%= ctxPath %>/product/productList.sp?category=collaboration" class="nav-item nav-link text-nowrap">COLLABORATION</a>
                     </div>
                 </div>
-			
-           <%-- <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse">  --%> 
-                <%------------%>
-                <button id="btnSideToggle" type="button" class="navbar-toggler side-toggle" aria-label="menu">
-				  <span class="hamburger" aria-hidden="true">
-				    <span class="bar1"></span>
-				    <span class="bar2"></span>
-				    <span class="bar3"></span>
-				  </span>
-				</button>
-                <%------------%>
+
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
                 <div class="center-logo">
                     <a href="<%= ctxPath %>" class="text-decoration-none text-center d-block">
@@ -406,7 +240,14 @@ a.lower{
                     <div class="d-inline-flex align-items-center">
                         <div class="dropdown d-inline-block mr-3">
                         
-                         <button id="btnHeaderSearch" class="btn btn-link text-wood p-0" type="button">
+                        
+                            <!--
+                            <button class="btn btn-link text-wood p-0" type="button" data-toggle="dropdown">
+                                <i class="fa fa-search"></i>
+                            </button> -->
+                            
+                            
+                            <button id="btnHeaderSearch" class="btn btn-link text-wood p-0" type="button">
 		                       <i class="fa fa-search"></i>
 		                     </button>
                             
@@ -456,6 +297,7 @@ a.lower{
                  placeholder="상품명을 입력하세요" autocomplete="off"
                  style="font-size:0.9rem; padding:6px 10px; height:36px;" />
     
+         <!-- 검색 실행 버튼(선택: 있으면 UX 좋아짐) -->
          <button type="submit" class="btn btn-wood"
                  style="font-size:0.85rem; padding:6px 12px; height:36px; white-space:nowrap;">
             검색
@@ -469,24 +311,7 @@ a.lower{
         </div>
       </div>   
     </div>
-  </div>
-  <%------------%>
-  <!-- fixed-top-header 닫힌 다음에 위치시키기 -->
-  <div id="mySidenav" class="sidenav">
-	  <a class="upper" href="<%= ctxPath %>/product/productList.sp?category=sunglasses">SUNGLASSES</a>
-	  <a class="upper" href="<%= ctxPath %>/product/productList.sp?category=eyeglasses">EYEGLASSES</a>
-	  <a class="upper" href="<%= ctxPath %>/product/productList.sp?category=accessory">ACC</a>
-	  <a class="upper" href="<%= ctxPath %>/product/productList.sp?category=collaboration">COLLABORATION</a>
-	  <hr style="border-color:rgba(255,255,255,.15);">
-	  <a class="upper" href="<%= ctxPath %>/noticeList.sp">Notice</a>
-	  <a class="upper" href="<%= ctxPath %>/reviews.sp">Review</a>
-	  <a class="upper" href="<%= ctxPath %>/qnaList.sp">QnA</a>
-	  <hr style="border-color:rgba(255,255,255,.15); height:10%;">
-	  <a class="lower" href="<%= ctxPath %>/reservation.sp">예약하기</a>
-	  <a class="lower" href="<%= ctxPath %>#">매장찾기</a>
-	  
-   </div>
-   <%------------%>
+  </div> 
     
 <script type="text/javascript">
 
@@ -537,7 +362,10 @@ $(function () {
 	    $form.css({ width: w, minWidth: minW, maxWidth: maxW });
 	    $result.css({ width: w, minWidth: minW, maxWidth: maxW });
 	  }
-	  
+
+	  adjustHeaderSearchWidth();
+	  $(window).on("resize", adjustHeaderSearchWidth);
+
 	  // submit 검증(2글자 미만 막기)
 	  $form.on("submit", function(e){
 	    const q = ($input.val() || "").trim();
@@ -549,105 +377,8 @@ $(function () {
 	    }
 	    closePanel(); // 제출 시 닫기(선택)
 	  });
-	  
-	<%------------%>
-	//===== sidenav 토글(한 번만 바인딩) =====
-	$("#btnSideToggle").on("click", function(e){
-	  e.preventDefault();
-	  if($(this).hasClass("is-open")) closeNav();
-	  else openNav();
-	});
-	
-	// ESC로 닫기
-	$(document).on("keydown", function(e){
-	  if(e.key === "Escape") closeNav();
-	});
-	
-	// sidenav 링크 클릭하면 닫기
-	$("#mySidenav").on("click", "a", function(){
-	  closeNav();
-	});
-	
-	// 리사이즈 처리
-	syncFixedHeaderHeight();
-	autoCloseSideNavOnDesktop();
-	
-	$(window).on("resize", function(){
-	  syncFixedHeaderHeight();
-	  autoCloseSideNavOnDesktop();
-	});
-	
-	// X 버튼 닫기
-	$("#rsModalCloseBtn").on("click", function(){
-	  closeReservationModal({ reloadMain:false });
-	});
-	
-	// 오버레이 바깥 클릭 닫기
-	$("#rsModalOverlay").on("click", function(e){
-	  if(e.target === this){
-	    closeReservationModal({ reloadMain:false });
-	  }
-	});
-	
-	// ESC 닫기
-	$(document).on("keydown", function(e){
-	  if(e.key === "Escape" && $("#rsModalOverlay").is(":visible")){
-	    closeReservationModal({ reloadMain:false });
-	  }
 	});
 
-}); // end of $(function () 
-		
-// function declaration
-function syncFixedHeaderHeight(){
-  const header = document.querySelector(".fixed-top-header");
-  if(!header) return;
-  const h = header.getBoundingClientRect().height;
-  document.documentElement.style.setProperty("--fixedHeaderH", h + "px");
-}
-
-function openNav(){
-  syncFixedHeaderHeight();
-  document.getElementById("mySidenav").style.width = "100%";
-  document.body.style.overflow = "hidden";
-  $("#btnSideToggle").addClass("is-open");
-}
-
-function closeNav(){
-  document.getElementById("mySidenav").style.width = "0";
-  document.body.style.overflow = "";
-  $("#btnSideToggle").removeClass("is-open");
-}
-
-function autoCloseSideNavOnDesktop(){
-  const isDesktop = window.matchMedia("(min-width: 992px)").matches;
-  if(isDesktop) closeNav();
-}
-
-/* ===== Reservation Modal Control ===== */
-function openReservationModal(url){
-  const $ov = $("#rsModalOverlay");
-  $("#rsModalFrame").attr("src", url);
-  $ov.show();
-
-  // 배경 스크롤 막기(선택)
-  document.body.style.overflow = "hidden";
-}
-
-function closeReservationModal(options){
-  // options: { reloadMain: true/false, goUrl: "..." }
-  const $ov = $("#rsModalOverlay");
-  $("#rsModalFrame").attr("src", "about:blank");
-  $ov.hide();
-  document.body.style.overflow = "";
-
-  if(options && options.reloadMain){
-    const go = (options.goUrl) ? options.goUrl : "<%=request.getContextPath()%>/index.sp";
-    // 새로고침 느낌 확실히
-    location.href = go + (go.includes("?") ? "&" : "?") + "_=" + Date.now();
-  }
-}
-<%------------%>
 </script>
 
 </body>
