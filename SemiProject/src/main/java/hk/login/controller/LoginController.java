@@ -51,7 +51,7 @@ public class LoginController extends AbstractController {
 
 			String userid = request.getParameter("userid");   // name="userid"
 			String passwd = request.getParameter("passwd");   // pwd → passwd 변경
-
+			
 			// Map 방식으로 DAO에 전달
 			Map<String, String> paraMap = new HashMap<>();
 			paraMap.put("userid", userid);

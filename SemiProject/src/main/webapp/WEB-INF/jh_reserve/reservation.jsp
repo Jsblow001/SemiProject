@@ -222,7 +222,7 @@
       <div class="rs-okbox" id="rsOkBox" style="display:none;"></div>
       <div class="rs-err" id="rsFailBox" style="display:none;"></div>
       <div class="rs-btns" style="margin-top:12px;">
-        <a class="rs-btn" href="<%=ctxPath%>/index.sp">메인으로</a>
+        <button type="button" class="rs-btn" id="rsGoMain">메인으로</button>
         <a class="rs-btn" href="<%=ctxPath%>/myReservations.sp">내 예약 보기(회원)</a>
       </div>
     </div>
@@ -307,6 +307,22 @@ $(function(){
   $("#rsBack2").on("click", function(){ rsHideErr(); rsGoStep(2); });
 
   $("#rsSubmit").on("click", rsSubmitReservation);
+  
+  $("#rsGoMain").on("click", function(){
+	  const go = "<%=ctxPath%>/index.sp";
+	
+	  // ✅ iframe(모달)로 열린 경우: 부모에게 "닫고 메인 새로고침" 요청
+	  try{
+	    if(window.parent && window.parent !== window && window.parent.closeReservationModal){
+	      window.parent.closeReservationModal({ reloadMain:true, goUrl: go });
+	      return;
+	    }
+	  }catch(e){}
+	
+	  // ✅ 혹시 단독 페이지로 열렸다면 그냥 이동
+	  location.href = go + "?_=" + Date.now();
+   });
+
 
   rsUpdateSummary2();
   

@@ -32,9 +32,9 @@ public class ReservationDAO_imple implements ReservationDAO {
 
     private void close() {
         try {
-            if(rs != null)    {rs.close(); rs=null;}
-            if(pstmt != null) {pstmt.close(); pstmt=null;}
-            if(conn != null)  {conn.close(); conn=null;}
+            if(rs != null)    { rs.close(); rs=null; }
+            if(pstmt != null) { pstmt.close(); pstmt=null; }
+            if(conn != null)  { conn.close(); conn=null; }
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -48,6 +48,7 @@ public class ReservationDAO_imple implements ReservationDAO {
 
         try {
             conn = ds.getConnection();
+
             int storeId = Integer.parseInt(paraMap.get("storeId"));
             Timestamp dayStart = Timestamp.valueOf(paraMap.get("dayStart"));
             Timestamp dayEnd   = Timestamp.valueOf(paraMap.get("dayEnd"));
@@ -161,6 +162,8 @@ public class ReservationDAO_imple implements ReservationDAO {
     }
 
     // ---------- 4) insert reservation (원자적: 겹침 없을 때만 insert) ----------
+    // paraMap key 통일:
+    // - 회원아이디(= tbl_member.member_id): "userid"
     @Override
     public int insertReservation(Map<String, String> paraMap) throws Exception {
 
@@ -169,7 +172,7 @@ public class ReservationDAO_imple implements ReservationDAO {
         try {
             conn = ds.getConnection();
 
-            String memberUserid = paraMap.get("memberUserid"); // null이면 비회원
+            String userid = paraMap.get("userid"); // 회원이면 값 존재, 비회원이면 null/blank 가능
 
             String sql =
                 " INSERT INTO tbl_reservation " +
@@ -197,25 +200,25 @@ public class ReservationDAO_imple implements ReservationDAO {
             int idx = 1;
 
             // INSERT 값들
-            pstmt.setInt(idx++, Integer.parseInt(paraMap.get("storeId")));      // fk_store_id
-            pstmt.setString(idx++, (memberUserid == null || memberUserid.isBlank()) ? null : memberUserid); // fk_member_userid
-            pstmt.setString(idx++, paraMap.get("guestName"));                   // guest_name
-            pstmt.setString(idx++, paraMap.get("guestPhone"));                  // guest_phone
-            pstmt.setString(idx++, paraMap.get("reason"));                      // reason_code
-            pstmt.setInt(idx++, Integer.parseInt(paraMap.get("durationMin")));  // duration_min
-            pstmt.setTimestamp(idx++, java.sql.Timestamp.valueOf(paraMap.get("startAt"))); // start_at
-            pstmt.setTimestamp(idx++, java.sql.Timestamp.valueOf(paraMap.get("endAt")));   // end_at
-            pstmt.setString(idx++, paraMap.get("message"));                     // message
+            pstmt.setInt(idx++, Integer.parseInt(paraMap.get("storeId"))); // fk_store_id
+            pstmt.setString(idx++, (userid == null || userid.isBlank()) ? null : userid); // fk_member_userid
+            pstmt.setString(idx++, paraMap.get("guestName"));              // guest_name
+            pstmt.setString(idx++, paraMap.get("guestPhone"));             // guest_phone
+            pstmt.setString(idx++, paraMap.get("reason"));                 // reason_code
+            pstmt.setInt(idx++, Integer.parseInt(paraMap.get("durationMin"))); // duration_min
+            pstmt.setTimestamp(idx++, Timestamp.valueOf(paraMap.get("startAt"))); // start_at
+            pstmt.setTimestamp(idx++, Timestamp.valueOf(paraMap.get("endAt")));   // end_at
+            pstmt.setString(idx++, paraMap.get("message"));                // message
 
             // NOT EXISTS(예약 겹침) 바인딩
             pstmt.setInt(idx++, Integer.parseInt(paraMap.get("storeId")));
-            pstmt.setTimestamp(idx++, java.sql.Timestamp.valueOf(paraMap.get("endAt")));   // r.start_at < newEnd
-            pstmt.setTimestamp(idx++, java.sql.Timestamp.valueOf(paraMap.get("startAt"))); // r.end_at   > newStart
+            pstmt.setTimestamp(idx++, Timestamp.valueOf(paraMap.get("endAt")));   // r.start_at < newEnd
+            pstmt.setTimestamp(idx++, Timestamp.valueOf(paraMap.get("startAt"))); // r.end_at   > newStart
 
             // NOT EXISTS(막기 겹침) 바인딩
             pstmt.setInt(idx++, Integer.parseInt(paraMap.get("storeId")));
-            pstmt.setTimestamp(idx++, java.sql.Timestamp.valueOf(paraMap.get("endAt")));   // b.start_at < newEnd
-            pstmt.setTimestamp(idx++, java.sql.Timestamp.valueOf(paraMap.get("startAt"))); // b.end_at   > newStart
+            pstmt.setTimestamp(idx++, Timestamp.valueOf(paraMap.get("endAt")));   // b.start_at < newEnd
+            pstmt.setTimestamp(idx++, Timestamp.valueOf(paraMap.get("startAt"))); // b.end_at   > newStart
 
             n = pstmt.executeUpdate(); // 1 성공 / 0 겹침
 
@@ -226,8 +229,6 @@ public class ReservationDAO_imple implements ReservationDAO {
         return n;
     }
 
-
-    
     // 슬롯막기 넣기
     @Override
     public int insertBlockSlot(Map<String, String> paraMap) throws Exception {
@@ -243,9 +244,6 @@ public class ReservationDAO_imple implements ReservationDAO {
             String memo = paraMap.get("memo");
             if(memo == null) memo = "";
 
-            // ✅ 겹침이 없을 때만 INSERT 되게 한다.
-            // - 예약(CONFIRMED)과 겹치면 막기 불가
-            // - 다른 막기와 겹쳐도 불가
             String sql =
                 " INSERT INTO tbl_block_slot " +
                 " (fk_store_id, start_at, end_at, memo, created_at) " +
@@ -288,8 +286,7 @@ public class ReservationDAO_imple implements ReservationDAO {
 
         return n;
     }
-    
-    
+
     // 슬롯막기 없애기
     @Override
     public int deleteBlockSlot(Map<String, String> paraMap) throws Exception {
@@ -314,12 +311,12 @@ public class ReservationDAO_imple implements ReservationDAO {
 
         return n; // 1=삭제됨 / 0=없음
     }
-    
+
     // 슬롯막기 목록 조회
     @Override
     public List<Map<String, String>> selectBlockList(Map<String, String> paraMap) throws Exception {
 
-        List<Map<String, String>> list = new java.util.ArrayList<>();
+        List<Map<String, String>> list = new ArrayList<>();
 
         try {
             conn = ds.getConnection();
@@ -360,14 +357,12 @@ public class ReservationDAO_imple implements ReservationDAO {
 
         return list;
     }
-    
-    
-    
+
     // 관리자 화면에 뿌리는 하루치 이벤트 목록 싸그리
     @Override
     public List<Map<String, String>> selectScheduleBoard(Map<String, String> paraMap) throws Exception {
 
-        List<Map<String, String>> list = new java.util.ArrayList<>();
+        List<Map<String, String>> list = new ArrayList<>();
 
         try {
             conn = ds.getConnection();
@@ -377,38 +372,37 @@ public class ReservationDAO_imple implements ReservationDAO {
             Timestamp dayEnd   = Timestamp.valueOf(paraMap.get("dayEnd"));
 
             String sql =
-            	    " SELECT 'RESERVATION' AS type, " +
-            	    "        TO_CHAR(r.reservation_id) AS id, " +
-            	    "        TO_CHAR(r.start_at, 'YYYY-MM-DD HH24:MI:SS') AS startAt, " +
-            	    "        TO_CHAR(r.end_at,   'YYYY-MM-DD HH24:MI:SS') AS endAt, " +
-            	    "        r.reason_code AS reason, " +
-            	    "        r.status AS status, " +
-            	    "        r.guest_name AS name, " +
-            	    "        r.guest_phone AS phone, " +
-            	    "        NVL(r.message,'') AS message, " +  
-            	    "        NVL(r.message,'') AS memo " +       
-            	    "   FROM tbl_reservation r " +
-            	    "  WHERE r.fk_store_id = ? " +
-            	    "    AND r.status = 'CONFIRMED' " +
-            	    "    AND r.start_at < ? " +
-            	    "    AND r.end_at   > ? " +
-            	    " UNION ALL " +
-            	    " SELECT 'BLOCK' AS type, " +
-            	    "        TO_CHAR(b.block_id) AS id, " +
-            	    "        TO_CHAR(b.start_at, 'YYYY-MM-DD HH24:MI:SS') AS startAt, " +
-            	    "        TO_CHAR(b.end_at,   'YYYY-MM-DD HH24:MI:SS') AS endAt, " +
-            	    "        '' AS reason, " +
-            	    "        '' AS status, " +
-            	    "        '' AS name, " +
-            	    "        '' AS phone, " +
-            	    "        NVL(b.memo,'') AS message, " +      
-            	    "        NVL(b.memo,'') AS memo " +          
-            	    "   FROM tbl_block_slot b " +
-            	    "  WHERE b.fk_store_id = ? " +
-            	    "    AND b.start_at < ? " +
-            	    "    AND b.end_at   > ? " +
-            	    " ORDER BY startAt ";
-
+                " SELECT 'RESERVATION' AS type, " +
+                "        TO_CHAR(r.reservation_id) AS id, " +
+                "        TO_CHAR(r.start_at, 'YYYY-MM-DD HH24:MI:SS') AS startAt, " +
+                "        TO_CHAR(r.end_at,   'YYYY-MM-DD HH24:MI:SS') AS endAt, " +
+                "        r.reason_code AS reason, " +
+                "        r.status AS status, " +
+                "        r.guest_name AS name, " +
+                "        r.guest_phone AS phone, " +
+                "        NVL(r.message,'') AS message, " +
+                "        NVL(r.message,'') AS memo " +
+                "   FROM tbl_reservation r " +
+                "  WHERE r.fk_store_id = ? " +
+                "    AND r.status = 'CONFIRMED' " +
+                "    AND r.start_at < ? " +
+                "    AND r.end_at   > ? " +
+                " UNION ALL " +
+                " SELECT 'BLOCK' AS type, " +
+                "        TO_CHAR(b.block_id) AS id, " +
+                "        TO_CHAR(b.start_at, 'YYYY-MM-DD HH24:MI:SS') AS startAt, " +
+                "        TO_CHAR(b.end_at,   'YYYY-MM-DD HH24:MI:SS') AS endAt, " +
+                "        '' AS reason, " +
+                "        '' AS status, " +
+                "        '' AS name, " +
+                "        '' AS phone, " +
+                "        NVL(b.memo,'') AS message, " +
+                "        NVL(b.memo,'') AS memo " +
+                "   FROM tbl_block_slot b " +
+                "  WHERE b.fk_store_id = ? " +
+                "    AND b.start_at < ? " +
+                "    AND b.end_at   > ? " +
+                " ORDER BY startAt ";
 
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, storeId);
@@ -432,7 +426,7 @@ public class ReservationDAO_imple implements ReservationDAO {
                 m.put("name", rs.getString("name"));
                 m.put("phone", rs.getString("phone"));
                 m.put("memo", rs.getString("memo"));
-                m.put("message", rs.getString("message")); 
+                m.put("message", rs.getString("message"));
                 list.add(m);
             }
 
@@ -443,10 +437,7 @@ public class ReservationDAO_imple implements ReservationDAO {
         return list;
     }
 
-    
-    
-    
-    // 문자 로그 저장	
+    // 문자 로그 저장
     @Override
     public int insertSmsLog(Map<String, String> paraMap) throws Exception {
 
@@ -459,9 +450,9 @@ public class ReservationDAO_imple implements ReservationDAO {
             int storeId = Integer.parseInt(paraMap.get("storeId"));
 
             String toPhone = paraMap.get("toPhone");
-            String smsType = paraMap.get("smsType");       // REMINDER / ADMIN / etc
+            String smsType = paraMap.get("smsType");
             String content = paraMap.get("content");
-            String resultJson = paraMap.get("resultJson"); // coolsms 응답 json string
+            String resultJson = paraMap.get("resultJson");
 
             String sql =
                 " INSERT INTO tbl_sms_log " +
@@ -484,8 +475,9 @@ public class ReservationDAO_imple implements ReservationDAO {
 
         return n;
     }
-    
+
     // 회원예약취소기능
+    // paraMap: reservationId, userid
     @Override
     public int cancelReservationByMember(Map<String, String> paraMap) throws Exception {
 
@@ -495,7 +487,7 @@ public class ReservationDAO_imple implements ReservationDAO {
             conn = ds.getConnection();
 
             long reservationId = Long.parseLong(paraMap.get("reservationId"));
-            int memberId = Integer.parseInt(paraMap.get("memberId"));
+            String userid = paraMap.get("userid"); // 문자열(tbl_member.member_id)
 
             String sql =
                 " UPDATE tbl_reservation " +
@@ -506,7 +498,7 @@ public class ReservationDAO_imple implements ReservationDAO {
 
             pstmt = conn.prepareStatement(sql);
             pstmt.setLong(1, reservationId);
-            pstmt.setInt(2, memberId);
+            pstmt.setString(2, userid);
 
             n = pstmt.executeUpdate();
 
@@ -514,20 +506,23 @@ public class ReservationDAO_imple implements ReservationDAO {
             close();
         }
 
-        return n; // 1=취소 성공 / 0=권한없음 또는 이미 취소/없음
+        return n;
     }
 
-
     // 내 예약목록 조회
+    // paraMap: userid
     @Override
     public List<Map<String, String>> selectMyReservations(Map<String, String> paraMap) throws Exception {
 
-        List<Map<String, String>> list = new java.util.ArrayList<>();
+        List<Map<String, String>> list = new ArrayList<>();
 
         try {
             conn = ds.getConnection();
 
-            int memberId = Integer.parseInt(paraMap.get("memberId"));
+            String userid = paraMap.get("userid");
+            if (userid == null || userid.trim().isEmpty()) {
+                return list;
+            }
 
             String sql =
                 " SELECT r.reservation_id, r.fk_store_id, s.store_name, " +
@@ -541,7 +536,7 @@ public class ReservationDAO_imple implements ReservationDAO {
                 "  ORDER BY r.start_at DESC ";
 
             pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, memberId);
+            pstmt.setString(1, userid);
 
             rs = pstmt.executeQuery();
 
@@ -550,8 +545,8 @@ public class ReservationDAO_imple implements ReservationDAO {
                 m.put("reservationId", String.valueOf(rs.getLong("reservation_id")));
                 m.put("storeId", String.valueOf(rs.getInt("fk_store_id")));
                 m.put("storeName", rs.getString("store_name"));
-                m.put("startAt", rs.getString("start_at")); // "YYYY-MM-DD HH:mm"
-                m.put("endAt", rs.getString("end_at"));     // "HH:mm"
+                m.put("startAt", rs.getString("start_at"));
+                m.put("endAt", rs.getString("end_at"));
                 m.put("reason", rs.getString("reason_code"));
                 m.put("durationMin", String.valueOf(rs.getInt("duration_min")));
                 m.put("status", rs.getString("status"));
@@ -567,8 +562,4 @@ public class ReservationDAO_imple implements ReservationDAO {
 
         return list;
     }
-
-
-
-
 }

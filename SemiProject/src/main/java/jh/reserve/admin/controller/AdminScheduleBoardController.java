@@ -27,13 +27,15 @@ public class AdminScheduleBoardController extends AbstractController {
     	HttpSession session = request.getSession();
 
         // ===== 테스트 모드 =====
-        boolean testMode = true; // 테스트 끝나면 false
-        MemberDTO loginuser = (MemberDTO) session.getAttribute("loginuser");
-        if (testMode && loginuser == null) {
-            loginuser = new MemberDTO();
-            loginuser.setUserid("admin");
-            session.setAttribute("loginuser", loginuser);
-        }
+    	boolean testMode = true;
+    	MemberDTO loginuser = (MemberDTO) session.getAttribute("loginuser");
+
+    	if (testMode && (loginuser == null || !"admin".equals(loginuser.getUserid()))) {
+    	    loginuser = new MemberDTO();
+    	    loginuser.setUserid("admin");
+    	    session.setAttribute("loginuser", loginuser);
+    	}
+
 
         // 1) 관리자 체크
         if (loginuser == null || !"admin".equals(loginuser.getUserid())) {
