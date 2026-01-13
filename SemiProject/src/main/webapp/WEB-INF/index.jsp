@@ -464,32 +464,30 @@
 
 
 
-    <!-- Template Javascript -->
-    <script src="js/main.js"></script>
     
-        <script type="text/javascript">
-        $(document).ready(function(){
-        	
-        	$('#recipeCarousel').carousel({
-          	  interval :2000
-          	});
+    
+<script type="text/javascript">
+$(document).ready(function(){
+	
+	$('#recipeCarousel').carousel({
+  	  interval :2000
+  	});
 
-        	$('#recipeCarousel .carousel-item').each(function(){
-        	    var next = $(this).next();
-        	    if (!next.length) next = $(this).siblings(':first');
+	$('#recipeCarousel .carousel-item').each(function(){
+	    var next = $(this).next();
+	    if (!next.length) next = $(this).siblings(':first');
 
-        	    next.children(':first-child').clone().appendTo($(this));
+	    next.children(':first-child').clone().appendTo($(this));
 
-        	    for (var i=0;i<2;i++) {
-        	        next = next.next();
-        	        if (!next.length) next = $(this).siblings(':first');
-        	        next.children(':first-child').clone().appendTo($(this));
-        	    }
-        	});
+	    for (var i=0;i<2;i++) {
+	        next = next.next();
+	        if (!next.length) next = $(this).siblings(':first');
+	        next.children(':first-child').clone().appendTo($(this));
+	    }
+	});
 
-          	
-        });
-  </script>
+});
+</script>
 </body>
 
 </html>

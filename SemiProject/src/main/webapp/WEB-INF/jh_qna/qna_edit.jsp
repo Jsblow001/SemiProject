@@ -21,6 +21,17 @@
   .qna-btn.primary{background:#111;color:#fff;}
   .qna-btn.ghost{background:#eee;}
   .qna-btn.danger{background:#d9534f;color:#fff;}
+
+  /* 기존 첨부 표시 */
+  .att-list{display:flex;flex-direction:column;gap:12px;}
+  .att-item{display:flex;gap:12px;align-items:flex-start;border:1px solid #eee;border-radius:10px;padding:10px;}
+  .att-thumb{width:120px;height:90px;object-fit:cover;border-radius:8px;background:#fafafa;border:1px solid #eee;}
+  .att-meta{flex:1;min-width:0;}
+  .att-name{font-weight:700;word-break:break-all;}
+  .att-actions{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:6px;}
+  .att-actions label{display:flex;gap:6px;align-items:center;}
+  .att-replace{margin-top:6px;}
+  .att-small{font-size:12px;color:#666;}
 </style>
 </head>
 <body>
@@ -34,17 +45,15 @@
         action="<%=request.getContextPath()%>/qnaEditEnd.sp"
         enctype="multipart/form-data">
 
-    
     <!-- 글번호 -->
-	<input type="hidden" name="qnaId" value="${qnaId}" />
-	
-	<div class="qna-row">
-	  <label class="qna-label">제목</label>
-	  <input type="text" name="subject" id="subject" class="qna-input"
-	         placeholder="제목을 입력하세요"
-	         value="${qdto.subject}">
-	</div>
+    <input type="hidden" name="qnaId" value="${qnaId}" />
 
+    <div class="qna-row">
+      <label class="qna-label">제목</label>
+      <input type="text" name="subject" id="subject" class="qna-input"
+             placeholder="제목을 입력하세요"
+             value="${qdto.subject}">
+    </div>
 
     <div class="qna-row">
       <label class="qna-label">내용</label>
@@ -64,10 +73,56 @@
       <div class="qna-help">체크 안 하면 공개글(0)로 저장됩니다.</div>
     </div>
 
+    <!-- ✅ 기존 첨부(삭제/교체) -->
+    <div class="qna-row">
+      <label class="qna-label">기존 첨부파일</label>
+
+      <c:choose>
+        <c:when test="${empty fileList}">
+          <div class="qna-help">기존 첨부파일이 없습니다.</div>
+        </c:when>
+
+        <c:otherwise>
+          <div class="att-list">
+            <c:forEach var="f" items="${fileList}">
+              <div class="att-item">
+                <img class="att-thumb"
+                     src="${pageContext.request.contextPath}/images/qna/${f.saveFilename}"
+                     onerror="this.style.display='none';" />
+
+                <div class="att-meta">
+                  <div class="att-name">${f.orgFilename}</div>
+                  <div class="att-small">저장명: ${f.saveFilename}</div>
+
+                  <div class="att-actions">
+                    <!-- ✅ 삭제 체크박스 (value는 QNA_FILE_ID) -->
+                    <label>
+                      <input type="checkbox" name="delFileId" value="${f.qnaFileId}">
+                      이 첨부 삭제
+                    </label>
+                  </div>
+
+                  <!-- ✅ 교체 업로드: name="files_{QNA_FILE_ID}" -->
+                  <div class="att-replace">
+                    <div class="att-small">교체할 파일 선택(선택)</div>
+                    <input type="file" name="files_${f.qnaFileId}">
+                  </div>
+                </div>
+              </div>
+            </c:forEach>
+          </div>
+
+          <div class="qna-help">
+            삭제 체크 후 수정완료하면 해당 첨부가 삭제됩니다. 교체 파일을 선택하면 해당 첨부가 새 파일로 바뀝니다.
+          </div>
+        </c:otherwise>
+      </c:choose>
+    </div>
+
+    <!-- ✅ 새 첨부 추가 -->
     <div class="qna-row">
       <label class="qna-label">첨부파일(추가 업로드)</label>
       <input type="file" name="files" multiple>
-      <div class="qna-help">기존 첨부 목록/삭제는 다음 단계에서 확장 가능.</div>
     </div>
 
     <div class="qna-btns">
@@ -82,7 +137,7 @@
 
   <!-- 삭제 폼 -->
   <form id="delFrm" method="post" action="<%=request.getContextPath()%>/qnaDelete.sp">
-	  <input type="hidden" name="qnaId" value="${qnaId}" />
+    <input type="hidden" name="qnaId" value="${qnaId}" />
   </form>
 
 </div>

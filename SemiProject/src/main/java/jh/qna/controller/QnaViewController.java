@@ -1,6 +1,8 @@
 package jh.qna.controller;
 
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.util.List;
 
 import hk.member.domain.MemberDTO;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import sp.common.controller.AbstractController;
 import jh.qna.domain.QnaDTO;
+import jh.qna.domain.QnaFileDTO;
 import jh.qna.model.QnaDAO;
 import jh.qna.model.QnaDAO_imple;
 
@@ -18,17 +21,15 @@ public class QnaViewController extends AbstractController {
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        // 세션은 한 번만
         HttpSession session = request.getSession();
 
         // ===== 1) 로그인/테스트 모드 =====
-        boolean testMode = false; // 테스트 끝나면 false
-
+        boolean testMode = false;
         MemberDTO loginuser = (MemberDTO) session.getAttribute("loginuser");
 
         if (testMode && loginuser == null) {
             loginuser = new MemberDTO();
-            loginuser.setUserid("admin"); // ⚠️ 실제 존재하는 userid
+            loginuser.setUserid("admin");
             session.setAttribute("loginuser", loginuser);
         }
 
@@ -42,36 +43,43 @@ public class QnaViewController extends AbstractController {
         // ===== 2) 목록으로 돌아가기 URL 처리 (referer 보정) =====
         String refererHeader = request.getHeader("referer");
 
-        // 네 프로젝트에서 "목록"에 해당하는 URL을 모두 인정 (일반/관리자)
         boolean fromUserList  = (refererHeader != null && refererHeader.contains("/qnaList.sp"));
-        boolean fromAdminList = (refererHeader != null && refererHeader.contains("/adminQnaList.sp")); // ✅ 관리자 목록 URL
+        boolean fromAdminList = (refererHeader != null && refererHeader.contains("/adminQnaList.sp"));
+        boolean fromNoCommentList = (refererHeader != null && refererHeader.contains("/noCommentQnaList.sp"));
+        boolean fromMyQnaList = (refererHeader != null && refererHeader.contains("/myQnaList.sp"));
 
-        // "목록에서 들어온 경우"만 세션에 저장
-        if (fromUserList || fromAdminList) {
+        if (fromUserList || fromAdminList || fromNoCommentList || fromMyQnaList) {
             session.setAttribute("qna_referer", refererHeader);
         }
 
         String saved = (String) session.getAttribute("qna_referer");
 
-        // 저장된 게 없으면 로그인 상태에 맞는 기본 목록으로
         String defaultListUrl = isAdmin
                 ? request.getContextPath() + "/adminQnaList.sp"
                 : request.getContextPath() + "/qnaList.sp";
 
         String goListUrl = (saved != null && !saved.isBlank()) ? saved : defaultListUrl;
-
-        // JSP에서 목록 버튼이 이 값을 씀
         request.setAttribute("referer", goListUrl);
 
-        // ===== 3) 이하 기존 로직 =====
-        String noStr = request.getParameter("no");
-        if (noStr == null) {
+        // ===== 3) 파라미터 통일 패치 (no / qnaid / qnaId 모두 허용) =====
+        String idStr = request.getParameter("no");
+        if (idStr == null || idStr.isBlank()) idStr = request.getParameter("qnaid");
+        if (idStr == null || idStr.isBlank()) idStr = request.getParameter("qnaId");
+
+        if (idStr == null || idStr.isBlank()) {
             sendAlertAndGo(response, "잘못된 접근입니다.", defaultListUrl);
             return;
         }
 
-        int qnaId = Integer.parseInt(noStr);
+        int qnaId;
+        try {
+            qnaId = Integer.parseInt(idStr.trim());
+        } catch (NumberFormatException e) {
+            sendAlertAndGo(response, "잘못된 글번호입니다.", defaultListUrl);
+            return;
+        }
 
+        // ===== 4) 상세 조회 =====
         QnaDTO qna = qdao.selectOneQna(qnaId);
         if (qna == null) {
             sendAlertAndGo(response, "존재하지 않는 글입니다.", defaultListUrl);
@@ -91,6 +99,17 @@ public class QnaViewController extends AbstractController {
 
         request.setAttribute("qna", qna);
         request.setAttribute("commentList", qdao.selectCommentList(qnaId));
+
+        // ===== 5) ✅ 첨부 목록 조회 (conn 있는 버전만 사용) =====
+        Connection conn = null;
+        try {
+            conn = qdao.getConnection();
+            List<QnaFileDTO> fileList = qdao.selectQnaFileList(conn, (long)qnaId);
+            request.setAttribute("fileList", fileList);
+        }
+        finally {
+            if(conn != null) try { conn.close(); } catch(Exception ignore) {}
+        }
 
         super.setRedirect(false);
         super.setViewPage("/WEB-INF/jh_qna/qna_content_view.jsp");
