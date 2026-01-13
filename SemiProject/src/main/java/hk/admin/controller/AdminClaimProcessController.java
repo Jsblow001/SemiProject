@@ -14,12 +14,13 @@ public class AdminClaimProcessController extends AbstractController {
         int odrDetailNo = Integer.parseInt(request.getParameter("odrdetailno"));
         String action = request.getParameter("action"); // APPROVE / REJECT
 
+        System.out.println("odrdetailno = " + odrDetailNo);
+        System.out.println("action = " + action);
+        
         odao.processClaim(odrDetailNo, action);
 
         super.setRedirect(true);
         super.setViewPage(request.getContextPath() + "/admin/claimList.sp");
-        
-        System.out.println("odrdetailno = " + odrDetailNo);
-        System.out.println("action = " + action);
+              
     }
 }
