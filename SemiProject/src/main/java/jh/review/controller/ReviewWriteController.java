@@ -2,6 +2,7 @@ package jh.review.controller;
 
 import java.io.File;
 import java.nio.file.Paths;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -42,8 +43,8 @@ public class ReviewWriteController extends AbstractController {
             return;
         }
 
+        // ===== GET: 작성폼 =====
         if("GET".equalsIgnoreCase(request.getMethod())) {
-
             List<Map<String, String>> purchaseList = rdao.selectPurchasesForReview(loginuser.getUserid());
             request.setAttribute("purchaseList", purchaseList);
 
@@ -52,7 +53,9 @@ public class ReviewWriteController extends AbstractController {
             return;
         }
 
-        // ===== POST =====
+        // ===== POST: 등록 =====
+        Connection conn = null;
+
         try {
             String fk_product_id = request.getParameter("fk_product_id");
             String review_title = request.getParameter("review_title");
@@ -84,10 +87,15 @@ public class ReviewWriteController extends AbstractController {
                 praise_keywords = sj.toString();
             }
 
-            long review_id = rdao.getReviewSeqNextVal();
+            // ✅ 트랜잭션 시작
+            conn = rdao.getConnection();     // (DAO에 getConnection() 추가한 상태여야 함)
+            conn.setAutoCommit(false);
+
+            long reviewId = rdao.getReviewSeqNextVal(); // seq는 커넥션 없이 뽑아도 OK
+                                                     // (원하면 conn버전으로 맞춰도 됨)
 
             ReviewDTO dto = new ReviewDTO();
-            dto.setReview_id(review_id);
+            dto.setReview_id(reviewId);
             dto.setFk_product_id(Integer.parseInt(fk_product_id));
             dto.setFk_member_id(loginuser.getUserid());
             dto.setRating(rating);
@@ -95,9 +103,10 @@ public class ReviewWriteController extends AbstractController {
             dto.setReview_content(review_content.trim());
             dto.setPraise_keywords(praise_keywords); // null 가능
 
-            int n = rdao.insertReview(dto);
-
+            // ✅ conn 버전 insertReview 사용 (DAO에 구현되어 있어야 함)
+            int n = rdao.insertReview(conn, dto);
             if(n != 1) {
+                conn.rollback();
                 request.setAttribute("message", "리뷰 등록에 실패했습니다.");
                 request.setAttribute("loc", "javascript:history.back()");
                 super.setRedirect(false);
@@ -105,46 +114,65 @@ public class ReviewWriteController extends AbstractController {
                 return;
             }
 
-            // ===== 이미지 업로드(선택) =====
-            // input name="review_images" 로 받는다고 JSP에 되어 있으면 getParts로 처리
+            // ✅ 업로드 경로 (너 프로젝트는 img 폴더 쓰고 있음)
+            String uploadDir = request.getServletContext().getRealPath("/img/review");
+            String devImgDir = "C:\\git\\SemiProject\\SemiProject\\src\\main\\webapp\\img\\review"; // 너 환경
+            new File(uploadDir).mkdirs();
+            new File(devImgDir).mkdirs();
+
+            // ✅ 이미지 업로드 + DB 저장 (여러장 가능)
             for(Part part : request.getParts()) {
+                if(!"files".equals(part.getName())) continue;
+                if(part.getSize() == 0) continue;
 
-                if(!"review_images".equals(part.getName())) continue;
-                if(part.getSize() <= 0) continue;
+                String orgName = Paths.get(part.getSubmittedFileName()).getFileName().toString();
 
-                String submitted = Paths.get(part.getSubmittedFileName()).getFileName().toString();
-                if(submitted == null || submitted.isBlank()) continue;
-
-                // 확장자
                 String ext = "";
-                int dot = submitted.lastIndexOf(".");
-                if(dot > -1) ext = submitted.substring(dot);
+                int dot = orgName.lastIndexOf('.');
+                if(dot > -1) ext = orgName.substring(dot);
 
-                String newFileName = UUID.randomUUID().toString() + ext;
+                String saveName = UUID.randomUUID().toString().replace("-", "") + ext;
 
-                // ✅ 실제 저장 경로는 프로젝트에 맞춰 바꿔야 함
-                // (QnA 업로드 저장 폴더가 이미 있으면 그 방식 그대로 쓰는 게 정답)
-                String uploadDir = request.getServletContext().getRealPath("/images/review");
-                File dir = new File(uploadDir);
-                if(!dir.exists()) dir.mkdirs();
+                // 1) 물리 저장
+                part.write(uploadDir + File.separator + saveName);
 
-                part.write(uploadDir + File.separator + newFileName);
+                // 2) (선택) 개발 폴더 복사
+                java.nio.file.Files.copy(
+                    java.nio.file.Paths.get(uploadDir, saveName),
+                    java.nio.file.Paths.get(devImgDir, saveName),
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING
+                );
 
-                rdao.insertReviewImage(review_id, newFileName);
+                // 3) DB 저장: TBL_REVIEW_IMAGE
+                // ✅ conn 버전 insertReviewImage 사용 (DAO에 구현되어 있어야 함)
+                rdao.insertReviewImage(conn, reviewId, saveName);
             }
+
+            conn.commit();
 
             request.setAttribute("message", "리뷰가 등록되었습니다.");
             request.setAttribute("loc", request.getContextPath() + "/reviews.sp");
             super.setRedirect(false);
             super.setViewPage("/WEB-INF/msg.jsp");
 
-        } catch(SQLException e) {
-            // unique (fk_product_id, fk_member_id) 위반 가능
+        }
+        catch(SQLException e) {
+            if(conn != null) try { conn.rollback(); } catch(Exception ignore) {}
             e.printStackTrace();
+
             request.setAttribute("message", "이미 해당 상품에 대한 리뷰를 작성하셨습니다.");
             request.setAttribute("loc", request.getContextPath() + "/reviews.sp");
             super.setRedirect(false);
             super.setViewPage("/WEB-INF/msg.jsp");
+        }
+        catch(Exception e) {
+            if(conn != null) try { conn.rollback(); } catch(Exception ignore) {}
+            e.printStackTrace();
+            super.setRedirect(true);
+            super.setViewPage(request.getContextPath() + "/error.sp");
+        }
+        finally {
+            if(conn != null) try { conn.setAutoCommit(true); conn.close(); } catch(Exception ignore) {}
         }
     }
 }

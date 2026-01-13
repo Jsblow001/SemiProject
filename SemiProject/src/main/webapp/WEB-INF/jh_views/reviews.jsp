@@ -362,7 +362,6 @@
           <span class="divider">|</span>
           <a href="javascript:void(0);" id="btnToggleSearch">직접검색</a>
           <button type="button" class="bottom-search-btn" aria-label="검색" id="btnSearchIcon">
-            (SVG는 너 기존 그대로)
           </button>
         </div>
       </div>
@@ -394,58 +393,65 @@
               </div>
 
               <div class="r-right">
-                <div class="r-top">
-                  <span class="stars">
-                    <c:forEach var="i" begin="1" end="5">
-                      <c:choose>
-                        <c:when test="${i <= r.rating}">
-                          <span class="star">★</span>
-                        </c:when>
-                        <c:otherwise>
-                          <span class="star off">★</span>
-                        </c:otherwise>
-                      </c:choose>
-                    </c:forEach>
-                  </span>
-
-                  <c:if test="${not empty r.badge}">
-                    <span class="badge">${r.badge}</span>
-                  </c:if>
-
-                  <span class="prodcode">${r.productCode}</span>
-                </div>
-
-                <div class="r-content">${r.review_content}</div>
-
-                <c:if test="${not empty r.photos}">
-                  <div class="r-photos">
-                    <c:forEach var="ph" items="${r.photos}" varStatus="st">
-                      <c:if test="${st.index < 2}">
-                        <div class="r-photo"><img src="${ph}" alt="review photo"></div>
-                      </c:if>
-                    </c:forEach>
-                  </div>
-                </c:if>
-
-                <c:if test="${not empty r.tags}">
-                  <div class="r-tags">
-                    <c:forEach var="t" items="${r.tags}">
-                      <span class="tag">${t}</span>
-                    </c:forEach>
-                  </div>
-                </c:if>
-
-                <div class="r-actions">
-                  <a>💬 댓글 ${r.commentCount}</a>
-                  <a href="#">⚑ 신고</a>
-                </div>
-
-                <c:if test="${not empty r.adminReply}">
-                  <div class="admin-reply">
-                    ${r.adminReply}
-                    <div class="admin-name">카린 올림</div>
-                  </div>
-                </c:if>
+	              <a href="${pageContext.request.contextPath}/reviewView.sp?reviewId=${r.review_id}"
+	     			style="display:block; color:inherit;">
+	                <div class="r-top">
+	                  <span class="stars">
+	                    <c:forEach var="i" begin="1" end="5">
+	                      <c:choose>
+	                        <c:when test="${i <= r.rating}">
+	                          <span class="star">★</span>
+	                        </c:when>
+	                        <c:otherwise>
+	                          <span class="star off">★</span>
+	                        </c:otherwise>
+	                      </c:choose>
+	                    </c:forEach>
+	                  </span>
+	
+	                  <c:if test="${not empty r.badge}">
+	                    <span class="badge">${r.badge}</span>
+	                  </c:if>
+	
+	                  <span class="prodcode">${r.productCode}</span>
+	                </div>
+	
+	                <div class="r-content">${r.review_content}</div>
+	
+	                <c:if test="${not empty r.photos}">
+	                  <div class="r-photos">
+	                    <c:forEach var="ph" items="${r.photos}" varStatus="st">
+	                      <c:if test="${st.index < 2}">
+	                        <div class="r-photo">
+							  <img src="${pageContext.request.contextPath}/img/review/${ph}"
+							       alt="review photo"
+							       onerror="this.style.display='none';">
+							</div>
+	                      </c:if>
+	                    </c:forEach>
+	                  </div>
+	                </c:if>
+	
+	                <c:if test="${not empty r.tags}">
+	                  <div class="r-tags">
+	                    <c:forEach var="t" items="${r.tags}">
+	                      <span class="tag">${t}</span>
+	                    </c:forEach>
+	                  </div>
+	                </c:if>
+	
+	                <div class="r-actions">
+	                  <a>💬 댓글 ${r.commentCount}</a>
+	                  <a href="#">⚑ 신고</a>
+	                </div>
+	
+	                <c:if test="${not empty r.adminReply}">
+	                  <div class="admin-reply">
+	                    ${r.adminReply}
+	                    <div class="admin-name">카린 올림</div>
+	                  </div>
+	                </c:if>
+                </a>
               </div>
             </div>
           </c:forEach>

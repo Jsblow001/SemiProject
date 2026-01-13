@@ -33,6 +33,12 @@ public class ReviewDAO_imple implements ReviewDAO {
             e.printStackTrace();
         }
     }
+    
+    // 컨트롤러에서 트랜잭션 잡을 때 conn 얻는 용도
+    @Override
+    public Connection getConnection() throws SQLException {
+        return ds.getConnection();
+    }
 
     // =========================
     // 1) 총 리뷰 수
@@ -305,14 +311,14 @@ public class ReviewDAO_imple implements ReviewDAO {
         return val;
     }
 
+    
     @Override
-    public int insertReview(ReviewDTO dto) throws SQLException {
+    public int insertReview(Connection conn, ReviewDTO dto) throws SQLException {
 
         int result = 0;
+        PreparedStatement pstmt = null;
 
         try {
-            conn = ds.getConnection();
-
             String sql =
                 " insert into tbl_product_review " +
                 " (review_id, fk_product_id, fk_member_id, review_date, rating, review_title, review_content, praise_keywords) " +
@@ -331,36 +337,33 @@ public class ReviewDAO_imple implements ReviewDAO {
             result = pstmt.executeUpdate();
 
         } finally {
-            close();
+            if(pstmt != null) pstmt.close();
         }
 
         return result;
     }
 
+
+    
+    
     @Override
-    public int insertReviewImage(long review_id, String image_filename) throws SQLException {
-
+    public int insertReviewImage(Connection conn, long review_id, String image_filename) throws SQLException {
         int result = 0;
-
+        PreparedStatement pstmt = null;
         try {
-            conn = ds.getConnection();
-
             String sql =
                 " insert into tbl_review_image (review_image_id, fk_review_id, image_filename) " +
                 " values (seq_review_image_id.nextval, ?, ?) ";
-
             pstmt = conn.prepareStatement(sql);
             pstmt.setLong(1, review_id);
             pstmt.setString(2, image_filename);
-
             result = pstmt.executeUpdate();
-
         } finally {
-            close();
+            if(pstmt != null) pstmt.close();
         }
-
         return result;
     }
+
     
     
     
@@ -483,5 +486,201 @@ public class ReviewDAO_imple implements ReviewDAO {
 
         return list;
     }
+    
+    
+    @Override
+    public ReviewDTO selectReviewOne(long reviewId) throws SQLException {
+
+        ReviewDTO dto = null;
+
+        try {
+            conn = ds.getConnection();
+
+            String sql =
+                " select review_id, fk_product_id, fk_member_id, rating, review_title, review_content, praise_keywords, " +
+                "        to_char(review_date,'yyyy-mm-dd') as review_date " +
+                "   from tbl_product_review " +
+                "  where review_id = ? ";
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, reviewId);
+
+            rs = pstmt.executeQuery();
+            if(rs.next()) {
+                dto = new ReviewDTO();
+                dto.setReview_id(rs.getLong("review_id"));
+                dto.setFk_product_id(rs.getInt("fk_product_id"));
+                dto.setFk_member_id(rs.getString("fk_member_id"));
+                dto.setRating(rs.getInt("rating"));
+                dto.setReview_title(rs.getString("review_title"));
+                dto.setReview_content(rs.getString("review_content"));
+                dto.setPraise_keywords(rs.getString("praise_keywords"));
+                dto.setReview_date(rs.getString("review_date"));
+            }
+
+        } finally {
+            close();
+        }
+
+        return dto;
+    }
+    
+    @Override
+    public List<String> selectReviewImageFilenames(Connection conn, long reviewId) throws SQLException {
+
+        List<String> list = new ArrayList<>();
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            String sql =
+                " select image_filename " +
+                "   from tbl_review_image " +
+                "  where fk_review_id = ? " +
+                "  order by review_image_id ";
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, reviewId);
+
+            rs = pstmt.executeQuery();
+            while(rs.next()) {
+                list.add(rs.getString("image_filename"));
+            }
+
+        } finally {
+            if(rs != null) rs.close();
+            if(pstmt != null) pstmt.close();
+        }
+
+        return list;
+    }
+    
+    @Override
+    public int deleteReviewComments(Connection conn, long reviewId) throws SQLException {
+
+        PreparedStatement pstmt = null;
+        try {
+            String sql = " delete from tbl_review_comment where fk_review_id = ? ";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, reviewId);
+            return pstmt.executeUpdate();
+        } finally {
+            if(pstmt != null) pstmt.close();
+        }
+    }
+
+    @Override
+    public int deleteReviewImages(Connection conn, long reviewId) throws SQLException {
+
+        PreparedStatement pstmt = null;
+        try {
+            String sql = " delete from tbl_review_image where fk_review_id = ? ";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, reviewId);
+            return pstmt.executeUpdate();
+        } finally {
+            if(pstmt != null) pstmt.close();
+        }
+    }
+    
+    @Override
+    public int deleteReview(Connection conn, long reviewId) throws SQLException {
+
+        PreparedStatement pstmt = null;
+        try {
+            String sql = " delete from tbl_product_review where review_id = ? ";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, reviewId);
+            return pstmt.executeUpdate();
+        } finally {
+            if(pstmt != null) pstmt.close();
+        }
+    }
+    
+    @Override
+    public ReviewDTO selectReviewDetail(long reviewId) throws SQLException {
+
+        ReviewDTO dto = null;
+
+        try {
+            conn = ds.getConnection();
+
+            String sql =
+                " select "
+              + "   r.review_id, r.fk_product_id, r.fk_member_id, "
+              + "   r.review_title, r.rating, r.review_content, r.praise_keywords, "
+              + "   to_char(r.review_date,'yyyy-mm-dd') as review_date, "
+              + "   p.product_name, "
+              + "   substr(m.name,1,1) || '**' as writer, "
+              + "   case when exists ( "
+              + "       select 1 "
+              + "         from tbl_order o join tbl_order_detail d "
+              + "           on o.odrcode = d.fk_odrcode "
+              + "        where o.fk_member_id = r.fk_member_id "
+              + "          and d.fk_product_id = r.fk_product_id "
+              + "          and o.payment_status = 1 "
+              + "   ) then 1 else 0 end as verified, "
+              + "   c.comment_content as admin_reply, "
+              + "   (select listagg(ri.image_filename, ',') within group(order by ri.review_image_id) "
+              + "      from tbl_review_image ri "
+              + "     where ri.fk_review_id = r.review_id "
+              + "   ) as photo_csv "
+              + " from tbl_product_review r "
+              + " join tbl_product p on p.product_id = r.fk_product_id "
+              + " join tbl_member  m on m.member_id = r.fk_member_id "
+              + " left join tbl_review_comment c "
+              + "   on c.fk_review_id = r.review_id and c.status = 1 "
+              + " where r.review_id = ? ";
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, reviewId);
+
+            rs = pstmt.executeQuery();
+
+            if(rs.next()) {
+                dto = new ReviewDTO();
+
+                dto.setReview_id(rs.getLong("review_id"));
+                dto.setFk_product_id(rs.getInt("fk_product_id"));
+                dto.setFk_member_id(rs.getString("fk_member_id"));
+
+                dto.setReview_title(rs.getString("review_title"));
+                dto.setRating(rs.getInt("rating"));
+                dto.setReview_content(rs.getString("review_content"));
+                dto.setPraise_keywords(rs.getString("praise_keywords"));
+                dto.setReview_date(rs.getString("review_date"));
+
+                dto.setProduct_name(rs.getString("product_name"));
+                dto.setProductCode(rs.getString("product_name"));
+
+                dto.setWriter(rs.getString("writer"));
+                dto.setVerified(rs.getInt("verified"));
+
+                dto.setAdminReply(rs.getString("admin_reply"));
+
+                // photos (전체)
+                String photoCsv = rs.getString("photo_csv");
+                if(photoCsv != null && !photoCsv.trim().isEmpty()) {
+                    dto.setPhotos(java.util.Arrays.asList(photoCsv.split(",")));
+                }
+
+                // tags
+                String pk = rs.getString("praise_keywords");
+                if(pk != null && !pk.trim().isEmpty()) {
+                    dto.setTags(java.util.Arrays.asList(pk.split("\\s*,\\s*")));
+                }
+            }
+
+        } finally {
+            close();
+        }
+
+        return dto;
+    }
+
+
+
+
+
 
 }
