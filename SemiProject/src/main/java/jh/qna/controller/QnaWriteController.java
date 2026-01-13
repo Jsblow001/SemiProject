@@ -26,24 +26,17 @@ public class QnaWriteController extends AbstractController {
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-//      MemberDTO loginuser = (MemberDTO) request.getSession().getAttribute("loginuser");
-//
-//      if(loginuser == null) {
-//          super.setRedirect(true);
-//          super.setViewPage(request.getContextPath() + "/login.sp");
-//          return;
-//      }
-//
-//      String memberId = loginuser.getUserid();
       
-		// ===== 테스트 모드: 로그인 없이도 작성되게(관리자 ID로 고정) =====
-		String memberId = "admin";  // ⚠️ tbl_qna.FK_MEMBER_ID에 실제 존재하는 ID로 넣어야 함
-		
-		MemberDTO loginuser = (MemberDTO) request.getSession().getAttribute("loginuser");
-		if(loginuser != null) {
-		    // 로그인 되어있으면 실제 로그인 사용자를 우선 사용
-		    memberId = loginuser.getUserid();
-		}
+    	MemberDTO loginuser = (MemberDTO) request.getSession().getAttribute("loginuser");
+
+        if(loginuser == null) {
+            super.setRedirect(true);
+            super.setViewPage(request.getContextPath() + "/login.sp");
+            return;
+        }
+
+        String memberId = loginuser.getUserid();
+        
       
         if("GET".equalsIgnoreCase(request.getMethod())) {
         	String myUrl = request.getParameter("myUrl");
@@ -52,9 +45,6 @@ public class QnaWriteController extends AbstractController {
             super.setViewPage("/WEB-INF/jh_qna/qna_write.jsp");
             return;
         }
-
-        
-
 
 
         String subject = request.getParameter("subject");
@@ -71,9 +61,13 @@ public class QnaWriteController extends AbstractController {
 
         // 업로드 폴더(실제 물리경로)
         String uploadDir = request.getServletContext().getRealPath("/img/qna");
-        System.out.println("uploadDir = " + uploadDir);
         File dir = new File(uploadDir);
         if(!dir.exists()) dir.mkdirs();
+        
+        // 로컬 개발용 폴더에도
+        String devImgDir = "C:\\git\\SemiProject\\SemiProject\\src\\main\\webapp\\img\\qna"; // 로컬 개발용
+        File devDir = new File(devImgDir);
+        if(!devDir.exists()) devDir.mkdirs();
 
         Connection conn = null;
 
@@ -109,6 +103,11 @@ public class QnaWriteController extends AbstractController {
 
                 // 디스크 저장
                 part.write(uploadDir + File.separator + saveName);
+                
+                java.nio.file.Path from = java.nio.file.Paths.get(uploadDir, saveName);
+                java.nio.file.Path to   = java.nio.file.Paths.get(devImgDir, saveName);
+
+                java.nio.file.Files.copy(from, to, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
 
                 // DB 저장
                 QnaFileDTO f = new QnaFileDTO();

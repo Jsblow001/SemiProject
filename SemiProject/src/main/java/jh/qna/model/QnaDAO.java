@@ -10,6 +10,8 @@ import jh.qna.domain.QnaFileDTO;
 
 public interface QnaDAO {
 
+	Connection getConnection() throws SQLException;
+	
     long insertQna(Connection conn, QnaDTO dto) throws SQLException;
     
     int insertQnaFile(Connection conn, QnaFileDTO fileDto) throws SQLException;
@@ -40,5 +42,22 @@ public interface QnaDAO {
 
 	// qna 수정
 	int updateQna(QnaDTO updated) throws Exception;
+	
+	// qna 수정 오버로드
+	int updateQna(Connection conn, QnaDTO updated) throws Exception;
+	
+	// qna 수정 시 파일 업데이트
+	int updateQnaFile(Connection conn, QnaFileDTO fileDto) throws SQLException;
+	
+	// qna 첨부했던 파일 삭제
+	int deleteQnaFile(Connection conn, long fileId) throws SQLException;
+
+	
+	List<QnaFileDTO> selectQnaFileList(Connection conn, long fkQnaId) throws SQLException;
+
+	
+	QnaFileDTO selectOneQnaFile(Connection conn, long qnaFileId) throws SQLException;
+
+	
 
 }

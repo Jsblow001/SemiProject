@@ -2,18 +2,22 @@
     pageEncoding="UTF-8"%>
 
 <script type="text/javascript">
+  alert("${message}");
 
- //	alert("${requestScope.message}"); // 메시지 출력해주기
-	alert("${message}");              // 메시지 출력해주기
-	
-	
+  var shouldClose = "${requestScope.popup_close}" === "true";
+  var loc = "${loc}";
+
+  if (shouldClose) {
+    try {
+      if (window.opener && !window.opener.closed) {
+        // ✅ 부모창을 '수정된 상세 URL'로 이동 (새로고침보다 확실)
+        window.opener.location.href = loc;
+      }
+    } catch (e) {}
+
+    window.close();
+  } else {
+    location.href = loc;
+  }
+</script>
     
-    if (${not empty requestScope.popup_close && requestScope.popup_close == true}) {
-        opener.history.go(0);  // 부모창 새로고침
-        self.close();          // 팝업 닫기
-    } else {
-        location.href = "${loc}";
-    }
-
-
-</script>    
