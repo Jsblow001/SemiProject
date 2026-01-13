@@ -250,4 +250,82 @@ public class AdminOrderDAO_imple implements AdminOrderDAO {
         }
         return result;
     }
+
+    // 운송장 출력을 위한 주문 정보 불러오기
+    @Override
+    public AdminOrderDTO getOrderDetail(String odrcode) throws SQLException {
+        AdminOrderDTO dto = null;
+        try {
+            conn = ds.getConnection();
+            
+            // O: 주문, A: 주소, M: 회원
+            String sql = " SELECT O.odrcode, O.fk_member_id, M.name, M.mobile, M.email, "
+                       + "        O.odrtotalprice, TO_CHAR(O.odrdate, 'yyyy-mm-dd hh24:mi:ss') AS odrdate, "
+                       + "        O.payment_status, A.postcode, A.address, A.detailaddress "
+                       + " FROM tbl_order O "
+                       + " JOIN tbl_address A ON O.fk_addr_id = A.addr_id "
+                       + " JOIN tbl_member M ON O.fk_member_id = M.member_id "
+                       + " WHERE O.odrcode = ? ";
+            
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, odrcode);
+            rs = pstmt.executeQuery();
+            
+            if(rs.next()) {
+                dto = new AdminOrderDTO();
+                dto.setOdrcode(rs.getString("odrcode"));
+                dto.setFk_userid(rs.getString("fk_member_id"));
+                dto.setName(rs.getString("name"));
+                dto.setMobile(rs.getString("mobile"));
+                dto.setEmail(rs.getString("email"));
+                dto.setOdrtotalprice(rs.getInt("odrtotalprice"));
+                dto.setOdrdate(rs.getString("odrdate"));
+                dto.setPayment_status(rs.getInt("payment_status"));
+                
+                // 배송지 정보 (tbl_address에서 가져옴)
+                dto.setPostcode(rs.getString("postcode"));
+                dto.setAddress(rs.getString("address"));
+                dto.setDetailaddress(rs.getString("detailaddress"));
+            }
+        } finally {
+            close();
+        }
+        return dto;
+    }
+
+    //  주문 상세 상품 리스트 조회
+    @Override
+    public List<AdminOrderDTO> getOrderDetailList(String odrcode) throws SQLException {
+        List<AdminOrderDTO> detailList = new ArrayList<>();
+        try {
+            conn = ds.getConnection();
+            
+            // D: 주문상세, P: 제품 
+            String sql = " SELECT D.odrdetailno, D.fk_product_id, D.odrqty, D.odrprice, "
+                       + "        D.deliverystatus, D.invoice_no, P.product_name "
+                       + " FROM tbl_order_detail D "
+                       + " JOIN tbl_product P ON D.fk_product_id = P.product_id "
+                       + " WHERE D.fk_odrcode = ? ";
+            
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, odrcode);
+            rs = pstmt.executeQuery();
+            
+            while(rs.next()) {
+                AdminOrderDTO dto = new AdminOrderDTO();
+                dto.setOdrdetailno(Integer.parseInt(rs.getString("odrdetailno")));
+                dto.setFk_pnum(rs.getInt("fk_product_id")); 
+                dto.setOdrqty(rs.getInt("odrqty"));
+                dto.setOdrprice(rs.getInt("odrprice"));
+                dto.setDeliverystatus(rs.getInt("deliverystatus"));
+                dto.setInvoice_no(rs.getString("invoice_no"));
+                dto.setPname(rs.getString("product_name"));
+                
+                detailList.add(dto);
+            }
+        } finally {
+            close();
+        }
+        return detailList;
+    }
 }

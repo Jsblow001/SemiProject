@@ -9,7 +9,6 @@
     <title>CARIN</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-	
 	<link rel="preconnect" href="https://fonts.gstatic.com">
 	
 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"> 
@@ -20,7 +19,6 @@
 	
 	<script src="<%= ctxPath%>/js/jquery-3.7.1.min.js"></script>
 	<script src="<%= ctxPath%>/js/main.js"></script>
-	
 	<script src="<%= ctxPath%>/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js" type="text/javascript"></script>
     
     <script src="lib/easing/easing.min.js"></script>
@@ -152,17 +150,18 @@
 </head>
 
 <body>
+
     <div class="fixed-top-header">
         <div class="container-fluid top-announcement-bar p-0">
             <div id="noticeCarousel" class="carousel slide" data-ride="carousel" data-interval="4000" data-pause="hover">
                 <div class="carousel-inner">
-                    <a href="/notice/1" class="carousel-item active announcement-item">
+                    <a href="<%= ctxPath %>/noticeList.sp" class="carousel-item active announcement-item">
                         <span class="announcement-text">[공지] 신규 회원 가입 시 10% 할인 쿠폰 즉시 지급</span>
                     </a>
-                    <a href="/notice/2" class="carousel-item announcement-item">
+                    <a href="<%= ctxPath %>/noticeList.sp" class="carousel-item announcement-item">
                         <span class="announcement-text">[이벤트] CARIN x Collaboration 컬렉션 무료 배송</span>
                     </a>
-                    <a href="/notice/3" class="carousel-item announcement-item">
+                    <a href="<%= ctxPath %>/noticeList.sp" class="carousel-item announcement-item">
                         <span class="announcement-text">[안내] 평일 오후 2시 이전 결제 시 당일 출고</span>
                     </a>
                 </div>
@@ -186,6 +185,7 @@
                         <a href="<%= ctxPath %>/product/productList.sp?category=collaboration" class="nav-item nav-link text-nowrap">COLLABORATION</a>
                     </div>
                 </div>
+                
 
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse">
                     <span class="navbar-toggler-icon"></span>
@@ -230,6 +230,7 @@
 		                   			<a class="dropdown-item text-primary" href="<%= ctxPath%>/noticeList.sp">Notice</a>
 		                   			<a class="dropdown-item text-primary" href="<%= ctxPath%>/reviews.sp">Review</a>
 		                   			<a class="dropdown-item text-primary" href="<%= ctxPath%>/qnaList.sp">QnA</a>
+		                   			<a class="dropdown-item text-primary" href="<%= ctxPath%>/reservation.sp">예약하기</a>
 		                   			<a class="dropdown-item text-primary" href="<%= ctxPath%>">매장찾기</a>
 		                   		</div>
 		                   	</li>
@@ -297,9 +298,8 @@
                  placeholder="상품명을 입력하세요" autocomplete="off"
                  style="font-size:0.9rem; padding:6px 10px; height:36px;" />
     
-         <!-- 검색 실행 버튼(선택: 있으면 UX 좋아짐) -->
          <button type="submit" class="btn btn-wood"
-                 style="font-size:0.85rem; padding:6px 12px; height:36px; white-space:nowrap;">
+             style="font-size:0.85rem; padding:6px 12px; height:36px; white-space:nowrap;">
             검색
          </button>
     

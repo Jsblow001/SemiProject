@@ -9,6 +9,7 @@ public class AdminOrderDTO {
     private int totalprice;    // 총주문금액
     private String odrdate;    // 주문일자
     private int delivery_status; // 배송상태 (1:결제완료, 2:배송중, 3:배송완료 등)
+    private int fk_pnum;
     
     // ---------------------------------------- //
     
@@ -17,6 +18,7 @@ public class AdminOrderDTO {
     private String postcode;
     private String address;
     private String detailaddress;
+    private String extraaddress;
     private int odrtotalprice;
     private int odrtotalpoint;
     private int payment_status;
@@ -26,7 +28,7 @@ public class AdminOrderDTO {
     private String pimage;     // 상품이미지
     private int odrqty;        // 수량
     private int odrprice;      // 단가
-    private int deliverystatus; // 배송상태
+    private int deliverystatus; // 배송상태 (1:결제완료, 2:배송중, 3:배송완료 등)
     
     private String invoice_no;
     
@@ -169,8 +171,19 @@ public class AdminOrderDTO {
 	public void setInvoice_no(String invoice_no) {
 		this.invoice_no = invoice_no;
 	}
+	public void setFk_pnum(int fk_pnum) {
+	    this.fk_pnum = fk_pnum;
+	}
+	public int getFk_pnum() {
+	    return fk_pnum;
+	}
+	public String getExtraaddress() {
+		return extraaddress;
+	}
+	public void setExtraaddress(String extraaddress) {
+		this.extraaddress = extraaddress;
+	}
 	
 	
-
 
 }

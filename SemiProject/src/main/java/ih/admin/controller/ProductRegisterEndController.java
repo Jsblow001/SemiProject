@@ -15,8 +15,11 @@ public class ProductRegisterEndController extends AbstractController {
         
         // 저장 경로 설정
         String uploadDir = request.getServletContext().getRealPath("/img");
-        File dir = new File(uploadDir);
-        if(!dir.exists()) dir.mkdirs(); 
+        System.out.println(uploadDir);
+        
+        // 로컬 개발용 폴더에도
+        String devImgDir = "C:\\git\\SemiProject\\SemiProject\\src\\main\\webapp\\img"; // 로컬 개발용
+        
 
         // 파일 데이터 처리 
         Part pimagePart = request.getPart("pimage"); 
@@ -25,7 +28,19 @@ public class ProductRegisterEndController extends AbstractController {
 
         if (originalFileName != null && !originalFileName.isEmpty()) {
             savedFileName = System.nanoTime() + "_" + originalFileName;
+            // 1) 실행 중 웹앱 경로에 저장
+            File dir = new File(uploadDir);
+            if(!dir.exists()) dir.mkdirs(); 
             pimagePart.write(uploadDir + File.separator + savedFileName);
+            
+            // 2) (로컬 개발용) 소스 폴더에도 복사 저장
+            File devDir = new File(devImgDir);
+            if(!devDir.exists()) devDir.mkdirs();
+            
+            java.nio.file.Path from = java.nio.file.Paths.get(uploadDir, savedFileName);
+            java.nio.file.Path to   = java.nio.file.Paths.get(devImgDir, savedFileName);
+
+            java.nio.file.Files.copy(from, to, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
         }
 
         // 데이터 읽기
