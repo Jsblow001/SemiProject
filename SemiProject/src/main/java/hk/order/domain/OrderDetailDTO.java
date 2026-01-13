@@ -16,8 +16,16 @@ public class OrderDetailDTO {
 	// ===== 조회용 =====
     private String productName;
     private String deliveryStatusName;
+    
+    
+    // ===== 클레임(취소/반품/교환) =====
+  	private String claimType;    // CANCEL / RETURN / EXCHANGE
+  	private String claimStatus;  // REQUEST / APPROVED / REJECTED
+  	private String claimReason;  // 사유
 
-    public int getOdrDetailNo() { return odrDetailNo; }
+
+
+	public int getOdrDetailNo() { return odrDetailNo; }
     public void setOdrDetailNo(int odrDetailNo) { this.odrDetailNo = odrDetailNo; }
 
     public int getOdrCode() { return odrCode; }
@@ -52,4 +60,29 @@ public class OrderDetailDTO {
   	public void setProductImage(String productImage) {
   		this.productImage = productImage;
   	}
+  	
+  	
+  	
+  	// ===== 클레임(취소/반품/교환) =====
+    public String getClaimType() {
+		return claimType;
+	}
+	public void setClaimType(String claimType) {
+		this.claimType = claimType;
+	}
+	public String getClaimStatus() {
+		return claimStatus;
+	}
+	public void setClaimStatus(String claimStatus) {
+		this.claimStatus = claimStatus;
+	}
+	public String getClaimReason() {
+		return claimReason;
+	}
+	public void setClaimReason(String claimReason) {
+		this.claimReason = claimReason;
+	}
+  	
+  	
+   
 }
