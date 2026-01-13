@@ -54,6 +54,7 @@ public class QnaDAO_imple implements QnaDAO {
     }
 
     // 컨트롤러에서 트랜잭션 잡을 때 conn 얻는 용도
+    @Override
     public Connection getConnection() throws SQLException {
         return ds.getConnection();
     }
@@ -96,34 +97,8 @@ public class QnaDAO_imple implements QnaDAO {
         return qnaId;
     }
 
-    // ======================================================
-    // 2) 첨부 insert (트랜잭션 conn 사용)
-    // ======================================================
-    @Override
-    public int insertQnaFile(Connection conn, QnaFileDTO fileDto) throws SQLException {
-        int result = 0;
-
-        try {
-            String sql =
-                " INSERT INTO tbl_qna_file " +
-                " (QNA_FILE_ID, FK_QNA_ID, ORG_FILENAME, SAVE_FILENAME, FILE_SIZE, CONTENT_TYPE, REGDATE) " +
-                " VALUES (SEQ_QNA_FILE_ID.nextval, ?, ?, ?, ?, ?, SYSDATE) ";
-
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setLong(1, fileDto.getFkQnaId());
-            pstmt.setString(2, fileDto.getOrgFilename());
-            pstmt.setString(3, fileDto.getSaveFilename());
-            pstmt.setLong(4, fileDto.getFileSize());
-            pstmt.setString(5, fileDto.getContentType());
-
-            result = pstmt.executeUpdate();
-
-        } finally {
-            closeStmtRs(); // ✅ conn 닫지 않음
-        }
-
-        return result;
-    }
+    
+   
 
     // ======================================================
     // 3) qna_id로 첨부 목록 조회 (트랜잭션 conn 사용)
@@ -606,11 +581,160 @@ public class QnaDAO_imple implements QnaDAO {
 
 	    return n;
 	}
+	
+	// 오버로드 - 트랜잭션용(conn 버전) - 컨트롤러가 conn을 관리
+	@Override
+	public int updateQna(Connection conn, QnaDTO updated) throws Exception {
+	    int n = 0;
+	    java.sql.PreparedStatement pstmt = null;
+
+	    try {
+	        String sql =
+	            " UPDATE tbl_qna " +
+	            "    SET subject = ?, content = ?, is_secret = ?, updatedate = SYSDATE " +
+	            "  WHERE QNA_ID = ? ";
+
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, updated.getSubject());
+	        pstmt.setString(2, updated.getContent());
+	        pstmt.setInt(3, updated.getIsSecret());
+	        pstmt.setLong(4, updated.getQnaId());
+
+	        n = pstmt.executeUpdate();
+	    }
+	    finally {
+	        if(pstmt != null) pstmt.close();
+	        // ✅ conn은 닫지 않는다(컨트롤러가 commit/rollback/close)
+	    }
+
+	    return n;
+	}
 
 
+	@Override
+    public int insertQnaFile(Connection conn, QnaFileDTO fileDto) throws SQLException {
+        int result = 0;
+
+        try {
+            String sql =
+                " INSERT INTO tbl_qna_file " +
+                " (QNA_FILE_ID, FK_QNA_ID, ORG_FILENAME, SAVE_FILENAME, FILE_SIZE, CONTENT_TYPE, REGDATE) " +
+                " VALUES (SEQ_QNA_FILE_ID.nextval, ?, ?, ?, ?, ?, SYSDATE) ";
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, fileDto.getFkQnaId());
+            pstmt.setString(2, fileDto.getOrgFilename());
+            pstmt.setString(3, fileDto.getSaveFilename());
+            pstmt.setLong(4, fileDto.getFileSize());
+            pstmt.setString(5, fileDto.getContentType());
+
+            result = pstmt.executeUpdate();
+
+        } finally {
+            closeStmtRs(); // ✅ conn 닫지 않음
+        }
+
+        return result;
+    }
+
+	@Override
+	public int updateQnaFile(Connection conn, QnaFileDTO fileDto) throws SQLException {
+
+	    int n = 0;
+
+	    String sql =
+	        " update TBL_QNA_FILE " +
+	        "    set ORG_FILENAME = ?, " +
+	        "        SAVE_FILENAME = ?, " +
+	        "        FILE_SIZE = ?, " +
+	        "        CONTENT_TYPE = ? " +
+	        "  where QNA_FILE_ID = ? ";
+
+	    try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	        pstmt.setString(1, fileDto.getOrgFilename());
+	        pstmt.setString(2, fileDto.getSaveFilename());
+	        pstmt.setLong(3, fileDto.getFileSize());
+	        pstmt.setString(4, fileDto.getContentType());
+	        pstmt.setLong(5, fileDto.getQnaFileId());
+	        n = pstmt.executeUpdate();
+	    }
+
+	    return n;
+	}
 
 
+	@Override
+	public int deleteQnaFile(Connection conn, long fileId) throws SQLException {
+	    int n = 0;
+	    String sql = " delete from tbl_qna_file where QNA_FILE_ID = ? ";
 
+	    try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	        pstmt.setLong(1, fileId);
+	        n = pstmt.executeUpdate();
+	    }
+
+	    return n;
+	}
+
+	@Override
+	public List<QnaFileDTO> selectQnaFileList(Connection conn, long fkQnaId) throws SQLException {
+
+	    List<QnaFileDTO> list = new ArrayList<>();
+
+	    String sql =
+	        " select QNA_FILE_ID, FK_QNA_ID, ORG_FILENAME, SAVE_FILENAME, FILE_SIZE, CONTENT_TYPE " +
+	        "   from TBL_QNA_FILE " +
+	        "  where FK_QNA_ID = ? " +
+	        "  order by QNA_FILE_ID asc ";
+
+	    try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	        pstmt.setLong(1, fkQnaId);
+
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            while(rs.next()) {
+	                QnaFileDTO f = new QnaFileDTO();
+	                f.setQnaFileId(rs.getLong("QNA_FILE_ID"));
+	                f.setFkQnaId(rs.getLong("FK_QNA_ID"));
+	                f.setOrgFilename(rs.getString("ORG_FILENAME"));
+	                f.setSaveFilename(rs.getString("SAVE_FILENAME"));
+	                f.setFileSize(rs.getLong("FILE_SIZE"));
+	                f.setContentType(rs.getString("CONTENT_TYPE"));
+	                list.add(f);
+	            }
+	        }
+	    }
+
+	    return list;
+	}
+
+	@Override
+	public QnaFileDTO selectOneQnaFile(Connection conn, long qnaFileId) throws SQLException {
+
+	    QnaFileDTO f = null;
+
+	    String sql =
+	        " select QNA_FILE_ID, FK_QNA_ID, ORG_FILENAME, SAVE_FILENAME, FILE_SIZE, CONTENT_TYPE " +
+	        "   from TBL_QNA_FILE " +
+	        "  where QNA_FILE_ID = ? ";
+
+	    try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	        pstmt.setLong(1, qnaFileId);
+
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            if(rs.next()) {
+	                f = new QnaFileDTO();
+	                f.setQnaFileId(rs.getLong("QNA_FILE_ID"));
+	                f.setFkQnaId(rs.getLong("FK_QNA_ID"));
+	                f.setOrgFilename(rs.getString("ORG_FILENAME"));
+	                f.setSaveFilename(rs.getString("SAVE_FILENAME"));
+	                f.setFileSize(rs.getLong("FILE_SIZE"));
+	                f.setContentType(rs.getString("CONTENT_TYPE"));
+	            }
+	        }
+	    }
+
+	    return f;
+	}
 
 
 

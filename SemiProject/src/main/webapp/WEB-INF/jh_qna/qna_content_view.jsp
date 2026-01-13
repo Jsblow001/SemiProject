@@ -44,6 +44,36 @@
   </div>
 
   <div class="content">${qna.content}</div>
+  
+  	<!-- ✅ 첨부파일 영역 -->
+	<c:if test="${not empty fileList}">
+	  <div style="margin-top:16px; border-top:1px solid #efefef; padding-top:14px;">
+	    <div style="font-weight:700; margin-bottom:10px;">첨부파일</div>
+	
+	    <div style="display:flex; flex-direction:column; gap:12px;">
+	      <c:forEach var="f" items="${fileList}">
+	        <div style="border:1px solid #eee; border-radius:10px; padding:10px;">
+	          <div style="font-size:13px; font-weight:700; word-break:break-all;">
+	            ${f.orgFilename}
+	          </div>
+	
+	          <div style="margin-top:8px;">
+	            <img src="${pageContext.request.contextPath}/images/qna/${f.saveFilename}"
+	                 style="max-width:100%; border-radius:10px; border:1px solid #eee;"
+	                 onerror="this.style.display='none';" />
+	          </div>
+	
+	          <div style="margin-top:8px; font-size:12px;">
+	            <a href="${pageContext.request.contextPath}/images/qna/${f.saveFilename}" target="_blank">
+	              원본 보기
+	            </a>
+	          </div>
+	        </div>
+	      </c:forEach>
+	    </div>
+	  </div>
+	</c:if>
+  
 
   <div class="btns">
     <button class="btn" type="button"

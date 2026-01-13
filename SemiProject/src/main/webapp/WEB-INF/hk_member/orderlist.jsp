@@ -190,7 +190,7 @@ body {
     <div class="order-tabs">
         <!-- 총 주문 건수로 표시 -->
         <a href="#" class="active">주문내역 (${totalCount})</a>
-        <a href="#">취소/교환/반품 내역 (0)</a>
+        <a href="<%=ctxPath%>/shop/orderList.sp?status=2" class="active">취소/교환/반품 내역 확인</a>
     </div>
 
     <!-- 필터 -->
