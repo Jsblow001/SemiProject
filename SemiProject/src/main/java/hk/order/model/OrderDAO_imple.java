@@ -223,9 +223,10 @@ public class OrderDAO_imple implements OrderDAO {
                 "        p.product_name, " +
                 "        p.pimage,        " +
                 "        CASE d.deliverystatus " +
-                "            WHEN 0 THEN '배송준비중' " +
-                "            WHEN 1 THEN '배송중' " +
-                "            WHEN 2 THEN '배송완료' " +
+                "            WHEN 1 THEN '배송준비중' " +
+                "            WHEN 2 THEN '배송중' " +
+                "            WHEN 3 THEN '배송완료' " +
+                "            WHEN 4 THEN '취소' " +
                 "        END AS delivery_status_name " +
                 " FROM tbl_order_detail d " +
                 " JOIN tbl_product p ON d.fk_product_id = p.product_id " +
@@ -427,9 +428,9 @@ public class OrderDAO_imple implements OrderDAO {
 
             if ("APPROVE".equals(action)) {
 
-                // 2. claim 승인
+                // 2. claim 승인 + 배송취소(4)
                 sql = " UPDATE tbl_order_detail " +
-                      " SET claim_status = 'APPROVED' " +
+                      " SET claim_status = 'APPROVED', deliverystatus = 4 " +
                       " WHERE odrdetailno = ? ";
 
                 pstmt = conn.prepareStatement(sql);
