@@ -186,14 +186,16 @@
 
     <table>
         <thead>
-            <tr>
-                <th style="width: 70px;">ID</th>
-                <th style="width: 100px;">이미지</th>
-                <th>상품명</th>
-                <th style="width: 150px;">판매가</th>
-                <th style="width: 120px;">재고</th>
-                <th style="width: 160px;">관리</th>
-            </tr>
+            <thead>
+			    <tr>
+			        <th style="width: 10%; text-align: center;">ID</th>
+			        <th style="width: 20%; text-align: center;">이미지</th>
+			        <th style="width: 30%; text-align: center;">상품명</th>
+			        <th style="width: 10%; text-align: center;">판매가</th>
+			        <th style="width: 10%; text-align: center;">재고</th>
+			        <th style="width: 20%; text-align: center;">관리</th>
+			    </tr>
+			</thead>
         </thead>
         <tbody>
             <c:if test="${not empty productList}">
@@ -212,9 +214,7 @@
                             </a>
                         </td>
                         <td>
-                            <span style="text-decoration: line-through; color: #bbb; font-size: 12px;">
-                                <fmt:formatNumber value="${p.list_price}" pattern="#,###"/>
-                            </span><br>
+
                             <span style="font-weight: 700; color: #2f2b2a;">
                                 <fmt:formatNumber value="${p.sale_price}" pattern="#,###"/>원
                             </span>
