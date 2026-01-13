@@ -59,6 +59,28 @@
         <div style="margin-top: 20px; text-align: center;">
             <div class="label">주문번호: ${orderInfo.odrcode}</div>
         </div>
+        
+        <div class="section">
+		    <div class="section-title">운송장 번호</div>
+		    <div class="info-box" style="font-family: 'Courier New'; font-size: 20px; letter-spacing: 2px;">
+		        <c:choose>
+		            <c:when test="${not empty detailList[0].invoice_no}">
+		                ${detailList[0].invoice_no}
+		            </c:when>
+		            <c:otherwise>
+		                <span style="color: red;">[미발급 - 송장을 먼저 등록하세요]</span>
+		            </c:otherwise>
+		        </c:choose>
+		    </div>
+		</div>
+		
+		<c:if test="${not empty detailList[0].invoice_no}">
+		    <div style="text-align: center; margin-top: 10px;">
+		        <img src="https://bwipjs-api.metafloor.com/?bcid=code128&text=${detailList[0].invoice_no}&scale=2&height=10&includetext" alt="Barcode">
+		        <p>${detailList[0].invoice_no}</p>
+		    </div>
+		</c:if>
+		
     </div>
 
     <div class="no-print" style="margin: 20px;">
