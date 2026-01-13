@@ -23,19 +23,21 @@ $(document).ready(function() {
                 },
                 dataType: "json",
                 success: function(json) {
-                    if(json.result == 1) {
+                    if(json.result >= 1) {
                         alert("성공적으로 변경되었습니다.");
                         $this.closest("tr").fadeOut(100).fadeIn(100);
-                        $this.data("originStatus", newStatus); // 원본 값 갱신
+                        $this.data("originStatus", newStatus); 
                     } else {
                         alert("상태 변경에 실패했습니다.");
                         $this.val(oldStatus); 
                     }
                 },
-                error: function() {
-                    alert("서버 통신 오류가 발생했습니다.");
-                    $this.val(oldStatus); 
-                },
+				error: function(request, status, error) {
+				    console.log("code: " + request.status);
+				    console.log("message: " + request.responseText);
+				    console.log("error: " + error);
+				    alert("서버 통신 오류가 발생했습니다.");
+				},
                 complete: function() {
                     $this.prop("disabled", false);
                 }
