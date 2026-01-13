@@ -397,7 +397,7 @@ public class OrderDAO_imple implements OrderDAO {
 
 
     
-    // 주문취소/반품/교환 신청 관리자 승인/반려 처리 -> 주문취소 (결제취소, 배송취소)
+    // 주문취소/반품/교환 신청 관리자 승인/반려 처리 -> 주문취소 (결제취소, 배송취소) + 재고반영
     @Override
     public int processClaim(int odrDetailNo, String action) throws SQLException {
 
@@ -406,47 +406,72 @@ public class OrderDAO_imple implements OrderDAO {
         try {
             conn = ds.getConnection();
 
-            String status = action.equals("APPROVE") ? "APPROVED" : "REJECTED";
-
-            // 1. 클레임 상태 변경
-            String sql1 =
-                " UPDATE tbl_order_detail " +
-                " SET claim_status = ? " +
+            // 1. 주문 상세 정보 조회 (주문번호, 상품번호, 수량)
+            String sql =
+                " SELECT fk_odrcode, fk_product_id, odrqty " +
+                " FROM tbl_order_detail " +
                 " WHERE odrdetailno = ? ";
 
-            pstmt = conn.prepareStatement(sql1);
-            pstmt.setString(1, status);
-            pstmt.setInt(2, odrDetailNo);
-            result = pstmt.executeUpdate();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, odrDetailNo);
+            rs = pstmt.executeQuery();
 
-            // 승인일 때만 주문 취소 처리
-            if("APPROVE".equals(action)) {
+            if (!rs.next()) return 0;
 
-                // 2. 주문번호 조회
-                String sql2 =
-                    " SELECT fk_odrcode FROM tbl_order_detail WHERE odrdetailno = ? ";
+            int odrcode = rs.getInt("fk_odrcode");
+            int productId = rs.getInt("fk_product_id");
+            int qty = rs.getInt("odrqty");
 
-                pstmt = conn.prepareStatement(sql2);
+            rs.close();
+            pstmt.close();
+
+            if ("APPROVE".equals(action)) {
+
+                // 2. claim 승인
+                sql = " UPDATE tbl_order_detail " +
+                      " SET claim_status = 'APPROVED' " +
+                      " WHERE odrdetailno = ? ";
+
+                pstmt = conn.prepareStatement(sql);
                 pstmt.setInt(1, odrDetailNo);
-                rs = pstmt.executeQuery();
-                rs.next();
-                int odrCode = rs.getInt(1);
+                int n1 = pstmt.executeUpdate();
+                pstmt.close();
 
-                // 3. 주문 결제 상태를 결제취소로
-                String sql3 =
-                    " UPDATE tbl_order SET payment_status = 2 WHERE odrcode = ? ";
+                // 3. 주문 결제상태 -> 결제취소(2)
+                sql = " UPDATE tbl_order " +
+                      " SET payment_status = 2 " +
+                      " WHERE odrcode = ? ";
 
-                pstmt = conn.prepareStatement(sql3);
-                pstmt.setInt(1, odrCode);
-                pstmt.executeUpdate();
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setInt(1, odrcode);
+                int n2 = pstmt.executeUpdate();
+                pstmt.close();
 
-                // 4. 해당 상품 배송 상태도 취소
-                String sql4 =
-                    " UPDATE tbl_order_detail SET deliverystatus = 4 WHERE odrdetailno = ? ";
+                // 4. 상품 재고 복구
+                sql = " UPDATE tbl_product " +
+                      " SET stock = stock + ? " +
+                      " WHERE product_id = ? ";
 
-                pstmt = conn.prepareStatement(sql4);
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setInt(1, qty);
+                pstmt.setInt(2, productId);
+                int n3 = pstmt.executeUpdate();
+                pstmt.close();
+
+                if (n1 == 1 && n2 == 1 && n3 == 1) {
+                    result = 1;
+                }
+
+            } else { // REJECT
+
+                sql = " UPDATE tbl_order_detail " +
+                      " SET claim_status = 'REJECTED' " +
+                      " WHERE odrdetailno = ? ";
+
+                pstmt = conn.prepareStatement(sql);
                 pstmt.setInt(1, odrDetailNo);
-                pstmt.executeUpdate();
+
+                result = pstmt.executeUpdate();
             }
 
         } finally {
@@ -455,6 +480,7 @@ public class OrderDAO_imple implements OrderDAO {
 
         return result;
     }
+
 
 
 
