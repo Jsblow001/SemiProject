@@ -164,7 +164,7 @@
 												            style="font-size: 0.7rem;"
 												            onclick="openInvoiceModal('${item.odrdetailno}')">
 												        <i class="fas fa-edit me-1"></i>
-												        ${empty item.invoice_no ? '송장등록' : '송장수정'}
+												        송장등록 및 수정
 												    </button>
 												</td>
 	                                        </tr>
@@ -184,7 +184,9 @@
 	            </c:choose>
 	            
 	            <div class="text-right pb-5">
-	                <button class="btn btn-secondary mr-2 shadow-sm"><i class="fas fa-print mr-1"></i>운송장 출력</button>
+	                <button class="btn btn-secondary mr-2 shadow-sm" onclick="openPrintInvoice('${orderInfo.odrcode}')">
+					    <i class="fas fa-print mr-1"></i>운송장 출력
+					</button>
 	                <button class="btn btn-danger shadow-sm"><i class="fas fa-times-circle mr-1"></i>주문 전체 취소</button>
 	            </div>
 	        </div>
@@ -251,6 +253,11 @@
 	            alert("서버 통신 오류가 발생했습니다.");
 	        }
 	    });
+	}
+	
+	function openPrintInvoice(odrcode) {
+	    const url = `${ctxPath}/admin/printInvoice.sp?odrcode=` + odrcode;
+	    window.open(url, "invoicePrint", "width=450, height=700, left=200, top=100, scrollbars=yes");
 	}
 	</script>
 	
