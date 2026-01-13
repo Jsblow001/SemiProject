@@ -2,159 +2,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
-<%
-    // =========================
-    // 0) midSort 기본값 (컨트롤러가 안 넣어줘도 안전)
-    // =========================
-    if (request.getAttribute("midSort") == null) {
-        String midSort = request.getParameter("midSort");
-        if (midSort == null || midSort.trim().isEmpty()) midSort = "reviewCount";
-        request.setAttribute("midSort", midSort);
-    }
-
-    // mid 리스트가 null이면(컨트롤러가 아직 미세팅) 빈 리스트로만 세팅 (데이터 창작 X)
-    if (request.getAttribute("mid_reviewCount") == null) request.setAttribute("mid_reviewCount", new java.util.ArrayList<>());
-    if (request.getAttribute("mid_recentSales") == null) request.setAttribute("mid_recentSales", new java.util.ArrayList<>());
-    if (request.getAttribute("mid_avgRating") == null) request.setAttribute("mid_avgRating", new java.util.ArrayList<>());
-    if (request.getAttribute("mid_newProduct") == null) request.setAttribute("mid_newProduct", new java.util.ArrayList<>());
-
-    // =========================
-    // 1) 상단 "인플루언서 리뷰" (더미 유지)
-    // =========================
-    if (request.getAttribute("heroReviews") == null) {
-
-        java.util.List<java.util.Map<String,Object>> heroReviews = new java.util.ArrayList<>();
-        java.util.Map<String,Object> h;
-
-        h = new java.util.HashMap<>();
-        h.put("image","img/review/r1.jpg");
-        h.put("rating",5);
-        h.put("title","[카린에이트×조은진님 협찬 리뷰] 카키 그레이 컬러가 오묘하면서도 빈티지한 매력");
-        h.put("code","RONENN_R_C2");
-        heroReviews.add(h);
-
-        h = new java.util.HashMap<>();
-        h.put("image","img/review/r2.jpg");
-        h.put("rating",5);
-        h.put("title","[카린에이트×하율님 협찬 리뷰] 어떤 룩에도 찰떡! 데일리로 손이 자주 가요");
-        h.put("code","ARNO_R_C3");
-        heroReviews.add(h);
-
-        h = new java.util.HashMap<>();
-        h.put("image","img/review/r3.jpg");
-        h.put("rating",5);
-        h.put("title","[카린에이트×OOO님 협찬 리뷰] 디테일이 예뻐서 포인트 주기 좋아요");
-        h.put("code","DENSE_C5");
-        heroReviews.add(h);
-
-        // 반복 더미
-        for(int k=0;k<3;k++){
-            h = new java.util.HashMap<>();
-            h.put("image","img/review/r1.jpg");
-            h.put("rating",5);
-            h.put("title","[카린에이트×조은진님 협찬 리뷰] 카키 그레이 컬러가 오묘하면서도 빈티지한 매력");
-            h.put("code","RONENN_R_C2");
-            heroReviews.add(h);
-
-            h = new java.util.HashMap<>();
-            h.put("image","img/review/r2.jpg");
-            h.put("rating",5);
-            h.put("title","[카린에이트×하율님 협찬 리뷰] 어떤 룩에도 찰떡! 데일리로 손이 자주 가요");
-            h.put("code","ARNO_R_C3");
-            heroReviews.add(h);
-
-            h = new java.util.HashMap<>();
-            h.put("image","img/review/r3.jpg");
-            h.put("rating",5);
-            h.put("title","[카린에이트×OOO님 협찬 리뷰] 디테일이 예뻐서 포인트 주기 좋아요");
-            h.put("code","DENSE_C5");
-            heroReviews.add(h);
-        }
-
-        request.setAttribute("heroReviews", heroReviews);
-        request.setAttribute("heroPageCount", (heroReviews.size() + 2) / 3);
-    }
-
-    // =========================
-    // 3) allReviews 더미(컨트롤러가 안 넣어준 경우만)
-    // =========================
-    if (request.getAttribute("allReviews") == null) {
-        java.util.List<java.util.Map<String,Object>> allReviews = new java.util.ArrayList<>();
-        java.util.Map<String,Object> r;
-
-        java.util.List<String> photos;
-        java.util.List<String> tags;
-
-        r = new java.util.HashMap<>();
-        r.put("writer","김**");
-        r.put("verified", 1);
-        r.put("date","오늘 작성");
-        r.put("rating", 5);
-        r.put("badge", "NEW");
-        r.put("productCode","DENSE_C5");
-        r.put("review_content","이번겨울에 추운날 안경하다가 픽 부러졌어요...\n2년가량 매일 잘 쓰고 다녔던 터라 아쉽지만 재구매 합니다.");
-        photos = new java.util.ArrayList<>();
-        photos.add("img/review/r3.jpg");
-        photos.add("img/review/r4.jpg");
-        r.put("photos", photos);
-        tags = new java.util.ArrayList<>();
-        tags.add("배송이 빨라요");
-        tags.add("포장이 꼼꼼해요");
-        tags.add("유니크한 디테일이 있어요");
-        tags.add("데일리로 착용하기 좋아요");
-        r.put("tags", tags);
-        r.put("commentCount", 0);
-        r.put("adminReply","소중한 후기 정말 감사드립니다~!!\n항상 고객님께 만족을 드릴 수 있도록 노력하겠습니다!\n고객님의 목소리로 더 발전하는 카린이 되겠습니다 :-)");
-        allReviews.add(r);
-
-        r = new java.util.HashMap<>();
-        r.put("writer","김**");
-        r.put("verified", 1);
-        r.put("date","1일 전 작성");
-        r.put("rating", 5);
-        r.put("badge", "NEW");
-        r.put("productCode","AIR 2 R_C2");
-        r.put("review_content","너무 예뻐요. 역시 카린은 믿고 삽니다! 🌿 감사합니다!");
-        photos = new java.util.ArrayList<>();
-        r.put("photos", photos);
-        tags = new java.util.ArrayList<>();
-        tags.add("배송이 빨라요");
-        tags.add("포장이 꼼꼼해요");
-        tags.add("데일리로 착용하기 좋아요");
-        tags.add("가벼워요");
-        r.put("tags", tags);
-        r.put("commentCount", 0);
-        r.put("adminReply","소중한 후기 정말 감사드립니다~!!\n항상 고객님께 만족을 드릴 수 있도록 노력하겠습니다!\n고객님의 목소리로 더 발전하는 카린이 되겠습니다 :-)");
-        allReviews.add(r);
-
-        r = new java.util.HashMap<>();
-        r.put("writer","송**");
-        r.put("verified", 0);
-        r.put("date","25.12.24 작성");
-        r.put("rating", 5);
-        r.put("badge", "");
-        r.put("productCode","RONENN_R_C4");
-        r.put("review_content","컬러가 묘~하게 빈티지하고 포인트 돼요.\n블루라이트 렌즈 덕분에 눈도 편합니다.");
-        photos = new java.util.ArrayList<>();
-        photos.add("img/review/r5.jpg");
-        photos.add("img/review/r1.jpg");
-        r.put("photos", photos);
-        tags = new java.util.ArrayList<>();
-        tags.add("컬러가 예뻐요");
-        tags.add("착용감이 좋아요");
-        r.put("tags", tags);
-        r.put("commentCount", 0);
-        r.put("adminReply","감사합니다. 더 좋은 상품으로 만족 드리겠습니다!");
-        allReviews.add(r);
-
-        request.setAttribute("allReviews", allReviews);
-    }
-
-    if (request.getAttribute("totalReviews") == null) {
-        request.setAttribute("totalReviews", 0);
-    }
-%>
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -174,42 +21,6 @@
   .stars{ display:inline-flex; gap:1px; font-size:12px; }
   .star{ color:#111; }
   .star.off{ color:#ddd; }
-
-  .hero-wrap{ padding:18px 0 24px; }
-  .hero-card{ border:1px solid #f2f2f2; border-radius:14px; overflow:hidden; background:#fff; height:100%; }
-  .hero-img{ aspect-ratio:1/1; background:#fafafa; overflow:hidden; }
-  .hero-img img{ width:100%; height:100%; object-fit:cover; }
-  .hero-body{ padding:10px 12px 14px; }
-  .hero-title{ margin-top:8px; font-size:12px; line-height:1.35; height:34px; overflow:hidden; }
-  .hero-code{ margin-top:8px; font-size:12px; color:#666; }
-
-  .hero-nav{
-    position:absolute; top:50%; transform:translateY(-50%);
-    width:44px; height:44px; border-radius:50%;
-    border:1px solid #ddd; background:#fff; z-index:20;
-  }
-  .hero-nav::before{
-    content:'‹'; font-size:26px; color:#111;
-    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-  }
-  .hero-nav.next::before{ content:'›'; }
-  .hero-nav.prev{ left:10px; }
-  .hero-nav.next{ right:10px; }
-
-  .carousel-nav{
-    position:absolute; top:50%; transform:translateY(-50%);
-    width:54px; height:120px;
-    background:rgba(0,0,0,.75); color:#fff;
-    border-radius:10px; display:flex;
-    align-items:center; justify-content:center;
-    font-size:34px; z-index:50;
-  }
-  .carousel-nav:hover{ background:rgba(0,0,0,.85); }
-  .carousel-nav.prev{ left:10px; }
-  .carousel-nav.next{ right:10px; }
-  @media (max-width:576px){
-    .carousel-nav{ width:44px; height:90px; font-size:28px; }
-  }
 
   .mid-tabs{
     display:flex; justify-content:center; align-items:center;
@@ -231,6 +42,21 @@
 
   @media (max-width:768px){
     .mid-col{ flex:0 0 50%; max-width:50%; }
+  }
+
+  .carousel-nav{
+    position:absolute; top:50%; transform:translateY(-50%);
+    width:54px; height:120px;
+    background:rgba(0,0,0,.75); color:#fff;
+    border-radius:10px; display:flex;
+    align-items:center; justify-content:center;
+    font-size:34px; z-index:50;
+  }
+  .carousel-nav:hover{ background:rgba(0,0,0,.85); }
+  .carousel-nav.prev{ left:10px; }
+  .carousel-nav.next{ right:10px; }
+  @media (max-width:576px){
+    .carousel-nav{ width:44px; height:90px; font-size:28px; }
   }
 
   .bottom-bar{
@@ -309,57 +135,22 @@
 <body>
 <jsp:include page="../header.jsp"/>
 
+<c:set var="midSort" value="${empty param.midSort ? 'reviewCount' : param.midSort}" />
+<c:set var="sort" value="${empty param.sort ? (empty sort ? 'recent' : sort) : param.sort}" />
+<c:set var="searchWord" value="${empty param.searchWord ? (empty searchWord ? '' : searchWord) : param.searchWord}" />
+
 <div class="wrap">
   <div class="inner">
     <div class="page-title">Reviews</div>
 
     <!-- =========================
-      상단 인플루언서 캐러셀 (Bootstrap)
-    ========================= -->
-    <div class="hero-wrap">
-      <div id="heroCarousel" class="carousel slide" data-ride="carousel" data-interval="false">
-        <div class="carousel-inner">
-          <c:forEach var="page" begin="0" end="${heroPageCount - 1}">
-            <div class="carousel-item ${page == 0 ? 'active' : ''}">
-              <div class="row">
-                <c:forEach var="i" begin="0" end="2">
-                  <c:set var="idx" value="${page*3 + i}" />
-                  <c:if test="${idx < heroReviews.size()}">
-                    <c:set var="h" value="${heroReviews[idx]}" />
-                    <div class="col-12 col-md-4 px-2">
-                      <a href="#" class="hero-card d-block">
-                        <div class="hero-img"><img src="${h.image}"></div>
-                        <div class="hero-body">
-                          <div class="stars">
-                            <c:forEach var="s" begin="1" end="5">
-                              <span class="star ${s > h.rating ? 'off' : ''}">★</span>
-                            </c:forEach>
-                          </div>
-                          <div class="hero-title">${h.title}</div>
-                          <div class="hero-code">${h.code}</div>
-                        </div>
-                      </a>
-                    </div>
-                  </c:if>
-                </c:forEach>
-              </div>
-            </div>
-          </c:forEach>
-        </div>
-
-        <a class="hero-nav prev" href="#heroCarousel" data-slide="prev"></a>
-        <a class="hero-nav next" href="#heroCarousel" data-slide="next"></a>
-      </div>
-    </div>
-
-    <!-- =========================
       ✅ 중단부: "탭 = 캐러셀 슬라이드" (4개씩, 각 탭 상위 4개)
-      ※ 화살표 prev/next = 앞/뒤 탭 이동 (wrap=true)
-      ※ 탭 순서(화살표 인접관계): 리뷰많은순 -> 최근판매량순 -> 리뷰평점순 -> 최근상품순 -> (wrap)
+      - 실데이터는 컨트롤러에서:
+        mid_reviewCount, mid_recentSales, mid_avgRating, mid_newProduct 로 내려온다고 가정
     ========================= -->
     <div class="mid-tabs" id="midTabs">
       <a href="javascript:void(0)" data-slide-to="0"
-         class="${empty midSort || midSort eq 'reviewCount' ? 'active' : ''}">리뷰 많은순</a>
+         class="${midSort eq 'reviewCount' ? 'active' : ''}">리뷰 많은순</a>
       <div class="divider"></div>
 
       <a href="javascript:void(0)" data-slide-to="1"
@@ -380,7 +171,7 @@
       <div class="carousel-inner">
 
         <!-- 0) 리뷰 많은순 -->
-        <div class="carousel-item ${empty midSort || midSort eq 'reviewCount' ? 'active' : ''}">
+        <div class="carousel-item ${midSort eq 'reviewCount' ? 'active' : ''}">
           <div class="row">
             <c:set var="list0" value="${mid_reviewCount}" />
             <c:forEach var="i" begin="0" end="3">
@@ -403,7 +194,6 @@
                   </div>
                 </c:when>
                 <c:otherwise>
-                  <!-- 데이터 부족 시: 빈 카드(준비중) -->
                   <div class="col-6 col-md-3 px-2 mid-col">
                     <div class="mid-card">
                       <div class="mid-main position-relative">
@@ -423,7 +213,7 @@
           </div>
         </div>
 
-        <!-- 1) 최근 판매량순 (결제완료만 집계한 값이 컨트롤러에서 들어온다고 가정) -->
+        <!-- 1) 최근 판매량순 -->
         <div class="carousel-item ${midSort eq 'recentSales' ? 'active' : ''}">
           <div class="row">
             <c:set var="list1" value="${mid_recentSales}" />
@@ -559,15 +349,15 @@
     </div>
 
     <!-- =========================
-      하단: allReviews (기존 유지)
+      하단: allReviews (실데이터)
     ========================= -->
     <div class="allreview-wrap" id="allReviews">
       <div class="bottom-bar">
         <div class="title">All Reviews</div>
         <div class="bottom-bar-right">
-          <a href="${pageContext.request.contextPath}/reviews.sp?sort=recent&searchWord=${fn:escapeXml(searchWord)}#allReviews"
+          <a href="${pageContext.request.contextPath}/reviews.sp?midSort=${midSort}&sort=recent&searchWord=${fn:escapeXml(searchWord)}#allReviews"
              class="${sort eq 'recent' ? 'active' : ''}">최신순</a>
-          <a href="${pageContext.request.contextPath}/reviews.sp?sort=rating&searchWord=${fn:escapeXml(searchWord)}#allReviews"
+          <a href="${pageContext.request.contextPath}/reviews.sp?midSort=${midSort}&sort=rating&searchWord=${fn:escapeXml(searchWord)}#allReviews"
              class="${sort eq 'rating' ? 'active' : ''}">별점 높은순</a>
           <span class="divider">|</span>
           <a href="javascript:void(0);" id="btnToggleSearch">직접검색</a>
@@ -579,117 +369,127 @@
 
       <div id="searchBox" style="display:none; margin-top:10px;">
         <form method="get" action="${pageContext.request.contextPath}/reviews.sp">
+          <input type="hidden" name="midSort" value="${midSort}" />
           <input type="hidden" name="sort" value="${sort}" />
           <input type="text" name="searchWord" value="${fn:escapeXml(searchWord)}" placeholder="제목/내용 검색" />
           <button type="submit">검색</button>
         </form>
       </div>
 
-      <c:forEach var="r" items="${allReviews}">
-        <div class="review-item">
-          <div class="r-left">
-            <div style="display:flex; gap:8px; align-items:center;">
-              <div style="font-weight:700; color:#111;">${r.writer}</div>
-              <c:if test="${r.verified == 1}">
-                <span class="pill">구매 인증</span>
-              </c:if>
-            </div>
-            <div>${r.date}</div>
-          </div>
-
-          <div class="r-right">
-            <div class="r-top">
-              <span class="stars">
-                <c:forEach var="i" begin="1" end="5">
-                  <c:choose>
-                    <c:when test="${i <= r.rating}">
-                      <span class="star">★</span>
-                    </c:when>
-                    <c:otherwise>
-                      <span class="star off">★</span>
-                    </c:otherwise>
-                  </c:choose>
-                </c:forEach>
-              </span>
-
-              <c:if test="${not empty r.badge}">
-                <span class="badge">${r.badge}</span>
-              </c:if>
-
-              <span class="prodcode">${r.productCode}</span>
-            </div>
-
-            <div class="r-content">${r.review_content}</div>
-
-            <c:if test="${not empty r.photos}">
-              <div class="r-photos">
-                <c:forEach var="ph" items="${r.photos}" varStatus="st">
-                  <c:if test="${st.index < 2}">
-                    <div class="r-photo"><img src="${ph}" alt="review photo"></div>
-                  </c:if>
-                </c:forEach>
-              </div>
-            </c:if>
-
-            <c:if test="${not empty r.tags}">
-              <div class="r-tags">
-                <c:forEach var="t" items="${r.tags}">
-                  <span class="tag">${t}</span>
-                </c:forEach>
-              </div>
-            </c:if>
-
-            <div class="r-actions">
-              <a>💬 댓글 ${r.commentCount}</a>
-              <a href="#">⚑ 신고</a>
-            </div>
-
-            <c:if test="${not empty r.adminReply}">
-              <div class="admin-reply">
-                ${r.adminReply}
-                <div class="admin-name">카린 올림</div>
-              </div>
-            </c:if>
-          </div>
-        </div>
-      </c:forEach>
-    </div>
-
-    <!-- 페이지네이션(기존 유지) -->
-    <div class="pager" style="margin-top:26px;">
       <c:choose>
-        <c:when test="${currentShowPageNo > 1}">
-          <a class="arrow"
-             href="${pageContext.request.contextPath}/reviews.sp?sort=${sort}&searchWord=${fn:escapeXml(searchWord)}&currentShowPageNo=${currentShowPageNo-1}#allReviews"
-             aria-label="이전">&lsaquo;</a>
+        <c:when test="${empty allReviews}">
+          <div style="padding:22px 0; color:#666; font-size:13px;">등록된 리뷰가 없습니다.</div>
         </c:when>
         <c:otherwise>
-          <span class="arrow" aria-label="이전">&lsaquo;</span>
+          <c:forEach var="r" items="${allReviews}">
+            <div class="review-item">
+              <div class="r-left">
+                <div style="display:flex; gap:8px; align-items:center;">
+                  <div style="font-weight:700; color:#111;">${r.writer}</div>
+                  <c:if test="${r.verified == 1}">
+                    <span class="pill">구매 인증</span>
+                  </c:if>
+                </div>
+                <div>${r.date}</div>
+              </div>
+
+              <div class="r-right">
+                <div class="r-top">
+                  <span class="stars">
+                    <c:forEach var="i" begin="1" end="5">
+                      <c:choose>
+                        <c:when test="${i <= r.rating}">
+                          <span class="star">★</span>
+                        </c:when>
+                        <c:otherwise>
+                          <span class="star off">★</span>
+                        </c:otherwise>
+                      </c:choose>
+                    </c:forEach>
+                  </span>
+
+                  <c:if test="${not empty r.badge}">
+                    <span class="badge">${r.badge}</span>
+                  </c:if>
+
+                  <span class="prodcode">${r.productCode}</span>
+                </div>
+
+                <div class="r-content">${r.review_content}</div>
+
+                <c:if test="${not empty r.photos}">
+                  <div class="r-photos">
+                    <c:forEach var="ph" items="${r.photos}" varStatus="st">
+                      <c:if test="${st.index < 2}">
+                        <div class="r-photo"><img src="${ph}" alt="review photo"></div>
+                      </c:if>
+                    </c:forEach>
+                  </div>
+                </c:if>
+
+                <c:if test="${not empty r.tags}">
+                  <div class="r-tags">
+                    <c:forEach var="t" items="${r.tags}">
+                      <span class="tag">${t}</span>
+                    </c:forEach>
+                  </div>
+                </c:if>
+
+                <div class="r-actions">
+                  <a>💬 댓글 ${r.commentCount}</a>
+                  <a href="#">⚑ 신고</a>
+                </div>
+
+                <c:if test="${not empty r.adminReply}">
+                  <div class="admin-reply">
+                    ${r.adminReply}
+                    <div class="admin-name">카린 올림</div>
+                  </div>
+                </c:if>
+              </div>
+            </div>
+          </c:forEach>
         </c:otherwise>
       </c:choose>
+    </div>
 
-      <c:forEach var="p" begin="1" end="${totalPage}">
+    <!-- 페이지네이션 -->
+    <c:if test="${not empty totalPage && totalPage > 1}">
+      <div class="pager" style="margin-top:26px;">
         <c:choose>
-          <c:when test="${p == currentShowPageNo}">
-            <span class="active">${p}</span>
+          <c:when test="${currentShowPageNo > 1}">
+            <a class="arrow"
+               href="${pageContext.request.contextPath}/reviews.sp?midSort=${midSort}&sort=${sort}&searchWord=${fn:escapeXml(searchWord)}&currentShowPageNo=${currentShowPageNo-1}#allReviews"
+               aria-label="이전">&lsaquo;</a>
           </c:when>
           <c:otherwise>
-            <a href="${pageContext.request.contextPath}/reviews.sp?sort=${sort}&searchWord=${fn:escapeXml(searchWord)}&currentShowPageNo=${p}#allReviews">${p}</a>
+            <span class="arrow" aria-label="이전">&lsaquo;</span>
           </c:otherwise>
         </c:choose>
-      </c:forEach>
 
-      <c:choose>
-        <c:when test="${currentShowPageNo < totalPage}">
-          <a class="arrow"
-             href="${pageContext.request.contextPath}/reviews.sp?sort=${sort}&searchWord=${fn:escapeXml(searchWord)}&currentShowPageNo=${currentShowPageNo+1}#allReviews"
-             aria-label="다음">&rsaquo;</a>
-        </c:when>
-        <c:otherwise>
-          <span class="arrow" aria-label="다음">&rsaquo;</span>
-        </c:otherwise>
-      </c:choose>
-    </div>
+        <c:forEach var="p" begin="1" end="${totalPage}">
+          <c:choose>
+            <c:when test="${p == currentShowPageNo}">
+              <span class="active">${p}</span>
+            </c:when>
+            <c:otherwise>
+              <a href="${pageContext.request.contextPath}/reviews.sp?midSort=${midSort}&sort=${sort}&searchWord=${fn:escapeXml(searchWord)}&currentShowPageNo=${p}#allReviews">${p}</a>
+            </c:otherwise>
+          </c:choose>
+        </c:forEach>
+
+        <c:choose>
+          <c:when test="${currentShowPageNo < totalPage}">
+            <a class="arrow"
+               href="${pageContext.request.contextPath}/reviews.sp?midSort=${midSort}&sort=${sort}&searchWord=${fn:escapeXml(searchWord)}&currentShowPageNo=${currentShowPageNo+1}#allReviews"
+               aria-label="다음">&rsaquo;</a>
+          </c:when>
+          <c:otherwise>
+            <span class="arrow" aria-label="다음">&rsaquo;</span>
+          </c:otherwise>
+        </c:choose>
+      </div>
+    </c:if>
 
     <a href="${pageContext.request.contextPath}/reviewWrite.sp"
        class="btn btn-dark shadow review-float-btn" id="reviewFloatBtn">
@@ -700,7 +500,7 @@
 </div>
 
 <script>
-/* 하단 플로팅 버튼(기존 유지) */
+/* 하단 플로팅 버튼 */
 (function(){
   const btn = document.getElementById('reviewFloatBtn');
   if(!btn) return;
@@ -735,7 +535,7 @@
   });
 })();
 
-/* 직접검색 토글(기존 유지) */
+/* 직접검색 토글 */
 (function(){
   const toggleBtn = document.getElementById('btnToggleSearch');
   const iconBtn = document.getElementById('btnSearchIcon');
@@ -750,7 +550,7 @@
   if(iconBtn) iconBtn.addEventListener('click', toggle);
 })();
 
-/* ✅ midSortCarousel 탭 동기화(수정본: DOM 기준 index, event.relatedTarget 미사용) */
+/* ✅ midSortCarousel 탭 동기화( DOM 기준 index ) */
 (function(){
   const $carousel = $('#midSortCarousel');
   const $tabs = $('#midTabs a[data-slide-to]');
