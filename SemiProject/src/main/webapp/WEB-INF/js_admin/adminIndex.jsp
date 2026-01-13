@@ -42,7 +42,7 @@
                <div class="card dashboard-card p-4" style="border-left: 5px solid #BCAA8F !important;">
                    <p class="text-muted mb-2">New Orders</p>
                    <h2 class="font-weight-bold">${(newOrderCount != null) ? newOrderCount : 0} 건</h2>
-                   <a href="<%= ctxPath%>/admin/allproductList.sp" class="small text-wood font-weight-bold mt-2">주문 내역 관리 ></a>
+                   <a href="<%= ctxPath%>/admin/adminOrderList.sp" class="small text-wood font-weight-bold mt-2">주문 내역 관리 ></a>
                </div>
            </div>
            <div class="col-md-4 mb-4">
