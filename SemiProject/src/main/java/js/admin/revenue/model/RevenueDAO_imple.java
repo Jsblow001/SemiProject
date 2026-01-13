@@ -114,4 +114,63 @@ public class RevenueDAO_imple implements RevenueDAO {
         
         return bestSeller;
     }
+
+    // 주간 인기 상품 TOP 5 (최근 7일)
+    @Override
+    public List<Map<String, String>> getTop5ProductsWeekly() {
+        // TRUNC(SYSDATE) - 6 : 오늘 포함 최근 7일간의 데이터
+        return getTop5ByPeriod(" WHERE O.odrdate >= TRUNC(SYSDATE) - 6 ");
+    }
+
+    // 월간 인기 상품 TOP 5 (최근 35일 또는 이번 달)
+    @Override
+    public List<Map<String, String>> getTop5ProductsMonthly() {
+        // TRUNC(SYSDATE) - 34 : 최근 5주간의 데이터 (차트 범위와 일치)
+        return getTop5ByPeriod(" WHERE O.odrdate >= TRUNC(SYSDATE) - 34 ");
+    }
+
+    // [공통 로직] 기간 조건을 파라미터로 받는 내부 메서드
+ // [공통 로직] 기간 조건을 파라미터로 받는 내부 메서드
+    private List<Map<String, String>> getTop5ByPeriod(String dateCondition) {
+        List<Map<String, String>> top5List = new ArrayList<>();
+        try {
+            conn = ds.getConnection();
+            
+            String sql = " SELECT product_name, category_name, total_qty, total_price, image_filename " +
+                         " FROM ( " +
+                         "      SELECT P.product_name, C.category_name, " +
+                         "             SUM(D.odrqty) AS total_qty, " +
+                         "             SUM(D.odrqty * D.odrprice) AS total_price, " +
+                         "             (SELECT MIN(image_filename) FROM tbl_product_image WHERE fk_product_id = P.product_id) AS image_filename " +
+                         "      FROM tbl_order_detail D " +
+                         "      JOIN tbl_product P ON D.fk_product_id = P.product_id " +
+                         "      JOIN tbl_category C ON P.fk_category_id = C.category_id " +
+                         "      JOIN tbl_order O ON D.fk_odrcode = O.odrcode " + 
+                                dateCondition + // <--- 여기가 핵심! 물음표 대신 전달받은 조건절을 넣습니다.
+                         "        AND O.payment_status = 1 " +
+                         "      GROUP BY P.product_id, P.product_name, C.category_name " +
+                         "      ORDER BY total_qty DESC " +
+                         " ) WHERE ROWNUM <= 5 ";
+            
+            pstmt = conn.prepareStatement(sql);
+            
+            rs = pstmt.executeQuery();
+            
+            while (rs.next()) {
+                Map<String, String> map = new HashMap<>();
+                map.put("pname", rs.getString("product_name"));
+                map.put("categoryName", rs.getString("category_name"));
+                map.put("totalCount", rs.getString("total_qty"));
+                map.put("totalPrice", rs.getString("total_price"));
+                String img = rs.getString("image_filename");
+                map.put("pimage", (img == null) ? "no-image.png" : img);
+                top5List.add(map);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            close();
+        }
+        return top5List;
+    }
 }

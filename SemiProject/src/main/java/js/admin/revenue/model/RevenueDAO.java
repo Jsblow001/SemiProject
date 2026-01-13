@@ -13,4 +13,11 @@ public interface RevenueDAO {
     
     // 가장 많이 팔린 상품명 가져오기
     String getBestSellerName();
+    
+    // 주간 인기 상품 TOP 5 (최근 7일 기준)
+    List<Map<String, String>> getTop5ProductsWeekly();
+    
+    // 월간 인기 상품 TOP 5 (이번 달 기준)
+    List<Map<String, String>> getTop5ProductsMonthly();
+    
 }
