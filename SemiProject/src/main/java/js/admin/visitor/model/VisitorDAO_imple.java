@@ -8,7 +8,10 @@ import javax.naming.InitialContext;
 
 public class VisitorDAO_imple implements VisitorDAO {
 
-    private DataSource ds;
+	private DataSource ds; // context.xml 에 설정된 DBCP 객체
+	private Connection conn;
+	private PreparedStatement pstmt;
+	private ResultSet rs;
 
     public VisitorDAO_imple() {
         try {
@@ -20,25 +23,46 @@ public class VisitorDAO_imple implements VisitorDAO {
         }
     }
 
-    // 자원 반납을 위한 공통 메서드 (Try-with-resources를 사용하므로 명시적 호출은 줄어듭니다)
-    private void close(Connection conn, PreparedStatement pstmt, ResultSet rs) {
+    // ===== 자원 반납 =====
+    private void close() {
         try {
-            if (rs != null) rs.close();
-            if (pstmt != null) pstmt.close();
-            if (conn != null) conn.close();
-        } catch (SQLException e) { e.printStackTrace(); }
+            if (rs != null)    { rs.close(); rs = null; }
+            if (pstmt != null) { pstmt.close(); pstmt = null; }
+            if (conn != null)  { conn.close(); conn = null; }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     // 1. 방문자 기록 저장
     @Override
     public void insertVisitor(String ip, String memberId) {
-        String sql = " INSERT INTO visitor_log (v_idx, v_ip, v_date, last_access, member_id) " +
-                     " VALUES (seq_visitor_log.NEXTVAL, ?, SYSDATE, SYSDATE, ?) ";
-        try (Connection conn = ds.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, ip);
-            pstmt.setString(2, memberId);
-            pstmt.executeUpdate();
+        // 오늘 해당 IP로 기록이 이미 있는지 확인하는 쿼리
+        String checkSql = " SELECT COUNT(*) FROM visitor_log WHERE v_ip = ? AND TRUNC(v_date) = TRUNC(SYSDATE) ";
+        
+        String insertSql = " INSERT INTO visitor_log (v_idx, v_ip, v_date, last_access, member_id) " +
+                           " VALUES (seq_visitor_log.NEXTVAL, ?, SYSDATE, SYSDATE, ?) ";
+
+        try (Connection conn = ds.getConnection()) {
+            int count = 0;
+            try (PreparedStatement pstmt = conn.prepareStatement(checkSql)) {
+                pstmt.setString(1, ip);
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    if (rs.next()) count = rs.getInt(1);
+                }
+            }
+
+            if (count == 0) {
+                // 오늘 처음 방문한 IP인 경우에만 신규 입력
+                try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
+                    pstmt.setString(1, ip);
+                    pstmt.setString(2, memberId);
+                    pstmt.executeUpdate();
+                }
+            } else {
+                // 이미 방문한 적이 있다면 시간만 갱신 (updateLastAccess 호출과 동일)
+                updateLastAccess(ip);
+            }
         } catch (SQLException e) { e.printStackTrace(); }
     }
 
@@ -68,15 +92,15 @@ public class VisitorDAO_imple implements VisitorDAO {
         return count;
     }
 
- // 4. 오늘/어제 방문자 수 (중복 제거 버전)
+    // 4. 오늘/어제 방문자 수 (중복 제거 버전)
     @Override
     public int getVisitorCount(String type, String day) {
         int count = 0;
-        String targetDate = "today".equals(day) ? "SYSDATE" : "SYSDATE-1";
+        String targetDate = "today".equals(day) ? "TRUNC(SYSDATE)" : "TRUNC(SYSDATE-1)";
         
-        // [수정 포인트] COUNT(*) 대신 COUNT(DISTINCT v_ip)를 사용합니다.
-        StringBuilder sql = new StringBuilder(" SELECT COUNT(DISTINCT v_ip) FROM visitor_log ");
-        sql.append(" WHERE TO_CHAR(v_date, 'YYYY-MM-DD') = TO_CHAR(").append(targetDate).append(", 'YYYY-MM-DD') ");
+        // [핵심 수정] IP와 ID 조합으로 유니크 방문자 계산
+        StringBuilder sql = new StringBuilder(" SELECT COUNT(DISTINCT(v_ip || NVL(member_id, 'guest'))) FROM visitor_log ");
+        sql.append(" WHERE TRUNC(v_date) = ").append(targetDate);
         
         if ("member".equals(type)) {
             sql.append(" AND member_id IS NOT NULL ");
@@ -116,7 +140,8 @@ public class VisitorDAO_imple implements VisitorDAO {
         List<Integer> stats = new ArrayList<>();
         StringBuilder sql = new StringBuilder();
         
-        sql.append(" SELECT b.dt, COUNT(a.v_idx) ")
+        // [핵심 수정] DISTINCT를 IP와 ID 조합으로 걸어줍니다.
+        sql.append(" SELECT b.dt, COUNT(DISTINCT(a.v_ip || NVL(a.member_id, 'guest'))) ")
            .append(" FROM visitor_log a, ")
            .append("      (SELECT TO_CHAR(SYSDATE - LEVEL + 1, 'YYYY-MM-DD') AS dt FROM DUAL CONNECT BY LEVEL <= 7) b ")
            .append(" WHERE b.dt = TO_CHAR(a.v_date(+), 'YYYY-MM-DD') ");
@@ -136,11 +161,6 @@ public class VisitorDAO_imple implements VisitorDAO {
                 stats.add(rs.getInt(2));
             }
         } catch (SQLException e) { e.printStackTrace(); }
-        
-        // 데이터가 7개가 안 채워졌을 경우를 대비한 방어 로직 (보통 쿼리에서 해결되지만 안전장치)
-        while(stats.size() < 7) {
-            stats.add(0, 0); 
-        }
         
         return stats;
     }
