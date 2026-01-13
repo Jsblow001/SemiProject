@@ -282,18 +282,52 @@ public class QnaDAO_imple implements QnaDAO {
     // 댓글 등록
     public void insertComment(int qnaId, String memberId, String content) throws Exception {
 
-        String sql =
+        // 1. 댓글 삽입 쿼리
+        String insertSql =
             " INSERT INTO qna_comment(comment_id, fk_qna_id, fk_member_id, content, regdate) " +
             " VALUES (seq_qna_comment.NEXTVAL, ?, ?, ?, SYSDATE) ";
 
-        try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        // 2. 답변 상태 업데이트 쿼리 (qna 테이블의 answered 컬럼을 1(완료)로 변경)
+        // 컬럼명은 실제 DB 설계에 맞춰 'is_answered' 혹은 'status' 등으로 수정하세요.
+        String updateSql =
+            " UPDATE TBL_QNA SET answer = 1 WHERE qna_id = ? ";
 
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+
+        try {
+            conn = getConnection();
+            // 트랜잭션 시작 (자동 커밋 방지)
+            conn.setAutoCommit(false);
+
+            // [작업 1] 댓글 등록
+            pstmt = conn.prepareStatement(insertSql);
             pstmt.setInt(1, qnaId);
             pstmt.setString(2, memberId);
             pstmt.setString(3, content);
-
             pstmt.executeUpdate();
+
+            // [작업 2] 작성자가 admin인 경우에만 qna 테이블 업데이트
+            if ("admin".equalsIgnoreCase(memberId)) {
+                pstmt.close(); // 기존 pstmt 닫기
+                pstmt = conn.prepareStatement(updateSql);
+                pstmt.setInt(1, qnaId);
+                pstmt.executeUpdate();
+            }
+
+            // 모든 작업 성공 시 커밋
+            conn.commit();
+
+        } catch (Exception e) {
+            // 오류 발생 시 롤백 (댓글만 달리고 상태가 안 변하는 등 방지)
+            if (conn != null) conn.rollback();
+            throw e;
+        } finally {
+            if (conn != null) {
+                conn.setAutoCommit(true); // 기본 설정 복구
+                conn.close();
+            }
+            if (pstmt != null) pstmt.close();
         }
     }
 
