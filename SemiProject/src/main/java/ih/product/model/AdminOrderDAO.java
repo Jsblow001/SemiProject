@@ -25,4 +25,11 @@ public interface AdminOrderDAO {
 
 	// 운송장 업데이트
 	int updateInvoice(String odrdetailno, String invoice_no) throws SQLException;
+	
+	// 운송장 출력을 위한 주문 정보 불러오기
+	AdminOrderDTO getOrderDetail(String odrcode) throws SQLException;
+	
+	// 운송장 출력을 위한 주문 세부 정보 불러오기
+	List<AdminOrderDTO> getOrderDetailList(String odrcode) throws SQLException;
+	
 }
