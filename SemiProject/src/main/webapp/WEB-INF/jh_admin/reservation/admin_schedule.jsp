@@ -26,6 +26,7 @@
 </style>
 </head>
 <body>
+<jsp:include page="../../header2.jsp"/>
 <div class="wrap">
   <h2>예약 스케줄(관리자)</h2>
 
@@ -281,5 +282,6 @@
     return out;
   }
 </script>
+<jsp:include page="../../footer2.jsp"/>
 </body>
 </html>

@@ -27,7 +27,7 @@ public class AdminScheduleBoardController extends AbstractController {
     	
 
     	// testmode!
-    	boolean testMode = false;
+    	boolean testMode = true;
 
     	HttpSession session = request.getSession();
     	MemberDTO loginuser = (MemberDTO) session.getAttribute("loginuser");
