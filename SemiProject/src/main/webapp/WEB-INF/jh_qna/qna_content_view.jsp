@@ -58,13 +58,13 @@
 	          </div>
 	
 	          <div style="margin-top:8px;">
-	            <img src="${pageContext.request.contextPath}/images/qna/${f.saveFilename}"
+	            <img src="${pageContext.request.contextPath}/img/qna/${f.saveFilename}"
 	                 style="max-width:100%; border-radius:10px; border:1px solid #eee;"
 	                 onerror="this.style.display='none';" />
 	          </div>
 	
 	          <div style="margin-top:8px; font-size:12px;">
-	            <a href="${pageContext.request.contextPath}/images/qna/${f.saveFilename}" target="_blank">
+	            <a href="${pageContext.request.contextPath}/img/qna/${f.saveFilename}" target="_blank">
 	              원본 보기
 	            </a>
 	          </div>

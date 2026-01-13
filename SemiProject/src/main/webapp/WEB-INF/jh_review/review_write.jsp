@@ -69,7 +69,7 @@
 
     <div class="row">
       <label class="label">사진(선택, 복수 가능)</label>
-      <input type="file" id="reviewImages" name="review_images" accept="image/*" multiple disabled />
+      <input type="file" id="reviewImages" name="files" multiple accept="image/*" />
     </div>
 
     <div class="row">
