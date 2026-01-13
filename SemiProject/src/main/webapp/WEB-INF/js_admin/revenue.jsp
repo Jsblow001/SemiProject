@@ -105,7 +105,7 @@
 
 <script>
     let currentChart = null;
-    // [수정] top5 데이터를 주간/월간으로 나누어 담도록 구조 변경
+    // top5 데이터를 주간/월간으로 나누어 담도록 구조 변경
     let dbChartData = { 
         weekly: {}, 
         monthly: {}, 
