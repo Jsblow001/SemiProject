@@ -1,0 +1,336 @@
+/* =========================
+   Base
+========================= */
+*{ box-sizing:border-box; }
+body{ margin:0; font-family: Arial, "Noto Sans KR", sans-serif; color:#111; background:#fff; }
+a{ color:inherit; text-decoration:none; }
+a:hover{ text-decoration:none; }
+
+.wrap{ width:100%; padding:24px 0 80px; }
+.inner{ width:92%; max-width:1500px; margin:0 auto; }
+.page-title{ font-size:26px; font-weight:500; letter-spacing:.3px; margin:26px 0 18px; }
+
+/* =========================
+   Stars
+========================= */
+.stars{ display:inline-flex; gap:1px; font-size:12px; }
+.star{ color:#111; }
+.star.off{ color:#ddd; }
+
+/* =========================
+   Mid Tabs
+========================= */
+.mid-tabs{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:14px;
+  margin:30px 0 14px;
+  font-size:13px;
+}
+.mid-tabs a{ color:#999; font-weight:500; }
+.mid-tabs a.active{ color:#111; font-weight:700; }
+.mid-tabs .divider{ width:1px; height:12px; background:#e2e2e2; }
+
+/* =========================
+   Mid Carousel (탭 캐러셀: 한 탭당 4개)
+   - 탭(슬라이드) 4장: reviewCount / recentSales / avgRating / newProduct
+========================= */
+
+/* 각 탭(슬라이드) 안에서 4개 카드 가로 정렬 */
+.mid-row{ display:flex; width:100%; }
+
+/* PC: 4열 */
+.mid-col{ flex:0 0 25%; max-width:25%; padding:0 10px; }
+
+/* 태블릿: 2열 */
+@media (max-width: 992px){
+  .mid-col{ flex:0 0 50%; max-width:50%; }
+}
+
+/* 모바일: 1열 */
+@media (max-width: 576px){
+  .mid-col{ flex:0 0 100%; max-width:100%; }
+}
+
+/* 카드 */
+.midrank-card{
+  border:1px solid #f0f0f0;
+  border-radius:16px;
+  background:#fff;
+  padding:14px;
+  height:100%;
+}
+.mid-main{
+  background:#f6f6f6;
+  border-radius:16px;
+  aspect-ratio: 1/1.15;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+.mid-main img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+.midrank-body{ margin-top:12px; }
+.midrank-title{ font-weight:700; font-size:12px; }
+.midrank-meta{
+  font-size:12px;
+  color:#666;
+  margin-top:6px;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.midrank-actions{ margin-top:8px; }
+
+/* =========================
+   Bottom Bar (All Reviews 상단)
+========================= */
+.bottom-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 0 12px;
+  border-top:1px solid #ededed;
+  border-bottom:1px solid #ededed;
+  margin-top:18px;
+}
+.bottom-bar-right{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  font-size:12px;
+  color:#666;
+}
+.bottom-bar-right a{ color:#666; text-decoration:none; }
+.bottom-bar-right a.active{ color:#111; font-weight:600; }
+.bottom-bar-right .divider{ color:#cfcfcf; }
+
+/* =========================
+   Search box slide down
+========================= */
+.searchbox{
+  overflow:hidden;
+  max-height:0;
+  opacity:0;
+  transform: translateY(-6px);
+  margin-top:0;
+  transition: max-height .25s ease, opacity .18s ease, transform .18s ease, margin-top .25s ease;
+}
+.searchbox.open{
+  max-height:120px;
+  opacity:1;
+  transform: translateY(0);
+  margin-top:10px;
+}
+.searchbox input[type="text"]{
+  width: min(420px, 100%);
+  height: 34px;
+  border:1px solid #ddd;
+  border-radius:10px;
+  padding:0 12px;
+  font-size:13px;
+  outline:none;
+}
+.searchbox button{
+  height:34px;
+  border:1px solid #2b2321;
+  background:#2b2321;
+  color:#fff;
+  border-radius:10px;
+  padding:0 12px;
+  margin-left:8px;
+  cursor:pointer;
+}
+
+/* =========================
+   All Reviews list
+========================= */
+.allreview-wrap{
+  margin-top:28px;
+  padding-top:18px;
+  border-top:1px solid #ededed;
+}
+.review-item{
+  display:grid;
+  grid-template-columns: 160px 1fr;
+  gap:18px;
+  padding:18px 0;
+  border-bottom:1px solid #f1f1f1;
+}
+.r-left{
+  font-size:12px;
+  color:#666;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.pill{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  height:18px;
+  padding:0 8px;
+  border-radius:999px;
+  border:1px solid #eaeaea;
+  font-size:11px;
+  color:#666;
+  width:max-content;
+  background:#fff;
+}
+.r-right{ min-width:0; }
+
+.r-top{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  border-radius:12px;
+  background:#fafafa;
+}
+.badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  height:18px;
+  padding:0 8px;
+  border-radius:999px;
+  background:#3b82f6;
+  color:#fff;
+  font-size:11px;
+}
+.prodcode{
+  font-size:12px;
+  font-weight:700;
+  color:#111;
+  margin-left:6px;
+}
+
+.r-content{
+  padding:12px 0 10px;
+  font-size:13px;
+  line-height:1.55;
+  color:#111;
+  white-space:pre-line;
+}
+.r-photos{
+  margin-top:6px;
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap:12px;
+  max-width:420px;
+}
+.r-photo{
+  border-radius:12px;
+  overflow:hidden;
+  background:#f2f2f2;
+  aspect-ratio: 1 / 1;
+}
+.r-photo img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+  transform:scale(1);
+  transition:transform .25s ease;
+}
+.r-photo:hover img{ transform:scale(1.06); }
+
+.r-tags{
+  margin-top:12px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.tag{
+  font-size:11px;
+  color:#555;
+  border:1px solid #ececec;
+  background:#f7f7f7;
+  padding:6px 10px;
+  border-radius:999px;
+}
+
+.r-actions{
+  margin-top:14px;
+  display:flex;
+  align-items:center;
+  gap:16px;
+  color:#666;
+  font-size:12px;
+}
+.r-actions a{ color:#666; }
+.r-actions a:hover{ color:#111; text-decoration:none; }
+
+.admin-reply{
+  margin-top:14px;
+  border-top:1px solid #eee;
+  padding-top:12px;
+  color:#444;
+  font-size:12px;
+  line-height:1.5;
+  white-space:pre-line;
+}
+.admin-name{ margin-top:10px; font-size:12px; color:#666; }
+
+/* ✅ 리뷰 목록 영역 링크 밑줄 제거 */
+.allreview-wrap .review-item a,
+.allreview-wrap .review-item a:hover,
+.allreview-wrap .review-item a:focus,
+.allreview-wrap .review-item a:active{
+  text-decoration:none !important;
+}
+
+/* =========================
+   Pager
+========================= */
+.pager{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  color:#777;
+  font-size:12px;
+}
+.pager a, .pager span{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:30px;
+  height:30px;
+  border-radius:8px;
+  border:1px solid #ececec;
+  padding:0 8px;
+  background:#fff;
+}
+.pager a:hover{ border-color:#ddd; text-decoration:none; }
+.pager .active{ border-color:#111; color:#111; font-weight:700; }
+.pager .arrow{ color:#666; font-size:14px; }
+
+/* =========================
+   Floating button
+========================= */
+.review-float-btn{
+  position: fixed;
+  right: 30px;
+  bottom: 30px;
+  z-index: 9999;
+  border-radius: 999px;
+  padding: 12px 16px;
+  font-size: 13px;
+  line-height: 1;
+}
+
+/* =========================
+   Mobile tweaks (All Reviews)
+========================= */
+@media (max-width: 560px){
+  .review-item{ grid-template-columns: 1fr; }
+  .bottom-bar-right{ gap:10px; }
+  .bottom-bar-right .divider{ display:none; }
+}

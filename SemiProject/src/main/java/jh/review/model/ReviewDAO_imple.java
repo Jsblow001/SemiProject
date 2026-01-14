@@ -368,7 +368,7 @@ public class ReviewDAO_imple implements ReviewDAO {
     
     
     @Override
-    public List<Map<String, Object>> selectMidRankProducts(String sortKey, int limit) throws SQLException {
+    public List<Map<String, Object>> selectMidRankProducts(String sortKey, int limit, String userid) throws SQLException {
 
         List<Map<String, Object>> list = new ArrayList<>();
 
@@ -382,14 +382,16 @@ public class ReviewDAO_imple implements ReviewDAO {
                 // 1) 리뷰 많은순
                 case "reviewCount":
                     sql =
-                        " SELECT p.product_id, p.product_name AS code, " +
+                        " SELECT p.product_id, p.product_name AS code, p.pimage, " +
                         "        COUNT(r.review_id) AS review_cnt, " +
                         "        NVL(ROUND(AVG(r.rating), 1), 0) AS avg_rating, " +
-                        "        TO_CHAR(p.stock_date, 'yyyy-mm-dd') AS stock_date " +
+                        "        TO_CHAR(p.stock_date, 'yyyy-mm-dd') AS stock_date, " +
+                        "        (SELECT COUNT(*) FROM tbl_wishlist " +
+                        "          WHERE product_id = p.product_id AND member_id = ?) AS is_wish " +
                         " FROM tbl_product p " +
                         " LEFT JOIN tbl_product_review r " +
                         "   ON r.fk_product_id = p.product_id " +
-                        " GROUP BY p.product_id, p.product_name, p.stock_date " +
+                        " GROUP BY p.product_id, p.product_name, p.pimage, p.stock_date " +
                         " ORDER BY review_cnt DESC, p.product_id DESC " +
                         " FETCH FIRST ? ROWS ONLY ";
                     break;
@@ -397,27 +399,31 @@ public class ReviewDAO_imple implements ReviewDAO {
                 // 2) 리뷰 평점순 (리뷰 있는 상품만)
                 case "avgRating":
                     sql =
-                        " SELECT p.product_id, p.product_name AS code, " +
+                        " SELECT p.product_id, p.product_name AS code, p.pimage, " +
                         "        COUNT(r.review_id) AS review_cnt, " +
                         "        ROUND(AVG(r.rating), 1) AS avg_rating, " +
-                        "        TO_CHAR(p.stock_date, 'yyyy-mm-dd') AS stock_date " +
+                        "        TO_CHAR(p.stock_date, 'yyyy-mm-dd') AS stock_date, " +
+                        "        (SELECT COUNT(*) FROM tbl_wishlist " +
+                        "          WHERE product_id = p.product_id AND member_id = ?) AS is_wish " +
                         " FROM tbl_product p " +
                         " JOIN tbl_product_review r " +
                         "   ON r.fk_product_id = p.product_id " +
-                        " GROUP BY p.product_id, p.product_name, p.stock_date " +
+                        " GROUP BY p.product_id, p.product_name, p.pimage, p.stock_date " +
                         " ORDER BY avg_rating DESC, review_cnt DESC, p.product_id DESC " +
                         " FETCH FIRST ? ROWS ONLY ";
                     break;
 
-                // 3) 최근 판매량순 (최근 주문일 큰 순 → 그 다음 판매수량)
+                // 3) 최근 30일 판매량순 (월간)
                 case "recentSales":
                     sql =
-                        " SELECT p.product_id, p.product_name AS code, " +
+                        " SELECT p.product_id, p.product_name AS code, p.pimage, " +
                         "        MAX(o.odrdate) AS last_sale_date, " +
                         "        SUM(od.odrqty) AS sale_qty, " +
                         "        COUNT(r.review_id) AS review_cnt, " +
                         "        NVL(ROUND(AVG(r.rating), 1), 0) AS avg_rating, " +
-                        "        TO_CHAR(p.stock_date, 'yyyy-mm-dd') AS stock_date " +
+                        "        TO_CHAR(p.stock_date, 'yyyy-mm-dd') AS stock_date, " +
+                        "        (SELECT COUNT(*) FROM tbl_wishlist " +
+                        "          WHERE product_id = p.product_id AND member_id = ?) AS is_wish " +
                         " FROM tbl_product p " +
                         " JOIN tbl_order_detail od " +
                         "   ON od.fk_product_id = p.product_id " +
@@ -425,26 +431,26 @@ public class ReviewDAO_imple implements ReviewDAO {
                         "   ON o.odrcode = od.fk_odrcode " +
                         " LEFT JOIN tbl_product_review r " +
                         "   ON r.fk_product_id = p.product_id " +
-                        " WHERE o.payment_status = 1 " +   // ✅ A안: 결제완료만 집계 (JOIN 뒤에!)
-                        " GROUP BY p.product_id, p.product_name, p.stock_date " +
-                        " ORDER BY MAX(o.odrdate) DESC, SUM(od.odrqty) DESC, p.product_id DESC " +
+                        " WHERE o.payment_status = 1 " +
+                        "   AND o.odrdate >= TRUNC(SYSDATE) - 30 " +
+                        " GROUP BY p.product_id, p.product_name, p.pimage, p.stock_date " +
+                        " ORDER BY SUM(od.odrqty) DESC, MAX(o.odrdate) DESC, p.product_id DESC " +
                         " FETCH FIRST ? ROWS ONLY ";
                     break;
-
-
-
 
                 // 4) 최근 상품순 (입고일 최신)
                 case "newProduct":
                     sql =
-                        " SELECT p.product_id, p.product_name AS code, " +
+                        " SELECT p.product_id, p.product_name AS code, p.pimage, " +
                         "        COUNT(r.review_id) AS review_cnt, " +
                         "        NVL(ROUND(AVG(r.rating), 1), 0) AS avg_rating, " +
-                        "        TO_CHAR(p.stock_date, 'yyyy-mm-dd') AS stock_date " +
+                        "        TO_CHAR(p.stock_date, 'yyyy-mm-dd') AS stock_date, " +
+                        "        (SELECT COUNT(*) FROM tbl_wishlist " +
+                        "          WHERE product_id = p.product_id AND member_id = ?) AS is_wish " +
                         " FROM tbl_product p " +
                         " LEFT JOIN tbl_product_review r " +
                         "   ON r.fk_product_id = p.product_id " +
-                        " GROUP BY p.product_id, p.product_name, p.stock_date " +
+                        " GROUP BY p.product_id, p.product_name, p.pimage, p.stock_date " +
                         " ORDER BY p.stock_date DESC, p.product_id DESC " +
                         " FETCH FIRST ? ROWS ONLY ";
                     break;
@@ -454,7 +460,10 @@ public class ReviewDAO_imple implements ReviewDAO {
             }
 
             pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, limit);
+
+            // ✅ userid가 null이어도 바인딩 가능 (is_wish=0으로 나옴)
+            pstmt.setString(1, userid);
+            pstmt.setInt(2, limit);
 
             rs = pstmt.executeQuery();
 
@@ -463,16 +472,13 @@ public class ReviewDAO_imple implements ReviewDAO {
 
                 m.put("productId", rs.getLong("product_id"));
                 m.put("code", rs.getString("code"));
+                m.put("pimage", rs.getString("pimage"));
 
-                // 이미지 컬럼이 DB에 없으니 일단 기본값(또는 null)로
-                m.put("main", "img/product/default.png");
-
-                // 공통
                 m.put("count", rs.getInt("review_cnt"));
                 m.put("rating", rs.getDouble("avg_rating"));
                 m.put("stockDate", rs.getString("stock_date"));
+                m.put("isWish", rs.getInt("is_wish"));
 
-                // recentSales 전용
                 if ("recentSales".equals(sortKey)) {
                     m.put("salesQty", rs.getInt("sale_qty"));
                 }
@@ -481,11 +487,13 @@ public class ReviewDAO_imple implements ReviewDAO {
             }
 
         } finally {
-            close(); // 너 프로젝트에서 쓰는 자원반납 메서드
+            close();
         }
 
         return list;
     }
+
+
     
     
     @Override
