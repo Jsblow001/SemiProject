@@ -31,7 +31,7 @@ public class MyReservationsController extends AbstractController {
         }
 
         Map<String,String> paraMap = new HashMap<>();
-        paraMap.put("memberUserid", loginuser.getUserid());
+        paraMap.put("userid", loginuser.getUserid());
 
         List<Map<String,String>> list = dao.selectMyReservations(paraMap);
 
