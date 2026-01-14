@@ -5,139 +5,194 @@
 <jsp:include page="../header2.jsp" />
 
 <style>
-    /* ================================
-       CARIN 브랜드 아이덴티티 스타일
-       ================================ */
-    :root {
-        --carin-black: #1a1a1a;
-        --carin-gray: #757575;
-        --carin-light-gray: #f2f2f2;
-        --carin-border: #e0e0e0;
-        --carin-point: #bcaaa4; /* 토프 브라운 */
-    }
+  /* ================================
+   ADMIN CLAIM – REFINED UI
+================================ */
+:root {
+    --carin-black: #1a1a1a;
+    --carin-gray: #8c8c8c;
+    --carin-light-gray: #f7f7f7;
+    --carin-border: #e6e6e6;
+    --carin-point: #bcaaa4;
+    --success: #4caf50;
+    --danger: #e53935;
+}
 
-    .carin-admin-wrap {
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 60px 20px;
-        font-family: 'Pretendard', sans-serif;
-        background-color: #fff;
-    }
+/* 전체 래퍼 */
+.carin-admin-wrap {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 60px 24px 120px;
+    background: #fff;
+    font-family: 'Pretendard', sans-serif;
+}
 
-    .page-title {
-        font-size: 22px;
-        font-weight: 600;
-        letter-spacing: 0.15em;
-        text-transform: uppercase;
-        margin-bottom: 50px;
-        color: var(--carin-black);
-        text-align: center;
-    }
+/* 타이틀 */
+.page-title {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-align: center;
+    margin-bottom: 60px;
+}
 
-    /* ================================
-       상단 요약 섹션
-       ================================ */
-    .summary-section {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 80px;
-    }
+/* ================================
+   SUMMARY CARD
+================================ */
+.summary-section {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    margin-bottom: 70px;
+}
 
-    .summary-item {
-        flex: 1;
-        max-width: 250px;
-        padding: 40px 20px;
-        border: 1px solid var(--carin-border);
-        margin-left: -1px;
-        text-align: center;
-    }
+.summary-item {
+    background: var(--carin-light-gray);
+    border-radius: 12px;
+    padding: 32px 24px;
+    min-width: 220px;
+    text-align: center;
+}
 
-    .summary-item .label {
-        display: block;
-        font-size: 11px;
-        color: var(--carin-gray);
-        letter-spacing: 0.1em;
-        margin-bottom: 15px;
-    }
+.summary-item .label {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--carin-gray);
+    margin-bottom: 12px;
+}
 
-    .summary-item .count {
-        font-size: 24px;
-        font-weight: 500;
-        color: var(--carin-black);
-    }
+.summary-item .count {
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--carin-black);
+}
 
-    /* ================================
-       테이블 디자인
-       ================================ */
-    .return-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 13px;
-    }
+/* ================================
+   TABLE
+================================ */
+.return-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 14px;
+    font-size: 13px;
+}
 
-    .return-table th {
-        padding: 20px 10px;
-        font-weight: 600;
-        color: #444;
-        border-bottom: 1px solid var(--carin-border);
-        text-align: center;
-    }
+.return-table thead th {
+    font-size: 12px;
+    color: var(--carin-gray);
+    font-weight: 500;
+    padding: 10px;
+    text-align: center;
+}
 
-    .return-table td {
-        padding: 25px 10px;
-        border-bottom: 1px solid #f9f9f9;
-        color: #333;
-        text-align: center;
-        vertical-align: middle;
-    }
+.return-table tbody tr {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    transition: transform .15s ease, box-shadow .15s ease;
+}
 
-    /* ================================
-       상태 뱃지 & 버튼
-       ================================ */
-    .badge {
-        font-size: 10px;
-        padding: 4px 10px;
-        letter-spacing: 0.05em;
-        border: 1px solid var(--carin-border);
-        color: #888;
-        display: inline-block;
-        text-transform: uppercase;
-    }
+.return-table tbody tr:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
 
-    .badge.cancel { border-color: #f44336; color: #f44336; }
-    .badge.return { border-color: var(--carin-point); color: var(--carin-point); }
-    .badge.exchange { border-color: var(--carin-black); color: var(--carin-black); }
+.return-table td {
+    padding: 18px 14px;
+    text-align: center;
+    vertical-align: middle;
+}
 
-    .btn-group {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        align-items: center;
-    }
+.return-table td:first-child {
+    border-radius: 12px 0 0 12px;
+}
 
-    .btn-admin {
-        background: none;
-        border: 1px solid var(--carin-black);
-        color: var(--carin-black);
-        padding: 7px 15px;
-        font-size: 11px;
-        cursor: pointer;
-        transition: 0.3s;
-        width: 100px;
-    }
+.return-table td:last-child {
+    border-radius: 0 12px 12px 0;
+}
 
-    .btn-admin:hover { background: var(--carin-black); color: #fff; }
+/* ================================
+   BADGE
+================================ */
+.badge {
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 11px;
+    border-radius: 999px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+}
 
-    .btn-approve {
-        background-color: var(--carin-point);
-        border: 1px solid var(--carin-point);
-        color: #fff;
-    }
+.badge.cancel { background: #fdecea; color: var(--danger); }
+.badge.return { background: #f3edea; color: var(--carin-point); }
+.badge.exchange { background: #ececec; color: #333; }
 
-    .btn-reject {
-        border-color: #ddd;
-        color: #999;
-    }
+.badge.request { background: #f5f5f5; color: #777; }
+.badge.wait { background: #f3edea; color: var(--carin-point); }
+.badge.done { background: #edf7ed; color: var(--success); }
+.badge.reject { background: #f5f5f5; color: #999; }
+
+
+/* ================================
+   ADMIN MANAGEMENT BUTTON – BROWN (FINAL)
+================================ */
+
+:root {
+    --admin-brown: #5d4037;
+    --admin-brown-hover: #4e342e;
+}
+
+/* 버튼 그룹 */
+.btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* 공통 버튼 */
+.btn-admin {
+    font-size: 11px;
+    padding: 8px 0;
+    border-radius: 4px;
+    border: 1px solid #d6d6d6;
+    background: #fff;
+    color: #333;
+    cursor: pointer;
+    transition: background .15s ease, color .15s ease;
+}
+
+/* 승인 / 처리완료 */
+.btn-approve {
+    background: var(--admin-brown);
+    border-color: var(--admin-brown);
+    color: #fff;
+}
+
+.btn-approve:hover {
+    background: var(--admin-brown-hover);
+    border-color: var(--admin-brown-hover);
+}
+
+/* 반려 */
+.btn-reject {
+    background: #fff;
+    color: #777;
+    border-color: #ddd;
+}
+
+.btn-reject:hover {
+    background: #f2f2f2;
+    color: #444;
+}
+
+/* 비활성 */
+.btn-admin:disabled {
+    background: #f5f5f5;
+    color: #aaa;
+    border-color: #e0e0e0;
+    cursor: not-allowed;
+}
+
 </style>
 
 <script>
