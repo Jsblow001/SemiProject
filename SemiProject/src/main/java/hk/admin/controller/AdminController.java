@@ -1,9 +1,15 @@
 package hk.admin.controller;
 
 import sp.common.controller.AbstractController;
+
+import java.util.List;
+
 import hk.member.domain.MemberDTO;
 import hk.member.model.MemberDAO;
 import hk.member.model.MemberDAO_imple;
+import ih.product.domain.AdminOrderDTO;
+import ih.product.model.AdminOrderDAO;
+import ih.product.model.AdminOrderDAO_imple;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -14,6 +20,7 @@ public class AdminController extends AbstractController {
 
    MemberDAO mdao = new MemberDAO_imple();
    MyQnaListDAO mydao = new MyQnaListDAO_imple();
+   AdminOrderDAO odao = new AdminOrderDAO_imple();
    
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -49,9 +56,24 @@ public class AdminController extends AbstractController {
         int totalCount  = mdao.getTotalMemberCount();
         int newQnACount = mydao.noCommentCnt();
 
+        List<AdminOrderDTO> orderList = odao.selectAllOrder();
+        
+        int newOrderCount = 0;
+        int totalOrderCount = 0;
+        
+        if(orderList != null) {
+            totalOrderCount = orderList.size();
+            for(AdminOrderDTO dto : orderList) {
+                int status = dto.getDeliverystatus();
+                
+                if(status == 1) newOrderCount++;
+            }
+        }
+              
         // 2. JSP에서 사용할 이름으로 request 영역에 저장
         request.setAttribute("totalCount", totalCount); 
         request.setAttribute("newQnACount", newQnACount);
+        request.setAttribute("newOrderCount", newOrderCount);
         
         // ===============================
         // 관리자 메인 페이지 보여주기 (껍데기)
