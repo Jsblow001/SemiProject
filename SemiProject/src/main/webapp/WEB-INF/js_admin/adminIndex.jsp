@@ -120,59 +120,82 @@
                 </div>
             </div>
 
-            <%-- 4. 반품/취소 요청 현황 --%>
-            <div class="row">
-                <div class="col-12">
-                    <div class="card dashboard-card p-4 border-0">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h5 class="font-weight-bold m-0 text-danger"><i class="fas fa-exclamation-circle mr-2"></i>반품/취소 요청 현황</h5>
-                            <a href="<%= ctxPath%>/admin/claimList.sp" class="btn btn-sm btn-light font-weight-bold px-3">클레임 전체보기</a>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover table-v-center border-bottom mb-0 text-center">
-                                <thead class="bg-light text-muted small font-weight-bold">
-                                    <tr>
-                                        <th>주문번호</th>
-                                        <th>주문자</th>
-                                        <th class="text-left">상품정보</th>
-                                        <th>요청유형</th>
-                                        <th>사유</th>
-                                        <th>요청일자</th>
-                                        <th>처리상태</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <c:choose>
-                                        <c:when test="${not empty returnRequestList}">
-                                            <c:forEach var="item" items="${returnRequestList}">
-                                                <tr>
-                                                    <td class="font-weight-bold">${item.odrcode}</td>
-                                                    <td>${item.memberName}</td>
-                                                    <td class="text-left"><div class="small">${item.pName}</div></td>
-                                                    <td>
-                                                        <span class="badge ${item.requestType eq '반품' ? 'badge-danger' : 'badge-warning'} p-2 px-3">
-                                                            ${item.requestType}
-                                                        </span>
-                                                    </td>
-                                                    <td class="text-muted small">${item.reason}</td>
-                                                    <td class="small">${item.requestDate}</td>
-                                                    <td><button class="btn btn-sm btn-dark px-3" onclick="handleReturn('${item.odrcode}')">승인</button></td>
-                                                </tr>
-                                            </c:forEach>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <tr><td colspan="7" class="text-center py-5 text-muted font-weight-bold">현재 접수된 반품/취소 요청이 없습니다.</td></tr>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+            
+			<%-- 4. 반품/취소 요청 현황 (미처리 건만 표시) --%>
+			<div class="row">
+			    <div class="col-12">
+			        <div class="card dashboard-card p-4 border-0">
+			            <div class="d-flex justify-content-between align-items-center mb-4">
+			                <h5 class="font-weight-bold m-0 text-danger">
+			                    <i class="fas fa-exclamation-circle mr-2"></i>미처리 클레임 현황
+			                </h5>
+			                <a href="<%= ctxPath%>/admin/claimList.sp" class="btn btn-sm btn-light font-weight-bold px-3">전체보기</a>
+			            </div>
+			            <div class="table-responsive">
+			                <table class="table table-hover table-v-center border-bottom mb-0 text-center">
+			                    <thead class="bg-light text-muted small font-weight-bold">
+			                        <tr>
+			                            <th style="width: 15%;">주문번호</th>
+			                            <th class="text-left" style="width: 40%;">상품명</th>
+			                            <th style="width: 15%;">요청유형</th>
+			                            <th style="width: 20%;">사유</th>
+			                            <th style="width: 10%;">상태</th>
+			                        </tr>
+			                    </thead>
+			                    <tbody>
+			                        <c:set var="pendingCount" value="0" />
+			                        <c:choose>
+			                            <c:when test="${not empty returnRequestList}">
+			                                <c:forEach var="c" items="${returnRequestList}">
+			                                    <%-- 처리 완료(APPROVED, REJECTED)가 아닌 '신청(REQUEST)' 상태만 출력 --%>
+			                                    <c:if test="${c.claimStatus eq 'REQUEST' and pendingCount lt 5}">
+			                                        <c:set var="pendingCount" value="${pendingCount + 1}" />
+			                                        <tr onclick="location.href='<%= ctxPath %>/admin/claimList.sp'" style="cursor:pointer;">
+			                                            <%-- 1. 주문번호 --%>
+			                                            <td class="font-weight-bold text-dark">${c.odrCode}</td>
+			                                            
+			                                            <%-- 2. 상품명 --%>
+			                                            <td class="text-left">
+			                                                <div class="small text-truncate" style="max-width:400px;">
+			                                                    ${c.productName}
+			                                                </div>
+			                                            </td>
+			                                            
+			                                            <%-- 3. 요청유형 --%>
+			                                            <td>
+			                                                <span class="badge ${c.claimType eq 'CANCEL' ? 'badge-danger' : 'badge-warning'} p-2 px-3" style="font-size: 11px;">
+			                                                    ${c.claimType eq 'CANCEL' ? '취소' : '반품'}
+			                                                </span>
+			                                            </td>
+			                                            
+			                                            <%-- 4. 사유 --%>
+			                                            <td class="text-muted small text-truncate">
+			                                                <div style="max-width:200px; margin: 0 auto;">${c.claimReason}</div>
+			                                            </td>
+			                                            
+			                                            <%-- 5. 상태 (미처리 건이므로 '대기'로 표시) --%>
+			                                            <td>
+			                                                <span class="badge badge-secondary p-2">접수대기</span>
+			                                            </td>
+			                                        </tr>
+			                                    </c:if>
+			                                </c:forEach>
+			                                
+			                                <%-- 만약 리스트는 있지만 필터링 결과 처리할 건이 하나도 없을 때 --%>
+			                                <c:if test="${pendingCount eq 0}">
+			                                    <tr><td colspan="5" class="text-center py-5 text-muted font-weight-bold">새로 들어온 요청이 없습니다.</td></tr>
+			                                </c:if>
+			                            </c:when>
+			                            <c:otherwise>
+			                                <tr><td colspan="5" class="text-center py-5 text-muted font-weight-bold">접수된 클레임 요청이 없습니다.</td></tr>
+			                            </c:otherwise>
+			                        </c:choose>
+			                    </tbody>
+			                </table>
+			            </div>
+			        </div>
+			    </div>
+			</div>
 
 <jsp:include page="../footer2.jsp" />
 
