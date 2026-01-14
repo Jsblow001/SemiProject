@@ -35,10 +35,9 @@
             border-radius: 5px;
         }
 
-        /* 스케치 이미지 기반 등급 원형 스타일 */
         .grade-circle {
-            width: 80px;
-            height: 80px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             border: 2px solid #5D4037;
             background-color: #fff;
@@ -47,9 +46,26 @@
             justify-content: center;
             font-weight: 700;
             color: #5D4037;
-            font-size: 14px;
+            font-size: 13px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             margin: 0 auto;
+        }
+
+        /* 정보수정 버튼 스타일 */
+        .btn-edit-profile {
+            display: inline-block;
+            padding: 8px 18px;
+            border: 1px solid #5D4037;
+            color: #5D4037;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 30px;
+            text-decoration: none !important;
+            transition: all 0.3s ease;
+        }
+        .btn-edit-profile:hover {
+            background: #5D4037;
+            color: #fff;
         }
         
         .btn-mypage-card {
@@ -71,78 +87,55 @@
         .card-title { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 5px; }
         .card-desc { font-size: 12px; color: #999; }
    
-         .account-box {
-          border-top: 1px solid #eee;
-          color: #888;
-      }
-      
-      .account-title {
-          font-size: 13px;
-          letter-spacing: 2px;
-          margin-bottom: 10px;
-          color: #aaa;
-      }
-      
-      .account-actions {
-          font-size: 13px;
-      }
-      
-      .account-link {
-          color: #777;
-          text-decoration: none;
-          transition: color .2s;
-      }
-      
-      .account-link:hover {
-          color: #5D4037;
-      }
-      
-      .account-link.withdraw:hover {
-          color: #c62828;
-      }
-      
-      .divider {
-          margin: 0 10px;
-          color: #ccc;
-      }
+        .account-box { border-top: 1px solid #eee; color: #888; }
+        .account-title { font-size: 13px; letter-spacing: 2px; margin-bottom: 10px; color: #aaa; }
+        .account-actions { font-size: 13px; }
+        .account-link { color: #777; text-decoration: none; transition: color .2s; }
+        .account-link:hover { color: #5D4037; }
+        .account-link.withdraw:hover { color: #c62828; }
+        .divider { margin: 0 10px; color: #ccc; }
     </style>
 </head>
 <body>
 
-    <%-- 상단 헤더 인클루드 --%>
     <jsp:include page="../header.jsp" />
 
     <div class="container mypage-container">
         
-        <%-- 사용자 요약 정보 영역 (등급 테이블 연동) --%>
-        <div class="summary-box row align-items-center mx-0">
-            <div class="col-md-6 border-right py-2">
-                <h2 style="font-size: 26px; font-weight: 500; letter-spacing: 1px; color: #333;">MY PAGE</h2>
-                <p class="text-muted mb-0" style="font-size: 15px; margin-top: 10px;">
-                    반갑습니다, <span style="color: #5D4037; font-weight: 700; font-size: 18px;">${sessionScope.loginuser.name}</span>님!
-                    <br>
-                    현재 고객님은 <span style="color: #5D4037; font-weight: 600;">${sessionScope.loginuser.grade_name}</span> 등급입니다.
-                </p>
-            </div>
-            
-            <div class="col-md-6 d-flex justify-content-around align-items-center py-2">
-                <%-- 포인트 표시 --%>
-                <div class="text-center">
-                    <div style="font-size: 12px; color: #888; margin-bottom: 8px; letter-spacing: 1px;">MEMBERSHIP</div>
-                    <div class="grade-circle">
-                        ${sessionScope.loginuser.grade_name}
-                    </div>
-                </div>
-
-                <%-- 회원 등급 원형 표시 (이미지 반영) --%>
-                <div class="text-center border-left pl-5">
-                    <div style="font-size: 12px; color: #888; margin-bottom: 8px; letter-spacing: 1px;">AVAILABLE POINT</div>
-                    <div style="font-weight: 600; font-size: 22px; color: #5D4037;">
-                        <fmt:formatNumber value="${sessionScope.loginuser.point}" pattern="#,###" /> <span style="font-size: 16px;">P</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <%-- 사용자 요약 정보 영역 (등급 원형 아래에 포인트 배치) --%>
+		<div class="summary-box row align-items-center mx-0">
+		    <div class="col-md-5 border-right py-2">
+		        <h2 style="font-size: 26px; font-weight: 500; letter-spacing: 1px; color: #333;">MY PAGE</h2>
+		        <p class="text-muted mb-0" style="font-size: 15px; margin-top: 10px;">
+		            반갑습니다, <span style="color: #5D4037; font-weight: 700; font-size: 18px;">${sessionScope.loginuser.name}</span>님!
+		        </p>
+		    </div>
+		    
+		    <div class="col-md-4 border-right py-2 text-center">
+		        <div style="font-size: 12px; color: #888; margin-bottom: 12px; letter-spacing: 1px;">MEMBERSHIP & POINT</div>
+		        
+		        <%-- 등급 원형 --%>
+		        <div class="grade-circle mb-3">
+		            ${sessionScope.loginuser.grade_name}
+		        </div>
+		        
+		        <%-- 원 바로 밑에 포인트 배치 --%>
+		        <div class="text-center">
+		            <div style="font-weight: 600; font-size: 20px; color: #5D4037; line-height: 1.2;">
+		                <fmt:formatNumber value="${sessionScope.loginuser.point}" pattern="#,###" /> <span style="font-size: 14px;">P</span>
+		            </div>
+		            
+		            
+		        </div>
+		    </div>
+		
+		    <div class="col-md-3 py-2 text-center">
+		        <div style="font-size: 12px; color: #888; margin-bottom: 12px; letter-spacing: 1px;">ACCOUNT MANAGEMENT</div>
+		        <a href="<%= ctxPath %>/js_member/memberedit.sp" class="btn-edit-profile">
+		            내 정보 수정 <i class="ml-1">→</i>
+		        </a>
+		    </div>
+		</div>
 
         <%-- 메뉴 카드 영역 --%>
         <div class="row text-center mb-5">
@@ -154,10 +147,10 @@
                 </a>
             </div>
             <div class="col-md-3 mb-4">
-                <a href="<%= ctxPath %>/js_member/memberedit.sp" class="btn-mypage-card">
-                    <div class="card-icon">👤</div>
-                    <div class="card-title">정보수정</div>
-                    <div class="card-desc">내 정보 및 비밀번호 변경</div>
+                <a href="<%= ctxPath %>/myReservations.sp" class="btn-mypage-card">
+                    <div class="card-icon">📅</div>
+                    <div class="card-title">예약확인</div>
+                    <div class="card-desc">매장 예약 확인</div>
                 </a>
             </div>
             <div class="col-md-3 mb-4">
@@ -170,7 +163,7 @@
             <div class="col-md-3 mb-4">
                 <a href="<%= ctxPath %>/customer/myQnaList.sp" class="btn-mypage-card">
                     <div class="card-icon">💬</div>
-                    <div class="card-title">나의문의</div>
+                    <div class="card-title">내 문의</div>
                     <div class="card-desc">1:1 문의 내역 확인</div>
                 </a>
             </div>
@@ -194,29 +187,17 @@
                 </thead>
                 <tbody class="text-center">
 				    <c:choose>
-				
-				        <%-- 최근 주문이 있는 경우 --%>
 				        <c:when test="${not empty recentOrderList}">
 				            <c:forEach var="o" items="${recentOrderList}" varStatus="status" end="4">
 				                <tr>
 				                	<td>${status.count}</td>
-				                    <td>
-				                        <fmt:formatDate value="${o.odrDate}" pattern="yyyy-MM-dd"/>
-				                    </td>
-				                    <td>
-				                        ${o.productName}
-				                    </td>
-				                    <td>
-				                        <fmt:formatNumber value="${o.odrTotalPrice}" pattern="#,###"/>원
-				                    </td>
-				                    <td>
-				                        ${o.paymentStatusName}
-				                    </td>
+				                    <td><fmt:formatDate value="${o.odrDate}" pattern="yyyy-MM-dd"/></td>
+				                    <td>${o.productName}</td>
+				                    <td><fmt:formatNumber value="${o.odrTotalPrice}" pattern="#,###"/>원</td>
+				                    <td>${o.paymentStatusName}</td>
 				                </tr>
 				            </c:forEach>
 				        </c:when>
-				
-				        <%-- 최근 주문이 없는 경우 --%>
 				        <c:otherwise>
 				            <tr>
 				                <td colspan="5" class="py-5 text-muted">
@@ -224,30 +205,22 @@
 				                </td>
 				            </tr>
 				        </c:otherwise>
-				
 				    </c:choose>
+                </tbody>
             </table>
         </div>
         
          <%-- 계정 관리 영역 --%>
          <div class="account-box mt-5 pt-4 text-center">
              <div class="account-title">계정 설정</div>
-         
              <div class="account-actions">
-                 <a href="<%=ctxPath%>/logout.sp" class="account-link">
-                     로그아웃
-                 </a>
+                 <a href="<%=ctxPath%>/logout.sp" class="account-link">로그아웃</a>
                  <span class="divider">|</span>
-                 <a href="<%=ctxPath%>/withdraw.sp" class="account-link withdraw">
-                     회원탈퇴
-                 </a>
+                 <a href="<%=ctxPath%>/withdraw.sp" class="account-link withdraw">회원탈퇴</a>
              </div>
          </div>
- 
     </div>
      
-
-    <%-- 하단 푸터 인클루드 --%>
     <jsp:include page="../footer.jsp" />
 
 </body>
