@@ -114,7 +114,7 @@
 	  let html = "";
 	  list.forEach(it => {
 	    const imgFile = (it.pimage1 && String(it.pimage1).trim()) ? String(it.pimage1).trim() : "";
-	    const img = imgFile ? (ctx + "/" + imgFile) : (ctx + "/img/glasses/product_1.png");
+	    const img = imgFile ? (ctx + "/img/" + imgFile) : (ctx + "/img/glasses/product_1.png");
 
 	    const detailUrl = ctx + "/product/productDetail.sp?product_id=" + encodeURIComponent(it.pnum);
 
