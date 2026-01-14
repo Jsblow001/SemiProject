@@ -404,34 +404,22 @@ public class OrderDAO_imple implements OrderDAO {
 
 
     
-    // 주문취소/교환/반품 신청 후 1단계: 관리자 승인 / 반려
-    public int approveOrRejectClaim(int odrDetailNo, String action) throws SQLException {
+    // 주문취소/교환/반품 신청 후 관리자 승인
+    public int approveClaim(int odrDetailNo, String action) throws SQLException {
         
     	int result = 0;
 
         try {
             conn = ds.getConnection();
 
-            if ("APPROVE".equals(action)) {
-                String sql =
-                    " UPDATE tbl_order_detail " +
-                    " SET claim_status = 'APPROVED' " +
-                    " WHERE odrdetailno = ? ";
+            String sql =
+                " UPDATE tbl_order_detail " +
+                " SET claim_status = 'APPROVED' " +
+                " WHERE odrdetailno = ? ";
 
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setInt(1, odrDetailNo);
-                result = pstmt.executeUpdate();
-
-            } else { // REJECT
-                String sql =
-                    " UPDATE tbl_order_detail " +
-                    " SET claim_status = 'REJECTED' " +
-                    " WHERE odrdetailno = ? ";
-
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setInt(1, odrDetailNo);
-                result = pstmt.executeUpdate();
-            }
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, odrDetailNo);
+            result = pstmt.executeUpdate();
 
         } finally {
             close();
@@ -468,6 +456,74 @@ public class OrderDAO_imple implements OrderDAO {
         }
 
         return cnt;
+    }
+
+    
+    
+    // 반려 사유 창 주문내역 조회용
+    public OrderDetailDTO getClaimDetail(int odrDetailNo) throws SQLException {
+
+        OrderDetailDTO dto = null;
+
+        try {
+            conn = ds.getConnection();
+
+            String sql =
+                " SELECT d.odrdetailno, d.fk_odrcode, d.odrqty, d.claim_type, " +
+                "        d.claim_reason, p.product_name " +
+                " FROM tbl_order_detail d " +
+                " JOIN tbl_product p ON d.fk_product_id = p.product_id " +
+                " WHERE d.odrdetailno = ? ";
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, odrDetailNo);
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                dto = new OrderDetailDTO();
+                dto.setOdrDetailNo(rs.getInt("odrdetailno"));
+                dto.setOdrCode(rs.getInt("fk_odrcode"));
+                dto.setOdrQty(rs.getInt("odrqty"));
+                dto.setClaimType(rs.getString("claim_type"));
+                dto.setClaimReason(rs.getString("claim_reason"));
+                dto.setProductName(rs.getString("product_name"));
+            }
+
+        } finally {
+            close();
+        }
+
+        return dto;
+    }
+
+    
+    
+    // 주문취소/교환/반품 신청 후 관리자 반려용
+    @Override
+    public int rejectClaim(int odrDetailNo, String rejectReason) throws SQLException {
+
+        int result = 0;
+
+        try {
+            conn = ds.getConnection();
+
+            String sql =
+                " UPDATE tbl_order_detail " +
+                " SET claim_status = 'REJECTED', " +
+                "     reject_reason = ? " +
+                " WHERE odrdetailno = ? ";
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, rejectReason);
+            pstmt.setInt(2, odrDetailNo);
+
+            result = pstmt.executeUpdate();
+
+        } finally {
+            close();
+        }
+
+        return result;
     }
 
 

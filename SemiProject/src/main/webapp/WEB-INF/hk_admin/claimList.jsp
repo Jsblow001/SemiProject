@@ -141,19 +141,6 @@
 </style>
 
 <script>
-    // ================================
-    // 승인 / 반려 처리
-    // ================================
-    function processClaim(odrdetailno, action) {
-        let actionKor = (action === 'APPROVE') ? '승인' : '반려';
-        if(!confirm("해당 요청을 " + actionKor + " 처리하시겠습니까?")) return;
-
-        location.href =
-            "${pageContext.request.contextPath}/admin/claimApprove.sp" +
-            "?odrdetailno=" + odrdetailno +
-            "&action=" + action;
-    }
-
     // [CHANGED] 처리완료(환불/배송취소/재고반영) 전용
     function completeClaim(odrdetailno) {
         if(!confirm("해당 요청을 처리완료 하시겠습니까?\n(결제취소/배송취소/재고반영 진행)")) return;
@@ -162,6 +149,7 @@
             "${pageContext.request.contextPath}/admin/claimComplete.sp" +
             "?odrdetailno=" + odrdetailno;
     }
+
 </script>
 
 <div class="carin-admin-wrap">
@@ -229,7 +217,7 @@
                     ${c.claimReason}
                 </td>
 
-                <!-- 🔴 [CHANGED] 상태 표시 분기 -->
+                <!--  [CHANGED] 상태 표시 분기 -->
                 <td>
                     <c:choose>
                         <c:when test="${c.claimStatus == 'REQUEST'}">
@@ -253,7 +241,7 @@
                     </c:choose>
                 </td>
 
-                <!-- [CHANGED] 매니지먼트 버튼 분기 (핵심) -->
+                <!-- [CHANGED] 매니지먼트 버튼 분기 -->
                 <td>
                     <div class="btn-group">
                        <c:choose>
@@ -261,13 +249,15 @@
 					    <%-- 1️ 요청 상태 --%>
 					    <c:when test="${c.claimStatus == 'REQUEST'}">
 					        <button class="btn-admin btn-approve"
-					                onclick="processClaim('${c.odrDetailNo}','APPROVE')">
-					            승인
-					        </button>
-					        <button class="btn-admin btn-reject"
-					                onclick="processClaim('${c.odrDetailNo}','REJECT')">
-					            반려
-					        </button>
+						        onclick="location.href='${pageContext.request.contextPath}/admin/claimApprove.sp?odrdetailno=${c.odrDetailNo}'">
+						     승인
+							</button>
+
+					       <button class="btn-admin btn-reject"
+						        onclick="location.href='${pageContext.request.contextPath}/admin/claimReject.sp?odrdetailno=${c.odrDetailNo}'">
+						   반려
+						   </button>
+
 					    </c:when>
 					
 					    <%-- 2️ 승인됨 (처리대기) --%>

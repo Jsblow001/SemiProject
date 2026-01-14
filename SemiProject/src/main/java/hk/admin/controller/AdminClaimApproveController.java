@@ -17,7 +17,7 @@ public class AdminClaimApproveController extends AbstractController {
         System.out.println("odrdetailno = " + odrDetailNo);
         System.out.println("action = " + action);
         
-        odao.approveOrRejectClaim(odrDetailNo, action);
+        odao.approveClaim(odrDetailNo, action);
 
         super.setRedirect(true);
         super.setViewPage(request.getContextPath() + "/admin/claimList.sp");
