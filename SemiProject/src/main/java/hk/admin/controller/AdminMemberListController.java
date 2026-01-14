@@ -58,7 +58,7 @@ public class AdminMemberListController extends AbstractController {
                 currentPage = Integer.parseInt(pageNo);
             }
 
-            int sizePerPage = 50; // ⭐ 한 페이지당 50명
+            int sizePerPage = 20; // ⭐ 한 페이지당 20명
 
             int totalCount = mdao.getTotalMemberCount();
             int totalPage = (int)Math.ceil((double)totalCount / sizePerPage);

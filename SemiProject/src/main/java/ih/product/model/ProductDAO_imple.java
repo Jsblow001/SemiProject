@@ -636,8 +636,34 @@ public class ProductDAO_imple implements ProductDAO {
 	// 주문 상품 정보 불러오기 -> 상품 상세페이지, 바로 구매시
 	@Override
 	public ProductDTO getProductDetail(String productId) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+	    ProductDTO pdto = null;
+	    try {
+	        conn = ds.getConnection();
+	        
+	        String sql = " select product_id, product_name, sale_price, list_price, stock, pimage, product_description, fk_category_id "
+	                   + " from tbl_product "
+	                   + " where product_id = ? "; 
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, productId);
+	        
+	        rs = pstmt.executeQuery();
+	        
+	        if(rs.next()) {
+	            pdto = new ProductDTO();
+	            pdto.setProduct_id(rs.getInt("product_id"));
+	            pdto.setProduct_name(rs.getString("product_name"));
+	            pdto.setSale_price(rs.getInt("sale_price"));
+	            pdto.setList_price(rs.getInt("list_price"));
+	            pdto.setStock(rs.getInt("stock"));
+	            pdto.setPimage(rs.getString("pimage"));
+	            pdto.setProduct_description(rs.getString("product_description"));
+	            pdto.setFk_category_id(rs.getInt("fk_category_id"));
+	        }
+	    } finally {
+	        close();
+	    }
+	    return pdto; 
 	}
 
 	// 장바구니에서 여러 상품 주문

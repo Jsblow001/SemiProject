@@ -49,9 +49,9 @@ public class VisitorCheckController extends AbstractController {
                 json.put("yesterday", vdao.getVisitorCount("member", "yesterday"));
                 json.put("newMember", vdao.getTodayNewMember());
             } else if ("guest".equals(mode)) {
-                int tTotal = vdao.getVisitorCount("total", "today");
-                int tMember = vdao.getVisitorCount("member", "today");
-                json.put("today", tTotal - tMember);
+                // 뺄셈(tTotal - tMember) 대신 DAO의 메서드를 직접 호출
+                json.put("today", vdao.getVisitorCount("guest", "today")); 
+                json.put("yesterday", vdao.getVisitorCount("guest", "yesterday"));
                 json.put("bounceRate", String.format("%.1f", vdao.getBounceRate()));
             }
 

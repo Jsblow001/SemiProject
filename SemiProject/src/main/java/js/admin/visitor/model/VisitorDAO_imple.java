@@ -98,7 +98,7 @@ public class VisitorDAO_imple implements VisitorDAO {
         int count = 0;
         String targetDate = "today".equals(day) ? "TRUNC(SYSDATE)" : "TRUNC(SYSDATE-1)";
         
-        // [핵심 수정] IP와 ID 조합으로 유니크 방문자 계산
+        // DISTINCT 안에 IP와 ID를 결합하여, 같은 IP라도 다른 유저면 각각 카운트합니다.
         StringBuilder sql = new StringBuilder(" SELECT COUNT(DISTINCT(v_ip || NVL(member_id, 'guest'))) FROM visitor_log ");
         sql.append(" WHERE TRUNC(v_date) = ").append(targetDate);
         
@@ -140,25 +140,31 @@ public class VisitorDAO_imple implements VisitorDAO {
         List<Integer> stats = new ArrayList<>();
         StringBuilder sql = new StringBuilder();
         
-        // [핵심 수정] DISTINCT를 IP와 ID 조합으로 걸어줍니다.
-        sql.append(" SELECT b.dt, COUNT(DISTINCT(a.v_ip || NVL(a.member_id, 'guest'))) ")
-           .append(" FROM visitor_log a, ")
-           .append("      (SELECT TO_CHAR(SYSDATE - LEVEL + 1, 'YYYY-MM-DD') AS dt FROM DUAL CONNECT BY LEVEL <= 7) b ")
-           .append(" WHERE b.dt = TO_CHAR(a.v_date(+), 'YYYY-MM-DD') ");
-        
-        if ("member".equals(type)) {
-            sql.append(" AND a.member_id(+) IS NOT NULL ");
-        } else if ("guest".equals(type)) {
-            sql.append(" AND a.member_id(+) IS NULL ");
-        }
-        
-        sql.append(" GROUP BY b.dt ORDER BY b.dt ASC ");
+        sql.append(" SELECT b.dt, ")
+           .append("        COUNT(DISTINCT CASE ")
+           .append("            WHEN 'total' = ? THEN (a.v_ip || NVL(a.member_id, 'guest')) ")
+           .append("            WHEN 'member' = ? AND a.member_id IS NOT NULL THEN (a.v_ip || a.member_id) ")
+           .append("            WHEN 'guest' = ? AND a.member_id IS NULL AND a.v_ip IS NOT NULL THEN a.v_ip ")
+           .append("            ELSE NULL END) ")
+           .append(" FROM ( ")
+           .append("   SELECT TO_CHAR(SYSDATE - LEVEL + 1, 'YYYY-MM-DD') AS dt ")
+           .append("   FROM DUAL CONNECT BY LEVEL <= 7 ")
+           .append(" ) b ")
+           .append(" LEFT OUTER JOIN visitor_log a ON b.dt = TO_CHAR(a.v_date, 'YYYY-MM-DD') ")
+           .append(" GROUP BY b.dt ORDER BY b.dt ASC ");
 
         try (Connection conn = ds.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql.toString());
-             ResultSet rs = pstmt.executeQuery()) {
-            while (rs.next()) {
-                stats.add(rs.getInt(2));
+             PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
+            
+            // 파라미터 3개 세팅 (type에 따라 내부 CASE문 작동)
+            pstmt.setString(1, type);
+            pstmt.setString(2, type);
+            pstmt.setString(3, type);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    stats.add(rs.getInt(2)); 
+                }
             }
         } catch (SQLException e) { e.printStackTrace(); }
         

@@ -22,6 +22,9 @@ public class OrderDetailDTO {
   	private String claimType;    // CANCEL / RETURN / EXCHANGE
   	private String claimStatus;  // REQUEST / APPROVED / REJECTED
   	private String claimReason;  // 사유
+  		
+ // ==== 관리자 반려 사유 ====
+  	private String rejectReason;
 
 
 
@@ -83,6 +86,14 @@ public class OrderDetailDTO {
 		this.claimReason = claimReason;
 	}
   	
+	// 관리자 반려사유
+	public String getRejectReason() {
+	    return rejectReason;
+	}
+
+	public void setRejectReason(String rejectReason) {
+	    this.rejectReason = rejectReason;
+	}
   	
    
 }
