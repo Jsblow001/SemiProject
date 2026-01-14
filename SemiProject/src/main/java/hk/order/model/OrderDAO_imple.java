@@ -219,7 +219,8 @@ public class OrderDAO_imple implements OrderDAO {
 
             String sql =
                 " SELECT d.odrdetailno, d.odrqty, d.odrprice, " +
-                "        d.deliverystatus, d.deliverydate, " +
+                "        d.deliverystatus, d.deliverydate, "
+                + " d.claim_status, d.reject_reason, " +
                 "        p.product_name, " +
                 "        p.pimage,        " +
                 "        CASE d.deliverystatus " +
@@ -249,6 +250,9 @@ public class OrderDAO_imple implements OrderDAO {
                 dto.setDeliveryDate(rs.getString("deliverydate"));
                 dto.setProductName(rs.getString("product_name"));
                 dto.setProductImage(rs.getString("pimage"));
+                
+                dto.setClaimStatus(rs.getString("claim_status"));   
+                dto.setRejectReason(rs.getString("reject_reason")); 
 
                 list.add(dto);
             }
