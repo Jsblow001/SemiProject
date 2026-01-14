@@ -56,6 +56,13 @@ public class ProductUpdateEndController extends AbstractController {
             final_pimage = System.currentTimeMillis() + "_" + fileName;
             part.write(uploadPath + File.separator + final_pimage);
             
+            // 추가한 코드
+            String devImgDir = "C:\\git\\SemiProject\\SemiProject\\src\\main\\webapp\\img"; // 로컬 개발용
+            java.nio.file.Path from = java.nio.file.Paths.get(uploadPath, final_pimage);
+            java.nio.file.Path to   = java.nio.file.Paths.get(devImgDir, final_pimage);
+            java.nio.file.Files.copy(from, to, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            // 추가한 코드
+            
         }
 
         // DTO

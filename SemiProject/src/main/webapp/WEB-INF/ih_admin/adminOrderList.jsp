@@ -145,7 +145,7 @@
 
         const ctx = document.getElementById('orderChart').getContext('2d');
         
-        // 데이터 예시 (서버에서 넘겨받은 데이터를 배열 형태로 넣으시면 됩니다)
+        // 데이터 예시 (서버에서 넘겨받은 데이터를 배열 형태로)
         const labels = ['01/07', '01/08', '01/09', '01/10', '01/11', '01/12', '오늘'];
         const orderData = [5, 12, 8, 15, 20, 10, 18]; // 예시 수치
 
@@ -176,6 +176,7 @@
             }
         });
     });
+
 </script>
 
 <script src="<%= ctxPath %>/js/ih_product/adminOrder.js"></script>
