@@ -1,10 +1,12 @@
 package hk.admin.controller;
 
-import jakarta.servlet.http.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import sp.common.controller.AbstractController;
-import hk.order.model.*;
+import hk.order.model.OrderDAO;
+import hk.order.model.OrderDAO_imple;
 
-public class AdminClaimProcessController extends AbstractController {
+public class AdminClaimCompleteController extends AbstractController {
 
     private OrderDAO odao = new OrderDAO_imple();
 
@@ -12,15 +14,11 @@ public class AdminClaimProcessController extends AbstractController {
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         int odrDetailNo = Integer.parseInt(request.getParameter("odrdetailno"));
-        String action = request.getParameter("action"); // APPROVE / REJECT
 
-        System.out.println("odrdetailno = " + odrDetailNo);
-        System.out.println("action = " + action);
-        
-        odao.processClaim(odrDetailNo, action);
+        int result = odao.completeClaim(odrDetailNo);
 
+        // 결과 체크는 선택
         super.setRedirect(true);
         super.setViewPage(request.getContextPath() + "/admin/claimList.sp");
-              
     }
 }

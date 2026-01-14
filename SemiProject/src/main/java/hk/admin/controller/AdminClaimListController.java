@@ -15,10 +15,16 @@ public class AdminClaimListController extends AbstractController {
 	    @Override
 	    public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
+	    	// 신청 목록
 	        List list = odao.getClaimList();
 
+	        // 처리대기 건수
+	        int pendingCount = odao.getPendingClaimCount();
+	        
+	        // request 에 담기
 	        request.setAttribute("claimList", list);
-
+	        request.setAttribute("pendingCount", pendingCount);
+	        
 	        super.setRedirect(false);
 	        super.setViewPage("/WEB-INF/hk_admin/claimList.jsp");
 	    }

@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import hk.member.domain.MemberDTO;
 import sp.common.controller.AbstractController;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -18,6 +19,10 @@ import jh.qna.domain.QnaFileDTO;
 import jh.qna.model.QnaDAO;
 import jh.qna.model.QnaDAO_imple;
 
+@MultipartConfig(
+  maxFileSize = 10 * 1024 * 1024,
+  maxRequestSize = 30 * 1024 * 1024
+)
 public class QnaEditEnd extends AbstractController {
 
     private QnaDAO qdao = new QnaDAO_imple();
@@ -75,8 +80,8 @@ public class QnaEditEnd extends AbstractController {
         }
 
         // ===== 업로드 경로 =====
-        String uploadDir = request.getServletContext().getRealPath("/images/qna");
-        String devImgDir = "C:\\dev\\SemiProject\\src\\main\\webapp\\images\\qna"; // 너 환경에 맞게
+        String uploadDir = request.getServletContext().getRealPath("/img/qna");
+        String devImgDir = "C:\\git\\SemiProject\\SemiProject\\src\\main\\webapp\\img\\qna"; // 너 환경에 맞게
 
         new File(uploadDir).mkdirs();
         new File(devImgDir).mkdirs();
@@ -129,7 +134,7 @@ public class QnaEditEnd extends AbstractController {
                 }
             }
 
-         // (B) 첨부 업로드 처리 (새첨부 추가만)
+            // (B) 첨부 업로드 처리 (새첨부 추가만)
             for(Part part : request.getParts()) {
 
                 if(!"files".equals(part.getName())) continue;

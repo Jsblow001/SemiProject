@@ -219,7 +219,8 @@ public class OrderDAO_imple implements OrderDAO {
 
             String sql =
                 " SELECT d.odrdetailno, d.odrqty, d.odrprice, " +
-                "        d.deliverystatus, d.deliverydate, " +
+                "        d.deliverystatus, d.deliverydate, "
+                + " d.claim_status, d.reject_reason, " +
                 "        p.product_name, " +
                 "        p.pimage,        " +
                 "        CASE d.deliverystatus " +
@@ -249,6 +250,9 @@ public class OrderDAO_imple implements OrderDAO {
                 dto.setDeliveryDate(rs.getString("deliverydate"));
                 dto.setProductName(rs.getString("product_name"));
                 dto.setProductImage(rs.getString("pimage"));
+                
+                dto.setClaimStatus(rs.getString("claim_status"));   
+                dto.setRejectReason(rs.getString("reject_reason")); 
 
                 list.add(dto);
             }
@@ -370,8 +374,14 @@ public class OrderDAO_imple implements OrderDAO {
                 " FROM tbl_order_detail d " +
                 " JOIN tbl_product p " +
                 "   ON d.fk_product_id = p.product_id " +
-                " WHERE d.claim_status = 'REQUEST' " +
-                " ORDER BY d.odrdetailno DESC ";
+                " WHERE d.claim_status IN ('REQUEST','APPROVED','COMPLETED','REJECTED') " +
+                " ORDER BY CASE d.claim_status"
+                + " WHEN 'REQUEST'   THEN 1 "
+                + " WHEN 'APPROVED'  THEN 2  "
+                + " WHEN 'COMPLETED' THEN 3"
+                + " WHEN 'REJECTED'  THEN 4"
+                + " END,"
+                + " d.odrdetailno DESC ";
 
             pstmt = conn.prepareStatement(sql);
             rs = pstmt.executeQuery();
@@ -398,82 +408,22 @@ public class OrderDAO_imple implements OrderDAO {
 
 
     
-    // 주문취소/반품/교환 신청 관리자 승인/반려 처리 -> 주문취소 (결제취소, 배송취소) + 재고반영
-    @Override
-    public int processClaim(int odrDetailNo, String action) throws SQLException {
-
-        int result = 0;
+    // 주문취소/교환/반품 신청 후 관리자 승인
+    public int approveClaim(int odrDetailNo, String action) throws SQLException {
+        
+    	int result = 0;
 
         try {
             conn = ds.getConnection();
 
-            // 1. 주문 상세 정보 조회 (주문번호, 상품번호, 수량)
             String sql =
-                " SELECT fk_odrcode, fk_product_id, odrqty " +
-                " FROM tbl_order_detail " +
+                " UPDATE tbl_order_detail " +
+                " SET claim_status = 'APPROVED' " +
                 " WHERE odrdetailno = ? ";
 
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, odrDetailNo);
-            rs = pstmt.executeQuery();
-
-            if (!rs.next()) return 0;
-
-            int odrcode = rs.getInt("fk_odrcode");
-            int productId = rs.getInt("fk_product_id");
-            int qty = rs.getInt("odrqty");
-
-            rs.close();
-            pstmt.close();
-
-            if ("APPROVE".equals(action)) {
-
-                // 2. claim 승인 + 배송취소(4)
-                sql = " UPDATE tbl_order_detail " +
-                      " SET claim_status = 'APPROVED', deliverystatus = 4 " +
-                      " WHERE odrdetailno = ? ";
-
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setInt(1, odrDetailNo);
-                int n1 = pstmt.executeUpdate();
-                pstmt.close();
-
-                // 3. 주문 결제상태 -> 결제취소(2)
-                sql = " UPDATE tbl_order " +
-                      " SET payment_status = 2 " +
-                      " WHERE odrcode = ? ";
-
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setInt(1, odrcode);
-                int n2 = pstmt.executeUpdate();
-                pstmt.close();
-
-                // 4. 상품 재고 복구
-                sql = " UPDATE tbl_product " +
-                      " SET stock = stock + ? " +
-                      " WHERE product_id = ? ";
-
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setInt(1, qty);
-                pstmt.setInt(2, productId);
-                int n3 = pstmt.executeUpdate();
-                pstmt.close();
-
-                if (n1 == 1 && n2 == 1 && n3 == 1) {
-                    result = 1;
-                }
-
-            } else { // REJECT
-
-                sql = " UPDATE tbl_order_detail " +
-                      " SET claim_status = 'REJECTED' " +
-                      " WHERE odrdetailno = ? ";
-
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setInt(1, odrDetailNo);
-
-                result = pstmt.executeUpdate();
-            }
+            result = pstmt.executeUpdate();
 
         } finally {
             close();
@@ -481,6 +431,193 @@ public class OrderDAO_imple implements OrderDAO {
 
         return result;
     }
+
+    
+    
+    // 처리대기 건수용
+    @Override
+    public int getPendingClaimCount() throws SQLException {
+
+        int cnt = 0;
+
+        try {
+            conn = ds.getConnection();
+
+            String sql =
+                " SELECT COUNT(*) " +
+                " FROM tbl_order_detail " +
+                " WHERE claim_status = 'APPROVED' "; // 처리대기 기준
+
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                cnt = rs.getInt(1);
+            }
+
+        } finally {
+            close();
+        }
+
+        return cnt;
+    }
+
+    
+    
+    // 반려 사유 창 주문내역 조회용
+    public OrderDetailDTO getClaimDetail(int odrDetailNo) throws SQLException {
+
+        OrderDetailDTO dto = null;
+
+        try {
+            conn = ds.getConnection();
+
+            String sql =
+                " SELECT d.odrdetailno, d.fk_odrcode, d.odrqty, d.claim_type, " +
+                "        d.claim_reason, p.product_name " +
+                " FROM tbl_order_detail d " +
+                " JOIN tbl_product p ON d.fk_product_id = p.product_id " +
+                " WHERE d.odrdetailno = ? ";
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, odrDetailNo);
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                dto = new OrderDetailDTO();
+                dto.setOdrDetailNo(rs.getInt("odrdetailno"));
+                dto.setOdrCode(rs.getInt("fk_odrcode"));
+                dto.setOdrQty(rs.getInt("odrqty"));
+                dto.setClaimType(rs.getString("claim_type"));
+                dto.setClaimReason(rs.getString("claim_reason"));
+                dto.setProductName(rs.getString("product_name"));
+            }
+
+        } finally {
+            close();
+        }
+
+        return dto;
+    }
+
+    
+    
+    // 주문취소/교환/반품 신청 후 관리자 반려용
+    @Override
+    public int rejectClaim(int odrDetailNo, String rejectReason) throws SQLException {
+
+        int result = 0;
+
+        try {
+            conn = ds.getConnection();
+
+            String sql =
+                " UPDATE tbl_order_detail " +
+                " SET claim_status = 'REJECTED', " +
+                "     reject_reason = ? " +
+                " WHERE odrdetailno = ? ";
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, rejectReason);
+            pstmt.setInt(2, odrDetailNo);
+
+            result = pstmt.executeUpdate();
+
+        } finally {
+            close();
+        }
+
+        return result;
+    }
+
+    
+    
+    
+	 // 주문취소/교환/반품 신청 승인 후 처리완료
+	 // (claim_status, deliverystatus, payment_status, stock)
+	 @Override
+	 public int completeClaim(int odrDetailNo) throws SQLException {
+	
+	     int result = 0;
+	
+	     try {
+	         conn = ds.getConnection();
+	
+	         /* =====================================
+	          * 1. 주문 상세 정보 조회
+	          * ===================================== */
+	         String sql =
+	             " SELECT fk_odrcode, fk_product_id, odrqty " +
+	             " FROM tbl_order_detail " +
+	             " WHERE odrdetailno = ? ";
+	
+	         pstmt = conn.prepareStatement(sql);
+	         pstmt.setInt(1, odrDetailNo);
+	         rs = pstmt.executeQuery();
+	
+	         if (!rs.next()) return 0;
+	
+	         int odrCode   = rs.getInt("fk_odrcode");
+	         int productId = rs.getInt("fk_product_id");
+	         int qty       = rs.getInt("odrqty");
+	
+	         rs.close();
+	         pstmt.close();
+	
+	         /* =====================================
+	          * 2. 주문 상세 → 클레임 완료 + 배송취소
+	          * ===================================== */
+	         sql =
+	             " UPDATE tbl_order_detail " +
+	             " SET claim_status = 'COMPLETED', " +
+	             "     deliverystatus = 4 " +
+	             " WHERE odrdetailno = ? ";
+	
+	         pstmt = conn.prepareStatement(sql);
+	         pstmt.setInt(1, odrDetailNo);
+	         int n1 = pstmt.executeUpdate();
+	         pstmt.close();
+	
+	         /* =====================================
+	          * 3. 주문 결제 상태 → 결제취소
+	          * ===================================== */
+	         sql =
+	             " UPDATE tbl_order " +
+	             " SET payment_status = 2 " +   // 2 = 결제취소
+	             " WHERE odrcode = ? ";
+	
+	         pstmt = conn.prepareStatement(sql);
+	         pstmt.setInt(1, odrCode);
+	         int n2 = pstmt.executeUpdate();
+	         pstmt.close();
+	
+	         /* =====================================
+	          * 4. 상품 재고 복구
+	          * ===================================== */
+	         sql =
+	             " UPDATE tbl_product " +
+	             " SET stock = stock + ? " +
+	             " WHERE product_id = ? ";
+	
+	         pstmt = conn.prepareStatement(sql);
+	         pstmt.setInt(1, qty);
+	         pstmt.setInt(2, productId);
+	         int n3 = pstmt.executeUpdate();
+	         pstmt.close();
+	
+	         if (n1 == 1 && n2 == 1 && n3 == 1) {
+	             result = 1;
+	         }
+	
+	     } finally {
+	         close();
+	     }
+	
+	     return result;
+	 }
+
+
+
 
 
 

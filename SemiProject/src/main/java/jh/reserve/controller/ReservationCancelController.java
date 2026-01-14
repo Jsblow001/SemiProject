@@ -57,7 +57,7 @@ public class ReservationCancelController extends AbstractController {
         Map<String,String> paraMap = new HashMap<>();
         paraMap.put("reservationId", reservationId);
 
-        paraMap.put("memberUserid", loginuser.getUserid());
+        paraMap.put("userid", loginuser.getUserid());
 
         int n = dao.cancelReservationByMember(paraMap);
 

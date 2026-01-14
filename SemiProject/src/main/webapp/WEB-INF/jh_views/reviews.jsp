@@ -10,6 +10,16 @@
 <title>Review</title>
 
 <style>
+
+/* ✅ 고정 헤더 높이만큼 앵커 위치 보정 */
+#allReviews{
+  scroll-margin-top: calc(var(--fixedHeaderH, 80px) + 12px);
+}
+#midRank{
+  scroll-margin-top: calc(var(--fixedHeaderH, 80px) + 12px);
+}
+
+
   *{ box-sizing:border-box; }
   body{ margin:0; font-family: Arial, "Noto Sans KR", sans-serif; color:#111; background:#fff; }
   a{ color:inherit; text-decoration:none; }
@@ -129,6 +139,46 @@
   }
 
   .page-title{ font-size:26px; font-weight:500; letter-spacing:.3px; margin:26px 0 18px; }
+  
+/* ✅ 직접검색 슬라이드 다운 */
+.searchbox{
+  overflow:hidden;
+  max-height:0;
+  opacity:0;
+  transform: translateY(-6px);
+  margin-top:0;
+
+  transition: max-height .25s ease, opacity .18s ease, transform .18s ease, margin-top .25s ease;
+}
+
+.searchbox.open{
+  max-height:120px;      /* 검색창 높이 예상치(필요시 160~200으로 늘려도 됨) */
+  opacity:1;
+  transform: translateY(0);
+  margin-top:10px;
+}
+
+/* input이 너무 작으면 보기 좋게 */
+.searchbox input[type="text"]{
+  width: min(420px, 100%);
+  height: 34px;
+  border:1px solid #ddd;
+  border-radius:10px;
+  padding:0 12px;
+  font-size:13px;
+  outline:none;
+}
+.searchbox button{
+  height:34px;
+  border:1px solid #2b2321;
+  background:#2b2321;
+  color:#fff;
+  border-radius:10px;
+  padding:0 12px;
+  margin-left:8px;
+  cursor:pointer;
+}
+  
 </style>
 </head>
 
@@ -361,20 +411,23 @@
              class="${sort eq 'rating' ? 'active' : ''}">별점 높은순</a>
           <span class="divider">|</span>
           <a href="javascript:void(0);" id="btnToggleSearch">직접검색</a>
-          <button type="button" class="bottom-search-btn" aria-label="검색" id="btnSearchIcon">
-            (SVG는 너 기존 그대로)
-          </button>
+		  
         </div>
       </div>
 
-      <div id="searchBox" style="display:none; margin-top:10px;">
-        <form method="get" action="${pageContext.request.contextPath}/reviews.sp">
-          <input type="hidden" name="midSort" value="${midSort}" />
-          <input type="hidden" name="sort" value="${sort}" />
-          <input type="text" name="searchWord" value="${fn:escapeXml(searchWord)}" placeholder="제목/내용 검색" />
-          <button type="submit">검색</button>
-        </form>
-      </div>
+      <div id="searchBox" class="searchbox">
+		  <form method="get" action="${pageContext.request.contextPath}/reviews.sp#allReviews">
+		    <input type="hidden" name="midSort" value="${midSort}" />
+		    <input type="hidden" name="sort" value="${sort}" />
+		    <!-- 검색 시 페이지는 1로 리셋(권장) -->
+		    <input type="hidden" name="currentShowPageNo" value="1" />
+		
+		    <input type="text" id="searchWordInput" name="searchWord"
+		           value="${fn:escapeXml(searchWord)}"
+		           placeholder="제목/내용 검색" />
+		    <button type="submit">검색</button>
+		  </form>
+		</div>
 
       <c:choose>
         <c:when test="${empty allReviews}">
@@ -394,58 +447,65 @@
               </div>
 
               <div class="r-right">
-                <div class="r-top">
-                  <span class="stars">
-                    <c:forEach var="i" begin="1" end="5">
-                      <c:choose>
-                        <c:when test="${i <= r.rating}">
-                          <span class="star">★</span>
-                        </c:when>
-                        <c:otherwise>
-                          <span class="star off">★</span>
-                        </c:otherwise>
-                      </c:choose>
-                    </c:forEach>
-                  </span>
-
-                  <c:if test="${not empty r.badge}">
-                    <span class="badge">${r.badge}</span>
-                  </c:if>
-
-                  <span class="prodcode">${r.productCode}</span>
-                </div>
-
-                <div class="r-content">${r.review_content}</div>
-
-                <c:if test="${not empty r.photos}">
-                  <div class="r-photos">
-                    <c:forEach var="ph" items="${r.photos}" varStatus="st">
-                      <c:if test="${st.index < 2}">
-                        <div class="r-photo"><img src="${ph}" alt="review photo"></div>
-                      </c:if>
-                    </c:forEach>
-                  </div>
-                </c:if>
-
-                <c:if test="${not empty r.tags}">
-                  <div class="r-tags">
-                    <c:forEach var="t" items="${r.tags}">
-                      <span class="tag">${t}</span>
-                    </c:forEach>
-                  </div>
-                </c:if>
-
-                <div class="r-actions">
-                  <a>💬 댓글 ${r.commentCount}</a>
-                  <a href="#">⚑ 신고</a>
-                </div>
-
-                <c:if test="${not empty r.adminReply}">
-                  <div class="admin-reply">
-                    ${r.adminReply}
-                    <div class="admin-name">카린 올림</div>
-                  </div>
-                </c:if>
+	              <a href="${pageContext.request.contextPath}/reviewView.sp?reviewId=${r.review_id}"
+	     			style="display:block; color:inherit;">
+	                <div class="r-top">
+	                  <span class="stars">
+	                    <c:forEach var="i" begin="1" end="5">
+	                      <c:choose>
+	                        <c:when test="${i <= r.rating}">
+	                          <span class="star">★</span>
+	                        </c:when>
+	                        <c:otherwise>
+	                          <span class="star off">★</span>
+	                        </c:otherwise>
+	                      </c:choose>
+	                    </c:forEach>
+	                  </span>
+	
+	                  <c:if test="${not empty r.badge}">
+	                    <span class="badge">${r.badge}</span>
+	                  </c:if>
+	
+	                  <span class="prodcode">${r.productCode}</span>
+	                </div>
+	
+	                <div class="r-content">${r.review_content}</div>
+	
+	                <c:if test="${not empty r.photos}">
+	                  <div class="r-photos">
+	                    <c:forEach var="ph" items="${r.photos}" varStatus="st">
+	                      <c:if test="${st.index < 2}">
+	                        <div class="r-photo">
+							  <img src="${pageContext.request.contextPath}/img/review/${ph}"
+							       alt="review photo"
+							       onerror="this.style.display='none';">
+							</div>
+	                      </c:if>
+	                    </c:forEach>
+	                  </div>
+	                </c:if>
+	
+	                <c:if test="${not empty r.tags}">
+	                  <div class="r-tags">
+	                    <c:forEach var="t" items="${r.tags}">
+	                      <span class="tag">${t}</span>
+	                    </c:forEach>
+	                  </div>
+	                </c:if>
+	
+	                <div class="r-actions">
+	                  <a>💬 댓글 ${r.commentCount}</a>
+	                  <a href="#">⚑ 신고</a>
+	                </div>
+	
+	                <c:if test="${not empty r.adminReply}">
+	                  <div class="admin-reply">
+	                    ${r.adminReply}
+	                    <div class="admin-name">카린 올림</div>
+	                  </div>
+	                </c:if>
+                </a>
               </div>
             </div>
           </c:forEach>
@@ -535,20 +595,39 @@
   });
 })();
 
-/* 직접검색 토글 */
+
+/* 직접검색 슬라이드 토글 */
 (function(){
   const toggleBtn = document.getElementById('btnToggleSearch');
   const iconBtn = document.getElementById('btnSearchIcon');
   const box = document.getElementById('searchBox');
+  const input = document.getElementById('searchWordInput');
   if(!box) return;
 
+  function open(){
+    box.classList.add('open');
+    if(input) setTimeout(()=>input.focus(), 120);
+  }
+
+  function close(){
+    box.classList.remove('open');
+  }
+
   function toggle(){
-    box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+    if(box.classList.contains('open')) close();
+    else open();
   }
 
   if(toggleBtn) toggleBtn.addEventListener('click', toggle);
   if(iconBtn) iconBtn.addEventListener('click', toggle);
+
+  // ✅ 이미 검색어가 있으면(=검색 결과 상태면) 검색창을 열린 상태로 유지
+  const hasSearchWord = (input && input.value && input.value.trim().length > 0);
+  if(hasSearchWord) {
+    box.classList.add('open');
+  }
 })();
+
 
 /* ✅ midSortCarousel 탭 동기화( DOM 기준 index ) */
 (function(){
@@ -559,21 +638,29 @@
 
   const sortByIndex = ['reviewCount','recentSales','avgRating','newProduct'];
 
-  function setActiveByIndex(idx){
-    $tabs.removeClass('active');
-    $tabs.filter('[data-slide-to="'+idx+'"]').addClass('active');
+  function setActiveByIndex(idx, opt={updateUrl:true}){
+	  $tabs.removeClass('active');
+	  $tabs.filter('[data-slide-to="'+idx+'"]').addClass('active');
 
-    const sort = sortByIndex[idx] || 'reviewCount';
-    const url = new URL(window.location.href);
-    url.searchParams.set('midSort', sort);
-    url.hash = 'midRank';
-    history.replaceState(null, '', url.toString());
-  }
+	  if(!opt.updateUrl) return;
 
-  function syncFromDom(){
-    const idx = $carousel.find('.carousel-item.active').index();
-    if(idx >= 0) setActiveByIndex(idx);
-  }
+	  const sort = sortByIndex[idx] || 'reviewCount';
+	  const url = new URL(window.location.href);
+	  url.searchParams.set('midSort', sort);
+
+	  // ✅ 여기선 midRank로 보내는 게 목적일 때만!
+	  if(!window.location.hash) url.hash = 'midRank';
+
+	  history.replaceState(null, '', url.toString());
+	}
+
+
+
+function syncFromDom(){
+  const idx = $carousel.find('.carousel-item.active').index();
+  if(idx >= 0) setActiveByIndex(idx, {updateUrl:false}); // ✅ 초기엔 URL/해시 손대지 말기
+}
+
 
   // 탭 클릭 -> 해당 슬라이드로
   $tabs.on('click', function(e){
@@ -599,6 +686,65 @@
     setTimeout(syncFromDom, 0);
   }
 })();
+
+// 최초 진입 시 해시 스크롤 2~3번 재정렬(가장 안정)
+(function(){
+  function findHeader(){
+    return document.querySelector('header')
+        || document.querySelector('.header')
+        || document.querySelector('.fixed-top')
+        || document.querySelector('#header')
+        || document.querySelector('nav.navbar');
+  }
+
+  function setHeaderVar(){
+    const h = findHeader();
+    const headerH = h ? Math.ceil(h.getBoundingClientRect().height) : 80;
+    document.documentElement.style.setProperty('--fixedHeaderH', headerH + 'px');
+    return headerH;
+  }
+
+  function scrollToHashWithOffset(behavior='auto'){
+    const hash = window.location.hash;
+    if(!hash) return;
+
+    const el = document.querySelector(hash);
+    if(!el) return;
+
+    const headerH = setHeaderVar();
+    const top = el.getBoundingClientRect().top + window.pageYOffset - headerH - 12;
+
+    window.scrollTo({ top, behavior });
+  }
+
+  function stabilizeInitialHashScroll(){
+    // ✅ 최초 진입에서 레이아웃이 바뀌는 타이밍을 흡수하기 위해
+    // rAF(즉시) + setTimeout(지연)으로 2~3번 보정
+    scrollToHashWithOffset('auto');
+    requestAnimationFrame(() => scrollToHashWithOffset('auto'));
+    setTimeout(() => scrollToHashWithOffset('auto'), 120);
+    setTimeout(() => scrollToHashWithOffset('auto'), 350);
+  }
+
+  window.addEventListener('load', () => {
+    setHeaderVar();
+
+    // 해시가 있을 때만 보정
+    if(window.location.hash){
+      stabilizeInitialHashScroll();
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    setHeaderVar();
+    // 리사이즈 중에도 해시가 있으면 위치 보정
+    if(window.location.hash){
+      scrollToHashWithOffset('auto');
+    }
+  });
+})();
+
+
 </script>
 
 <jsp:include page="../footer.jsp"/>
