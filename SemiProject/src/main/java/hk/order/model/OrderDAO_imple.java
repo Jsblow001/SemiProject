@@ -370,8 +370,14 @@ public class OrderDAO_imple implements OrderDAO {
                 " FROM tbl_order_detail d " +
                 " JOIN tbl_product p " +
                 "   ON d.fk_product_id = p.product_id " +
-                " WHERE d.claim_status = 'REQUEST' " +
-                " ORDER BY d.odrdetailno DESC ";
+                " WHERE d.claim_status IN ('REQUEST','APPROVED','COMPLETED','REJECTED') " +
+                " ORDER BY CASE d.claim_status"
+                + " WHEN 'REQUEST'   THEN 1 "
+                + " WHEN 'APPROVED'  THEN 2  "
+                + " WHEN 'COMPLETED' THEN 3"
+                + " WHEN 'REJECTED'  THEN 4"
+                + " END,"
+                + " d.odrdetailno DESC ";
 
             pstmt = conn.prepareStatement(sql);
             rs = pstmt.executeQuery();
@@ -398,80 +404,32 @@ public class OrderDAO_imple implements OrderDAO {
 
 
     
-    // 주문취소/반품/교환 신청 관리자 승인/반려 처리 -> 주문취소 (결제취소, 배송취소) + 재고반영
-    @Override
-    public int processClaim(int odrDetailNo, String action) throws SQLException {
-
-        int result = 0;
+    // 주문취소/교환/반품 신청 후 1단계: 관리자 승인 / 반려
+    public int approveOrRejectClaim(int odrDetailNo, String action) throws SQLException {
+        
+    	int result = 0;
 
         try {
             conn = ds.getConnection();
 
-            // 1. 주문 상세 정보 조회 (주문번호, 상품번호, 수량)
-            String sql =
-                " SELECT fk_odrcode, fk_product_id, odrqty " +
-                " FROM tbl_order_detail " +
-                " WHERE odrdetailno = ? ";
-
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, odrDetailNo);
-            rs = pstmt.executeQuery();
-
-            if (!rs.next()) return 0;
-
-            int odrcode = rs.getInt("fk_odrcode");
-            int productId = rs.getInt("fk_product_id");
-            int qty = rs.getInt("odrqty");
-
-            rs.close();
-            pstmt.close();
-
             if ("APPROVE".equals(action)) {
-
-                // 2. claim 승인 + 배송취소(4)
-                sql = " UPDATE tbl_order_detail " +
-                      " SET claim_status = 'APPROVED', deliverystatus = 4 " +
-                      " WHERE odrdetailno = ? ";
+                String sql =
+                    " UPDATE tbl_order_detail " +
+                    " SET claim_status = 'APPROVED' " +
+                    " WHERE odrdetailno = ? ";
 
                 pstmt = conn.prepareStatement(sql);
                 pstmt.setInt(1, odrDetailNo);
-                int n1 = pstmt.executeUpdate();
-                pstmt.close();
-
-                // 3. 주문 결제상태 -> 결제취소(2)
-                sql = " UPDATE tbl_order " +
-                      " SET payment_status = 2 " +
-                      " WHERE odrcode = ? ";
-
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setInt(1, odrcode);
-                int n2 = pstmt.executeUpdate();
-                pstmt.close();
-
-                // 4. 상품 재고 복구
-                sql = " UPDATE tbl_product " +
-                      " SET stock = stock + ? " +
-                      " WHERE product_id = ? ";
-
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setInt(1, qty);
-                pstmt.setInt(2, productId);
-                int n3 = pstmt.executeUpdate();
-                pstmt.close();
-
-                if (n1 == 1 && n2 == 1 && n3 == 1) {
-                    result = 1;
-                }
+                result = pstmt.executeUpdate();
 
             } else { // REJECT
-
-                sql = " UPDATE tbl_order_detail " +
-                      " SET claim_status = 'REJECTED' " +
-                      " WHERE odrdetailno = ? ";
+                String sql =
+                    " UPDATE tbl_order_detail " +
+                    " SET claim_status = 'REJECTED' " +
+                    " WHERE odrdetailno = ? ";
 
                 pstmt = conn.prepareStatement(sql);
                 pstmt.setInt(1, odrDetailNo);
-
                 result = pstmt.executeUpdate();
             }
 
@@ -481,6 +439,38 @@ public class OrderDAO_imple implements OrderDAO {
 
         return result;
     }
+
+    
+    
+    // 처리대기 건수용
+    @Override
+    public int getPendingClaimCount() throws SQLException {
+
+        int cnt = 0;
+
+        try {
+            conn = ds.getConnection();
+
+            String sql =
+                " SELECT COUNT(*) " +
+                " FROM tbl_order_detail " +
+                " WHERE claim_status = 'APPROVED' "; // 처리대기 기준
+
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                cnt = rs.getInt(1);
+            }
+
+        } finally {
+            close();
+        }
+
+        return cnt;
+    }
+
+
 
 
 

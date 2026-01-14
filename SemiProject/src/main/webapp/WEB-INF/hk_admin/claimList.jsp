@@ -5,7 +5,9 @@
 <jsp:include page="../header2.jsp" />
 
 <style>
-    /* CARIN 브랜드 아이덴티티 스타일 */
+    /* ================================
+       CARIN 브랜드 아이덴티티 스타일
+       ================================ */
     :root {
         --carin-black: #1a1a1a;
         --carin-gray: #757575;
@@ -32,7 +34,9 @@
         text-align: center;
     }
 
-    /* 상단 요약 섹션 (필요시 컨트롤러에서 카운트 전달) */
+    /* ================================
+       상단 요약 섹션
+       ================================ */
     .summary-section {
         display: flex;
         justify-content: center;
@@ -62,20 +66,9 @@
         color: var(--carin-black);
     }
 
-    /* 검색 및 정보 영역 */
-    .search-area {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        padding-bottom: 15px;
-        border-bottom: 2px solid var(--carin-black);
-        margin-bottom: 30px;
-    }
-
-    .total-info { font-size: 12px; color: var(--carin-gray); }
-    .total-info strong { color: var(--carin-black); font-weight: 600; }
-
-    /* 테이블 디자인 */
+    /* ================================
+       테이블 디자인
+       ================================ */
     .return-table {
         width: 100%;
         border-collapse: collapse;
@@ -98,7 +91,9 @@
         vertical-align: middle;
     }
 
-    /* 상태 뱃지 및 버튼 */
+    /* ================================
+       상태 뱃지 & 버튼
+       ================================ */
     .badge {
         font-size: 10px;
         padding: 4px 10px;
@@ -108,13 +103,18 @@
         display: inline-block;
         text-transform: uppercase;
     }
-    /* 요청유형별 색상 구분 */
+
     .badge.cancel { border-color: #f44336; color: #f44336; }
     .badge.return { border-color: var(--carin-point); color: var(--carin-point); }
     .badge.exchange { border-color: var(--carin-black); color: var(--carin-black); }
 
-    .btn-group { display: flex; flex-direction: column; gap: 6px; align-items: center; }
-    
+    .btn-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        align-items: center;
+    }
+
     .btn-admin {
         background: none;
         border: 1px solid var(--carin-black);
@@ -127,32 +127,50 @@
     }
 
     .btn-admin:hover { background: var(--carin-black); color: #fff; }
-    
-    .btn-approve { background-color: var(--carin-point); border: 1px solid var(--carin-point); color: #fff; }
-    .btn-approve:hover { background-color: #a6958e; border-color: #a6958e; }
-    
-    .btn-reject { border-color: #ddd; color: #999; }
-    .btn-reject:hover { background-color: #f5f5f5; color: #666; }
+
+    .btn-approve {
+        background-color: var(--carin-point);
+        border: 1px solid var(--carin-point);
+        color: #fff;
+    }
+
+    .btn-reject {
+        border-color: #ddd;
+        color: #999;
+    }
 </style>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script>
+    // ================================
+    // 승인 / 반려 처리
+    // ================================
     function processClaim(odrdetailno, action) {
         let actionKor = (action === 'APPROVE') ? '승인' : '반려';
         if(!confirm("해당 요청을 " + actionKor + " 처리하시겠습니까?")) return;
 
-        // 기존 방식 유지 (location.href) 
-        // 만약 AJAX 방식으로 바꾸고 싶다면 위 예시의 $.ajax 코드를 참고하세요.
-        location.href = "${pageContext.request.contextPath}/admin/claimProcess.sp" +
-                        "?odrdetailno=" + odrdetailno +
-                        "&action=" + action;
+        location.href =
+            "${pageContext.request.contextPath}/admin/claimApprove.sp" +
+            "?odrdetailno=" + odrdetailno +
+            "&action=" + action;
+    }
+
+    // [CHANGED] 처리완료(환불/배송취소/재고반영) 전용
+    function completeClaim(odrdetailno) {
+        if(!confirm("해당 요청을 처리완료 하시겠습니까?\n(결제취소/배송취소/재고반영 진행)")) return;
+
+        location.href =
+            "${pageContext.request.contextPath}/admin/claimComplete.sp" +
+            "?odrdetailno=" + odrdetailno;
     }
 </script>
 
 <div class="carin-admin-wrap">
+
     <h2 class="page-title">취소 / 반품 / 교환 요청 관리</h2>
 
-    <%-- 요약 섹션: 컨트롤러에서 값을 넘겨주지 않는다면 이 섹션은 삭제하셔도 됩니다 --%>
+    <!-- ================================
+         상단 요약 영역
+         ================================ -->
     <div class="summary-section">
         <div class="summary-item">
             <span class="label">전체 요청</span>
@@ -160,66 +178,117 @@
         </div>
         <div class="summary-item">
             <span class="label">처리 대기</span>
-            <span class="count" style="color: var(--carin-point);">${pendingCount}</span>
+            <span class="count" style="color: var(--carin-point);">
+                ${pendingCount}
+            </span>
         </div>
     </div>
 
-    <div class="search-area">
-        <div class="total-info">
-            전체 <strong>${not empty claimList ? claimList.size() : 0}</strong> 건의 요청이 있습니다.
-        </div>
-    </div>
-
+    <!-- ================================
+         클레임 목록 테이블
+         ================================ -->
     <table class="return-table">
         <thead>
             <tr>
-                <th style="width: 140px;">주문번호</th>
+                <th>주문번호</th>
                 <th>상품명</th>
-                <th style="width: 80px;">수량</th>
-                <th style="width: 120px;">요청유형</th>
+                <th>수량</th>
+                <th>요청유형</th>
                 <th>사유</th>
-                <th style="width: 120px;">상태</th>
-                <th style="width: 160px;">매니지먼트</th>
+                <th>상태</th>
+                <th>매니지먼트</th>
             </tr>
         </thead>
+
         <tbody>
-            <c:choose>
-                <c:when test="${not empty claimList}">
-                    <c:forEach var="c" items="${claimList}">
-                        <tr>
-                            <td style="font-weight: 500; letter-spacing: 0.5px;">${c.odrCode}</td>
-                            <td style="text-align: left; padding-left: 20px;">
-                                <span style="font-weight: 500; color: var(--carin-black);">${c.productName}</span>
-                            </td>
-                            <td>${c.odrQty}</td>
-                            <td>
-                                <c:choose>
-                                    <c:when test="${c.claimType == '취소'}"><span class="badge cancel">취소요청</span></c:when>
-                                    <c:when test="${c.claimType == '반품'}"><span class="badge return">반품요청</span></c:when>
-                                    <c:otherwise><span class="badge exchange">${c.claimType}</span></c:otherwise>
-                                </c:choose>
-                            </td>
-                            <td style="color: #757575; font-size: 12px;">${c.claimReason}</td>
-                            <td>
-                                <span class="badge">${c.claimStatus}</span>
-                            </td>
-                            <td>
-                                <div class="btn-group">
-                                    <button type="button" class="btn-admin btn-approve" 
-                                            onclick="processClaim('${c.odrDetailNo}','APPROVE')">요청승인</button>
-                                    <button type="button" class="btn-admin btn-reject" 
-                                            onclick="processClaim('${c.odrDetailNo}','REJECT')">요청반려</button>
-                                </div>
-                            </td>
-                        </tr>
-                    </c:forEach>
-                </c:when>
-                <c:otherwise>
-                    <tr>
-                        <td colspan="7" style="padding: 150px 0; color: #bbb;">처리할 클레임 내역이 존재하지 않습니다.</td>
-                    </tr>
-                </c:otherwise>
-            </c:choose>
+        <c:forEach var="c" items="${claimList}">
+            <tr>
+                <td>${c.odrCode}</td>
+
+                <td style="text-align:left;padding-left:20px;">
+                    ${c.productName}
+                </td>
+
+                <td>${c.odrQty}</td>
+
+                <td>
+                    <c:choose>
+                        <c:when test="${c.claimType == '취소'}">
+                            <span class="badge cancel">취소요청</span>
+                        </c:when>
+                        <c:when test="${c.claimType == '반품'}">
+                            <span class="badge return">반품요청</span>
+                        </c:when>
+                        <c:otherwise>
+                            <span class="badge exchange">${c.claimType}</span>
+                        </c:otherwise>
+                    </c:choose>
+                </td>
+
+                <td style="color:#757575;font-size:12px;">
+                    ${c.claimReason}
+                </td>
+
+                <!-- 🔴 [CHANGED] 상태 표시 분기 -->
+                <td>
+                    <c:choose>
+                        <c:when test="${c.claimStatus == 'REQUEST'}">
+                            <span class="badge">요청됨</span>
+                        </c:when>
+                        <c:when test="${c.claimStatus == 'APPROVED'}">
+                            <span class="badge" style="color:var(--carin-point);border-color:var(--carin-point);">
+                                처리대기
+                            </span>
+                        </c:when>
+                        <c:when test="${c.claimStatus == 'COMPLETED'}">
+                            <span class="badge" style="color:#222;border-color:#222;">
+                                처리완료
+                            </span>
+                        </c:when>
+                        <c:when test="${c.claimStatus == 'REJECTED'}">
+                            <span class="badge" style="color:#999;border-color:#999;">
+                                반려
+                            </span>
+                        </c:when>
+                    </c:choose>
+                </td>
+
+                <!-- [CHANGED] 매니지먼트 버튼 분기 (핵심) -->
+                <td>
+                    <div class="btn-group">
+                       <c:choose>
+
+					    <%-- 1️ 요청 상태 --%>
+					    <c:when test="${c.claimStatus == 'REQUEST'}">
+					        <button class="btn-admin btn-approve"
+					                onclick="processClaim('${c.odrDetailNo}','APPROVE')">
+					            승인
+					        </button>
+					        <button class="btn-admin btn-reject"
+					                onclick="processClaim('${c.odrDetailNo}','REJECT')">
+					            반려
+					        </button>
+					    </c:when>
+					
+					    <%-- 2️ 승인됨 (처리대기) --%>
+					    <c:when test="${c.claimStatus == 'APPROVED'}">
+					        <button class="btn-admin btn-approve"
+					                onclick="completeClaim('${c.odrDetailNo}')">
+					            처리완료
+					        </button>
+					    </c:when>
+					
+					    <%-- 3️ 완료 / 반려 --%>
+					    <c:otherwise>
+					        <span>-</span>
+					    </c:otherwise>
+					
+					</c:choose>
+
+                    </div>
+                </td>
+            </tr>
+        </c:forEach>
         </tbody>
     </table>
 </div>

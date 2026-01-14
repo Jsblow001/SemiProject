@@ -4,7 +4,7 @@ import jakarta.servlet.http.*;
 import sp.common.controller.AbstractController;
 import hk.order.model.*;
 
-public class AdminClaimProcessController extends AbstractController {
+public class AdminClaimApproveController extends AbstractController {
 
     private OrderDAO odao = new OrderDAO_imple();
 
@@ -17,7 +17,7 @@ public class AdminClaimProcessController extends AbstractController {
         System.out.println("odrdetailno = " + odrDetailNo);
         System.out.println("action = " + action);
         
-        odao.processClaim(odrDetailNo, action);
+        odao.approveOrRejectClaim(odrDetailNo, action);
 
         super.setRedirect(true);
         super.setViewPage(request.getContextPath() + "/admin/claimList.sp");
