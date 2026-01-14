@@ -75,7 +75,7 @@
                     <div class="card-header bg-dark text-white">주문 상품 정보</div>
                     <div class="card-body">
                         <table class="table borderless">
-                            <%-- 1. 바로 구매 상품 출력 --%>
+                            <%-- 바로 구매 상품 출력 --%>
                             <c:if test="${orderType eq 'direct'}">
                                 <tr>
                                     <td width="100"><img src="<%=ctxPath%>/img/${pdto.pimage}" class="img-fluid rounded"></td>
@@ -89,7 +89,7 @@
                                 </tr>
                             </c:if>
                 
-                            <%-- 2. 장바구니 상품 출력 --%>
+                            <%-- 장바구니 상품 출력 --%>
                             <c:if test="${orderType eq 'cart'}">
                                 <c:forEach var="map" items="${orderList}">
                                     <tr>
