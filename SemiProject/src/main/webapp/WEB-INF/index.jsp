@@ -63,19 +63,10 @@
 
   </style>
   
-<%-- 임시 review, notice, qna 이동 버튼 --%>
+<%-- 임시 이동 버튼 --%>
 <br><br>
-<a href="<%= request.getContextPath() %>/reviews.sp">Reviews</a>&nbsp&nbsp
-<a href="<%= request.getContextPath() %>/noticeList.sp">Notice</a>&nbsp&nbsp
-<a href="<%= request.getContextPath() %>/adminNoticeList.sp">Notice_admin</a>&nbsp&nbsp
-<a href="<%= request.getContextPath() %>/qnaList.sp">QnA</a>&nbsp&nbsp
-<a href="<%= request.getContextPath() %>/adminQnaList.sp">QnA_admin</a>&nbsp&nbsp
-<a href="#" onclick="openReservationModal('<%=request.getContextPath()%>/reservation.sp'); return false;">
-  reservation
-</a>&nbsp&nbsp
-<a href="#" onclick="openReservationModal('<%=request.getContextPath()%>/myReservations.sp'); return false;">
-  my_reservation
-</a>&nbsp&nbsp
+<a href="<%= request.getContextPath() %>/reservation.sp">reservation</a>&nbsp&nbsp
+<a href="<%= request.getContextPath() %>/myReservations.sp">my_reservation</a>&nbsp&nbsp
 <a href="<%= request.getContextPath() %>/admin/schedule.sp">reservation_admin</a>
 <%-- 임시 review, notice, qna 이동 버튼 --%>
     

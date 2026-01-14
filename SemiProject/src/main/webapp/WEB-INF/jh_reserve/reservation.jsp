@@ -120,6 +120,7 @@
 </head>
 
 <body class="rs">
+<jsp:include page="../header.jsp"/>
 <div class="rs-wrap">
 
   <h2 class="rs-title">안경원 방문예약</h2>
@@ -620,5 +621,6 @@ function rsSubmitReservation(){
   });
 }
 </script>
+<jsp:include page="../footer.jsp"/>
 </body>
 </html>

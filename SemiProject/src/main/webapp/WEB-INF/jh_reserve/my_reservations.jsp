@@ -24,6 +24,7 @@
 </style>
 </head>
 <body>
+<jsp:include page="../header.jsp"/>
 <div class="wrap">
   <h2>내 방문예약</h2>
   <p class="muted">비회원 예약은 취소가 불가하며, 회원 예약만 여기서 취소 가능합니다.</p>
@@ -102,5 +103,6 @@ $(function(){
   });
 });
 </script>
+<jsp:include page="../footer.jsp"/>
 </body>
 </html>

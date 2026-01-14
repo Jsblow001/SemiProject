@@ -136,7 +136,7 @@ public class ReservationCreateController extends AbstractController {
         HttpSession session = request.getSession();
         MemberDTO loginuser = (MemberDTO) session.getAttribute("loginuser");
         if(loginuser != null) {
-        	paraMap.put("memberUserid", loginuser.getUserid());
+        	paraMap.put("userid", loginuser.getUserid());
         }
 
         // ===== 6) INSERT(조건부) =====
