@@ -199,25 +199,34 @@
     });
 
     // [AJAX] 오늘의 예약 데이터 호출
-    function fetchTodayReservations(storeId) {
-        const $list = $("#dashResList");
-        const today = new Date().toISOString().split('T')[0];
+    // [AJAX] 오늘의 예약 데이터 호출 (현재 시간 이후만 표시)
+function fetchTodayReservations(storeId) {
+    const $list = $("#dashResList");
+    const now = new Date(); // 현재 시간 객체
+    const todayStr = now.toISOString().split('T')[0];
 
-        $.ajax({
-            url: "<%= ctxPath %>/admin/scheduleBoard.sp", // 기존 스케줄러 서블릿 활용
-            type: "GET",
-            data: { storeId: storeId, date: today },
-            dataType: "json",
-            success: function(json) {
-                $list.empty();
-                let count = 0;
+    $.ajax({
+        url: "<%= ctxPath %>/admin/scheduleBoard.sp",
+        type: "GET",
+        data: { storeId: storeId, date: todayStr },
+        dataType: "json",
+        success: function(json) {
+            $list.empty();
+            let count = 0;
 
-                if(json.ok && json.events && json.events.length > 0) {
-                    // 시간순 정렬
-                    json.events.sort((a, b) => a.startAt.localeCompare(b.startAt));
+            if(json.ok && json.events && json.events.length > 0) {
+                // 시간순 정렬
+                json.events.sort((a, b) => a.startAt.localeCompare(b.startAt));
 
-                    json.events.forEach(function(ev) {
-                        if(ev.type !== "BLOCK") { // 차단(BLOCK) 제외 실제 예약만
+                json.events.forEach(function(ev) {
+                    if(ev.type !== "BLOCK") { 
+                        
+                        // --- [시간 비교 로직 추가] ---
+                        // ev.startAt 형식 예: "2026-01-14 14:30:00"
+                        const eventTime = new Date(ev.startAt.replace(/-/g, "/")); // 크로스브라우징을 위해 -를 /로 교체
+                        
+                        // 현재 시간보다 이벤트 시작 시간이 큰(미래인) 경우만 화면에 그림
+                        if (eventTime > now) {
                             count++;
                             const startTime = ev.startAt.substring(11, 16);
                             const html = `
@@ -231,19 +240,20 @@
                                 </div>`;
                             $list.append(html);
                         }
-                    });
-                }
-
-                $("#dashResCount").text(count + "건");
-                if(count === 0) {
-                    $list.append('<div class="text-center py-5 text-muted small">금일 예약 내역이 없습니다.</div>');
-                }
-            },
-            error: function() {
-                $list.html('<div class="text-center py-5 text-danger small">데이터 호출 실패</div>');
+                    }
+                });
             }
-        });
-    }
+
+            $("#dashResCount").text(count + "건");
+            if(count === 0) {
+                $list.append('<div class="text-center py-5 text-muted small">남은 예약 내역이 없습니다.</div>');
+            }
+        },
+        error: function() {
+            $list.html('<div class="text-center py-5 text-danger small">데이터 호출 실패</div>');
+        }
+    });
+}
 
     // [AJAX] 매출 현황 로드
     function loadDashboardRevenue() {
