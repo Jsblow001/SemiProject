@@ -25,7 +25,10 @@ public interface OrderDAO {
 	// 주문취소/반품/교환 신청 요청목록 조회
 	List<OrderDetailDTO> getClaimList() throws SQLException;
 	
-	// 주문취소/반품/교환 신청 승인/반려 처리 -> 관리자 승인 -> 주문취소 (결제취소, 배송취소)
-	int processClaim(int odrDetailNo, String action) throws SQLException;
+	// 주문취소/교환/반품 신청 후 1단계: 관리자 승인 / 반려
+	public int approveOrRejectClaim(int odrDetailNo, String action) throws SQLException;
+
+	// 처리대기 건수 표시용
+	int getPendingClaimCount() throws SQLException;
 
 }
