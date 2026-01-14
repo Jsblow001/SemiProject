@@ -9,7 +9,7 @@
             <div class="col-12 text-left">
                 <a href="/" class="text-decoration-none">
                     <h1 class="m-0 display-5 font-weight-semi-bold">
-                        <span class="text-wood font-weight-bold px-0">CARIN</span>
+                        <span class="text-wood font-weight-bold px-0">SISEON</span>
                     </h1>
                 </a>
             </div>
@@ -24,17 +24,17 @@
 			        
 			        <div class="d-flex justify-content-between mb-1" padding-bottom: 2px;">
 			            <span class="font-weight-medium">사업자명</span>
-			            <span>세미플젝</span>
+			            <span>쌍용</span>
 			        </div>
 			
 			        <div class="d-flex justify-content-between mb-1" padding-bottom: 2px;">
 			            <span class="font-weight-medium">대표자명</span>
-			            <span>쌍용 6반 1팀</span>
+			            <span>6반 1팀</span>
 			        </div>
 			
 			        <div class="d-flex justify-content-between mb-1" padding-bottom: 2px;">
 			            <span class="font-weight-medium">주소</span>
-			            <span class="text-right pl-3">경기도 하남시 조정대로 150, 아이테코 430호</span>
+			            <span class="text-right pl-3">서울특별시 강남구 테헤란로70길 12 9층</span>
 			        </div>
 			
 			        <div class="d-flex justify-content-between mb-1" padding-bottom: 2px;">
@@ -44,7 +44,7 @@
 			
 			        <div class="d-flex justify-content-between mb-1" padding-bottom: 2px;">
 			            <span class="font-weight-medium">대표전화번호</span>
-			            <span>02-6851-4856</span>
+			            <span>0507-1316-4632</span>
 			        </div>
 			
 			        <div class="d-flex justify-content-between mb-1" padding-bottom: 2px;">
@@ -54,7 +54,7 @@
 			
 			        <div class="d-flex justify-content-between mb-1" padding-bottom: 2px;">
 			            <span class="font-weight-medium">이메일</span>
-			            <span>cs@carin2024.com</span>
+			            <span>ss@siseon2026.com</span>
 			        </div>
 			        
 			    </div>
@@ -86,7 +86,7 @@
         <div class="row border-top mx-xl-5 py-4" style="border-color: rgba(93, 64, 55, 0.1) !important;">
             <div class="col-md-6 px-xl-0">
                 <p class="mb-md-0 text-center text-md-left text-dark">
-                    &copy; <a class="text-wood font-weight-semi-bold" href="#">CARIN</a>. All Rights Reserved.
+                    &copy; <a class="text-wood font-weight-semi-bold" href="#">SISEON</a>. All Rights Reserved.
                 </p>
             </div>
         </div>

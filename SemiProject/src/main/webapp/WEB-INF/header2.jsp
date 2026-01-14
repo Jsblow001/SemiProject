@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>CARIN ADMIN</title>
+    <title>SISEON ADMIN</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -94,7 +94,7 @@
                 <div class="center-logo">
                     <a href="<%= ctxPath %>/admin.sp" class="text-decoration-none text-center d-block">
                         <h1 class="m-0 display-5 font-weight-semi-bold">
-                            <span class="text-wood font-weight-bold px-3">CARIN ADMIN</span>
+                            <span class="text-wood font-weight-bold px-3">SISEON ADMIN</span>
                         </h1>
                     </a>
                 </div>
