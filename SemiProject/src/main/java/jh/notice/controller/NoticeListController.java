@@ -4,8 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import hk.member.domain.MemberDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import sp.common.controller.AbstractController;
 import jh.notice.domain.NoticeDTO;
 import jh.notice.model.NoticeDAO;
@@ -18,6 +20,19 @@ public class NoticeListController extends AbstractController {
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
+    	
+    	// ✅ 관리자 여부 판단
+        HttpSession session = request.getSession();
+        MemberDTO loginuser = (MemberDTO) session.getAttribute("loginuser");
+
+        boolean isAdmin = false;
+        if(loginuser != null) {
+            // 프로젝트 정책에 맞게 변경 가능:
+            // 예) loginuser.getRole().equals("ADMIN") 이런 식이면 더 좋음
+            isAdmin = "admin".equalsIgnoreCase(loginuser.getUserid());
+        }
+        request.setAttribute("isAdmin", isAdmin);
+    	
         String currentShowPageNo = request.getParameter("currentShowPageNo");
         if(currentShowPageNo == null || currentShowPageNo.isBlank()) {
             currentShowPageNo = "1";

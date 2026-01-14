@@ -56,6 +56,8 @@
       <c:if test="${empty fixedList and empty noticeList}">
         <tr><td colspan="4" style="text-align:center; padding: 30px 0;">등록된 공지사항이 없습니다.</td></tr>
       </c:if>
+      
+      
     </tbody>
   </table>
 
@@ -63,6 +65,13 @@
   <div style="margin-top: 20px;">
     ${pageBar}
   </div>
+  
+  <!-- ✅ 관리자만 글쓰기 버튼 노출 -->
+  <c:if test="${requestScope.isAdmin}">
+  <div class="btn-row" style="text-align:right; margin-top:8px;">
+    <a class="btn btn-dark btn-sm btn-write" href="<%=request.getContextPath()%>/adminNoticeWrite.sp">글쓰기</a>
+  </div>
+  </c:if>
 
 </div>
 
