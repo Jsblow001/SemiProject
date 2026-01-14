@@ -6,23 +6,17 @@
 
 <head>
     <meta charset="utf-8">
-    <title>CARIN</title>
+    <title>SISEON</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-
+	<script src="<%= ctxPath%>/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js" type="text/javascript"></script>
 	<link rel="preconnect" href="https://fonts.gstatic.com">
-	
 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"> 
-	
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-	
+	<script src="<%= ctxPath%>/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js" type="text/javascript"></script>
 	<link href="<%= ctxPath%>/css/style.css" rel="stylesheet">
-	
 	<script src="<%= ctxPath%>/js/jquery-3.7.1.min.js"></script>
 	<script src="<%= ctxPath%>/js/main.js"></script>
-	<script src="<%= ctxPath%>/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js" type="text/javascript"></script>
-    
     <script src="lib/easing/easing.min.js"></script>
-    
     <script src="lib/owlcarousel/owl.carousel.min.js"></script>
     
     <style>
@@ -159,7 +153,7 @@
                         <span class="announcement-text">[공지] 신규 회원 가입 시 10% 할인 쿠폰 즉시 지급</span>
                     </a>
                     <a href="<%= ctxPath %>/noticeList.sp" class="carousel-item announcement-item">
-                        <span class="announcement-text">[이벤트] CARIN x Collaboration 컬렉션 무료 배송</span>
+                        <span class="announcement-text">[이벤트] SISEON x Collaboration 컬렉션 무료 배송</span>
                     </a>
                     <a href="<%= ctxPath %>/noticeList.sp" class="carousel-item announcement-item">
                         <span class="announcement-text">[안내] 평일 오후 2시 이전 결제 시 당일 출고</span>
@@ -194,7 +188,7 @@
                 <div class="center-logo">
                     <a href="<%= ctxPath %>" class="text-decoration-none text-center d-block">
                         <h1 class="m-0 display-5 font-weight-semi-bold">
-                            <span class="text-wood font-weight-bold px-3">CARIN</span>
+                            <span class="text-wood font-weight-bold px-3">SISEON</span>
                         </h1>
                     </a>
                 </div>
