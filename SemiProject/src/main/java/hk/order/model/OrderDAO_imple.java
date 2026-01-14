@@ -526,6 +526,93 @@ public class OrderDAO_imple implements OrderDAO {
         return result;
     }
 
+    
+    
+    
+	 // 주문취소/교환/반품 신청 승인 후 처리완료
+	 // (claim_status, deliverystatus, payment_status, stock)
+	 @Override
+	 public int completeClaim(int odrDetailNo) throws SQLException {
+	
+	     int result = 0;
+	
+	     try {
+	         conn = ds.getConnection();
+	
+	         /* =====================================
+	          * 1. 주문 상세 정보 조회
+	          * ===================================== */
+	         String sql =
+	             " SELECT fk_odrcode, fk_product_id, odrqty " +
+	             " FROM tbl_order_detail " +
+	             " WHERE odrdetailno = ? ";
+	
+	         pstmt = conn.prepareStatement(sql);
+	         pstmt.setInt(1, odrDetailNo);
+	         rs = pstmt.executeQuery();
+	
+	         if (!rs.next()) return 0;
+	
+	         int odrCode   = rs.getInt("fk_odrcode");
+	         int productId = rs.getInt("fk_product_id");
+	         int qty       = rs.getInt("odrqty");
+	
+	         rs.close();
+	         pstmt.close();
+	
+	         /* =====================================
+	          * 2. 주문 상세 → 클레임 완료 + 배송취소
+	          * ===================================== */
+	         sql =
+	             " UPDATE tbl_order_detail " +
+	             " SET claim_status = 'COMPLETED', " +
+	             "     deliverystatus = 4 " +
+	             " WHERE odrdetailno = ? ";
+	
+	         pstmt = conn.prepareStatement(sql);
+	         pstmt.setInt(1, odrDetailNo);
+	         int n1 = pstmt.executeUpdate();
+	         pstmt.close();
+	
+	         /* =====================================
+	          * 3. 주문 결제 상태 → 결제취소
+	          * ===================================== */
+	         sql =
+	             " UPDATE tbl_order " +
+	             " SET payment_status = 2 " +   // 2 = 결제취소
+	             " WHERE odrcode = ? ";
+	
+	         pstmt = conn.prepareStatement(sql);
+	         pstmt.setInt(1, odrCode);
+	         int n2 = pstmt.executeUpdate();
+	         pstmt.close();
+	
+	         /* =====================================
+	          * 4. 상품 재고 복구
+	          * ===================================== */
+	         sql =
+	             " UPDATE tbl_product " +
+	             " SET stock = stock + ? " +
+	             " WHERE product_id = ? ";
+	
+	         pstmt = conn.prepareStatement(sql);
+	         pstmt.setInt(1, qty);
+	         pstmt.setInt(2, productId);
+	         int n3 = pstmt.executeUpdate();
+	         pstmt.close();
+	
+	         if (n1 == 1 && n2 == 1 && n3 == 1) {
+	             result = 1;
+	         }
+	
+	     } finally {
+	         close();
+	     }
+	
+	     return result;
+	 }
+
+
 
 
 

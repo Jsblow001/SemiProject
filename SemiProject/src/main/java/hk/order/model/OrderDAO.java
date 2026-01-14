@@ -37,4 +37,7 @@ public interface OrderDAO {
 	// 주문취소/교환/반품 신청 후 관리자 반려용
 	int rejectClaim(int odrDetailNo, String rejectReason) throws SQLException;
 
+	// 주문취소/교환/반품 신청 후 관리자 승인 -> 처리대기 -> 처리완료
+	int completeClaim(int odrDetailNo) throws SQLException;
+
 }
