@@ -122,10 +122,10 @@ public class GradeListDAO_imple implements GradeListDAO {
 	    int totalAmount = 0;
 	    try {
 	        conn = ds.getConnection();
-	        // 결제 완료(예: 2) 이상의 상태인 주문들의 총합
+	        // 결제 완료(1) 상태인 주문들의 총합
 	        String sql = " SELECT nvl(sum(odrtotalprice), 0) " +
 	                     " FROM tbl_order " +
-	                     " WHERE fk_member_id = ? AND payment_status IN (2, 3, 4) "; // 상태값은 프로젝트 설계에 따름
+	                     " WHERE fk_member_id = ? AND payment_status = 1 ";
 	        
 	        pstmt = conn.prepareStatement(sql);
 	        pstmt.setString(1, userid);

@@ -4,6 +4,11 @@ import sp.common.controller.AbstractController;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jh.review.model.ReviewDAO_imple;
+import jh.review.domain.ReviewDTO;
+import jh.review.model.ReviewDAO;
+import java.util.List;
+
 import hk.member.domain.MemberDTO;
 import ih.product.domain.ProductDTO;
 import ih.product.model.*;
@@ -22,11 +27,13 @@ public class ProductDetailController extends AbstractController {
         // DB에서 해당 상품의 정보를 가져오기
         ProductDAO pdao = new ProductDAO_imple();
         ProductDTO pdto = pdao.selectOneProduct(product_id, userid);
+        ReviewDAO rdao = new ReviewDAO_imple();
+        List<ReviewDTO> allReviews = rdao.getReviewsByProductId(product_id);
         
         if(pdto != null) {
             // 데이터를 JSP에 전달
             request.setAttribute("pdto", pdto);
-            
+            request.setAttribute("allReviews", allReviews);
             super.setRedirect(false);
             super.setViewPage("/WEB-INF/ih_product/productDetail.jsp");
         } else {
