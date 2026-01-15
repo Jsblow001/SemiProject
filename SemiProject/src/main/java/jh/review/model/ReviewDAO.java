@@ -25,7 +25,7 @@ public interface ReviewDAO {
 
     
     // 리뷰 뷰단 중앙부 캐러셀 노출용(최근판매량순 등등)
-    List<Map<String, Object>> selectMidRankProducts(String sortKey, int limit) throws SQLException;
+    List<Map<String, Object>> selectMidRankProducts(String sortKey, int limit, String userid) throws SQLException;
 	
     // 리뷰 이미지 등록(복수)
     int insertReviewImage(Connection conn, long review_id, String image_filename) throws SQLException;
