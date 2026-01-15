@@ -5,6 +5,7 @@
 <head>
 <meta charset="UTF-8" />
 <title>방문 예약</title>
+<jsp:include page="../header.jsp"/>
 <script src="<%=ctxPath%>/js/jquery-3.7.1.min.js"></script>
 
 <style>
@@ -118,8 +119,9 @@
 #rsTimeGrid .rs-slot:focus{ outline: 3px solid rgba(0,0,0,.15); outline-offset: 2px; }
 </style>
 </head>
+<body>
+<div class="rs">
 
-<body class="rs">
 <div class="rs-wrap">
 
   <h2 class="rs-title">안경원 방문예약</h2>
@@ -229,7 +231,7 @@
   </div>
 
 </div>
-
+</div>
 <script>
 /* =========================
    State
@@ -620,5 +622,6 @@ function rsSubmitReservation(){
   });
 }
 </script>
+<jsp:include page="../footer.jsp"/>
 </body>
 </html>

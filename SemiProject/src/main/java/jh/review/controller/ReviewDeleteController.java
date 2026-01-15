@@ -51,12 +51,19 @@ public class ReviewDeleteController extends AbstractController {
         }
 
         long reviewId = Long.parseLong(reviewIdStr);
+        
+        // returnURL 받기 => 내 리뷰 모아보기에서 delete 진행 후 다시 내 리뷰 모아보기로 돌아오기
+        String returnUrl = request.getParameter("returnUrl");
+        if(returnUrl == null || returnUrl.isBlank()) {
+            returnUrl = request.getContextPath() + "/myReviewList.sp";
+        }
+
 
         // 3) 원글 조회 + 권한 확인
         ReviewDTO origin = rdao.selectReviewOne(reviewId); // 이미 있는 메서드면 그걸로 교체
         if(origin == null) {
             request.setAttribute("message", "존재하지 않는 리뷰입니다.");
-            request.setAttribute("loc", request.getContextPath() + "/reviews.sp");
+            request.setAttribute("loc", returnUrl);
             super.setRedirect(false);
             super.setViewPage("/WEB-INF/msg.jsp");
             return;
@@ -115,7 +122,7 @@ public class ReviewDeleteController extends AbstractController {
             }
 
             request.setAttribute("message", "리뷰가 삭제되었습니다.");
-            request.setAttribute("loc", request.getContextPath() + "/reviews.sp");
+            request.setAttribute("loc", returnUrl);
             super.setRedirect(false);
             super.setViewPage("/WEB-INF/msg.jsp");
 

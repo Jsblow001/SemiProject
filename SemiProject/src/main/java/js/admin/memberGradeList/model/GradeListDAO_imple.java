@@ -116,5 +116,25 @@ public class GradeListDAO_imple implements GradeListDAO {
 	    }
 	    return result;
 	}
+
+	// GradeListDAO_imple.java 내부 예시
+	public int getMemberTotalAmount(String userid) throws SQLException {
+	    int totalAmount = 0;
+	    try {
+	        conn = ds.getConnection();
+	        // 결제 완료(1) 상태인 주문들의 총합
+	        String sql = " SELECT nvl(sum(odrtotalprice), 0) " +
+	                     " FROM tbl_order " +
+	                     " WHERE fk_member_id = ? AND payment_status = 1 ";
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, userid);
+	        rs = pstmt.executeQuery();
+	        if(rs.next()) totalAmount = rs.getInt(1);
+	    } finally {
+	        close();
+	    }
+	    return totalAmount;
+	}
 	
 }

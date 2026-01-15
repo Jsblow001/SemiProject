@@ -25,7 +25,7 @@ public interface ReviewDAO {
 
     
     // 리뷰 뷰단 중앙부 캐러셀 노출용(최근판매량순 등등)
-    List<Map<String, Object>> selectMidRankProducts(String sortKey, int limit) throws SQLException;
+    List<Map<String, Object>> selectMidRankProducts(String sortKey, int limit, String userid) throws SQLException;
 	
     // 리뷰 이미지 등록(복수)
     int insertReviewImage(Connection conn, long review_id, String image_filename) throws SQLException;
@@ -42,5 +42,19 @@ public interface ReviewDAO {
     
     // 리뷰 상세 1건 보기 
     ReviewDTO selectReviewDetail(long reviewId) throws SQLException;
+    
+    // 마이페이지 최근 리뷰 n개 조회
+    List<ReviewDTO> selectMyRecentReviews(String userid, int limit) throws SQLException;
 
+    // 내 리뷰 전체보기 - 총 개수
+    int getTotalMyReviewCount(Map<String, String> paraMap) throws SQLException;
+
+    // 내 리뷰 전체보기 - 페이징 목록
+    List<ReviewDTO> selectMyReviewListPaging(Map<String, String> paraMap) throws SQLException;
+
+    // 관리자 리뷰 댓글달기 (update + insert)
+    int upsertReviewComment(long reviewId, String adminId, String commentContent) throws SQLException;
+
+    // 제품 상세 페이지 리뷰 불러오기
+    List<ReviewDTO> getReviewsByProductId(String product_id) throws SQLException;
 }
