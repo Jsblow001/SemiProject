@@ -5,5 +5,11 @@ import java.util.List;
 import ih.product.domain.ProductDTO;
 
 public interface ProductDAO {
+	
     List<ProductDTO> searchProductsByName(String q, int size, int offset) throws SQLException;
+    
+    List<String> selectBulkProductImages() throws Exception;
+    
+    int deleteBulkProducts() throws Exception;
+
 }

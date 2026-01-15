@@ -15,7 +15,7 @@
   .grid{border:1px solid #ddd;border-radius:10px;overflow:hidden;}
   .row{display:grid;grid-template-columns:120px 1fr;border-top:1px solid #eee;min-height:52px;}
   .row:first-child{border-top:none;}
-  .time{padding:12px;background:#fafafa;border-right:1px solid #eee;font-weight:700;}
+  .time{padding:12px 12px 12px 25px;background:#fafafa;border-right:1px solid #eee;font-weight:700;}
   .cell{padding:8px 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
   .badge{display:inline-flex;align-items:center;gap:8px;border:1px solid #ddd;border-radius:999px;padding:6px 10px;font-size:13px;}
   .b-res{background:#f3f7ff;}
