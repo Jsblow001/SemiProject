@@ -22,6 +22,8 @@
     }
     .section-title{
       letter-spacing: -0.02em;
+      border-bottom: none !important;
+  	  padding-bottom: 0 !important;
     }
     .card-soft{
       border: 1px solid rgba(0,0,0,.06);
@@ -45,13 +47,24 @@
       padding-left: 14px;
       color:#333;
     }
+    .section-title,
+	.section-title::before,
+	.section-title::after{
+	  border: 0 !important;
+	  box-shadow: none !important;
+	  background: none !important;
+	}
+	
+	.section-title::before,
+	.section-title::after{
+	  content: none !important;
+	  display: none !important;
+	}
+    
   </style>
 </head>
 
 <body class="bg-white">
-
-  <!-- (선택) 공통 헤더가 있으면 include로 교체 -->
-  <%-- <jsp:include page="/WEB-INF/views/common/header.jsp" /> --%>
 
   <jsp:include page="../header.jsp"/>
 
@@ -65,11 +78,12 @@
         <div class="row g-4">
           <div class="col-lg-7">
             <div class="card card-soft p-4">
+              <h4>SISEON</h4>
               <p class="mb-3">
-                우리는 <b>과하지 않은 디자인</b>, <b>오래 써도 편안한 착용감</b>,
+                <b>과하지 않은 디자인</b>, <b>오래 써도 편안한 착용감</b>,
                 그리고 <b>누구에게나 자연스럽게 어울리는 아이웨어</b>를 목표로 시작했습니다.
               </p>
-              <p class="mb-0 text-secondary">
+              <p class="mb-0 text-body">
                 단순히 “보여주기 위한 안경”이 아니라,
                 <b>매일 쓰고 싶은 안경</b>을 만드는 것이 우리의 기준입니다.
               </p>
@@ -78,7 +92,7 @@
           <div class="col-lg-5">
             <div class="card card-soft p-4">
               <div class="fw-semibold mb-2">핵심 키워드</div>
-              <ul class="mb-0 text-secondary">
+              <ul class="mb-0 text-body">
                 <li>데일리 웨어러블 디자인</li>
                 <li>장시간 착용 피로 최소화</li>
                 <li>검증된 소재와 공정</li>
@@ -98,7 +112,7 @@
                 <div class="icon-pill">D</div>
                 <div class="fw-semibold">Design</div>
               </div>
-              <p class="mb-0 text-secondary">
+              <p class="mb-0 text-body">
                 불필요한 장식을 덜어낸 미니멀 디자인.<br/>
                 얼굴형과 스타일을 자연스럽게 살리는 균형을 고민합니다.
               </p>
@@ -110,7 +124,7 @@
                 <div class="icon-pill">C</div>
                 <div class="fw-semibold">Comfort</div>
               </div>
-              <p class="mb-0 text-secondary">
+              <p class="mb-0 text-body">
                 장시간 착용해도 부담 없는 무게감.<br/>
                 브릿지와 템플 각도까지 세심하게 설계합니다.
               </p>
@@ -122,7 +136,7 @@
                 <div class="icon-pill">Q</div>
                 <div class="fw-semibold">Quality</div>
               </div>
-              <p class="mb-0 text-secondary">
+              <p class="mb-0 text-body">
                 엄선된 소재와 꼼꼼한 공정/검수.<br/>
                 오래 써도 안정적인 품질을 지향합니다.
               </p>
@@ -140,7 +154,7 @@
               <p class="mb-3">
                 우리의 모든 제품은 <b>실제 착용자의 경험</b>을 기준으로 설계됩니다.
               </p>
-              <ul class="text-secondary mb-0">
+              <ul class="text-body mb-0">
                 <li>데일리 착용이 가능한 디자인</li>
                 <li>다양한 얼굴형을 고려한 피팅</li>
                 <li>안경사, 디자이너, 제작 파트너의 협업</li>
@@ -150,7 +164,7 @@
           <div class="col-lg-4">
             <div class="card card-soft p-4 h-100">
               <div class="fw-semibold mb-2">우리가 만드는 것</div>
-              <p class="mb-0 text-secondary">
+              <p class="mb-0 text-body">
                 “잘 팔리는 안경”보다<br/>
                 <b>오래 함께할 수 있는 안경</b>을 만들고자 합니다.
               </p>
@@ -176,10 +190,10 @@
       <section>
         <div class="card card-soft p-4">
           <p class="quote mb-3">
-            안경은 단순한 액세서리가 아니라<br/>
+            <b>시선</b>은 단순한 액세서리가 아니라<br/>
             <b>당신의 시선과 일상을 함께하는 도구</b>입니다.
           </p>
-          <p class="mb-0 text-secondary">
+          <p class="mb-0 text-body">
             우리는 당신의 하루가 조금 더 편안해지도록 고민합니다.
           </p>
         </div>
@@ -190,6 +204,5 @@
 
   <jsp:include page="../footer.jsp"/>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

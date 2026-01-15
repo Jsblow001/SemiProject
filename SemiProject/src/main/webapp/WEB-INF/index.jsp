@@ -164,12 +164,7 @@
 
   </style>
   
-<%-- 임시 이동 버튼 --%>
-<br><br>
-<a href="<%= request.getContextPath() %>/reservation.sp">reservation</a>&nbsp&nbsp
-<a href="<%= request.getContextPath() %>/myReservations.sp">my_reservation</a>&nbsp&nbsp
-<a href="<%= request.getContextPath() %>/admin/schedule.sp">reservation_admin</a>
-<%-- 임시 review, notice, qna 이동 버튼 --%>
+
     
     <!-- Navbar Start -->
     <div class="container-fluid">

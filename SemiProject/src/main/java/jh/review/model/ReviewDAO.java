@@ -55,4 +55,6 @@ public interface ReviewDAO {
     // 관리자 리뷰 댓글달기 (update + insert)
     int upsertReviewComment(long reviewId, String adminId, String commentContent) throws SQLException;
 
+    // 제품 상세 페이지 리뷰 불러오기
+    List<ReviewDTO> getReviewsByProductId(String product_id) throws SQLException;
 }
