@@ -8,16 +8,14 @@
     <meta charset="utf-8">
     <title>SISEON</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-	<script src="<%= ctxPath%>/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js" type="text/javascript"></script>
+
 	<link rel="preconnect" href="https://fonts.gstatic.com">
 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"> 
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-	<script src="<%= ctxPath%>/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js" type="text/javascript"></script>
 	<link href="<%= ctxPath%>/css/style.css" rel="stylesheet">
 	<script src="<%= ctxPath%>/js/jquery-3.7.1.min.js"></script>
 	<script src="<%= ctxPath%>/js/main.js"></script>
-    <script src="lib/easing/easing.min.js"></script>
-    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="<%= ctxPath%>/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js" type="text/javascript"></script>
     
     <style>
         :root {
@@ -149,13 +147,13 @@
         <div class="container-fluid top-announcement-bar p-0">
             <div id="noticeCarousel" class="carousel slide" data-ride="carousel" data-interval="4000" data-pause="hover">
                 <div class="carousel-inner">
-                    <a href="<%= ctxPath %>/noticeList.sp" class="carousel-item active announcement-item">
-                        <span class="announcement-text">[공지] 신규 회원 가입 시 10% 할인 쿠폰 즉시 지급</span>
+                    <a href="<%= ctxPath %>/noticeView.sp?noticeId=5" class="carousel-item active announcement-item">
+                        <span class="announcement-text">[공지] 신규 회원 가입 시 3000 포인트 즉시 지급</span>
                     </a>
-                    <a href="<%= ctxPath %>/noticeList.sp" class="carousel-item announcement-item">
+                    <a href="<%= ctxPath %>/noticeView.sp?noticeId=8" class="carousel-item announcement-item">
                         <span class="announcement-text">[이벤트] SISEON x Collaboration 컬렉션 무료 배송</span>
                     </a>
-                    <a href="<%= ctxPath %>/noticeList.sp" class="carousel-item announcement-item">
+                    <a href="<%= ctxPath %>/noticeView.sp?noticeId=9" class="carousel-item announcement-item">
                         <span class="announcement-text">[안내] 평일 오후 2시 이전 결제 시 당일 출고</span>
                     </a>
                 </div>
