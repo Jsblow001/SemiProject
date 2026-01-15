@@ -687,7 +687,191 @@ public class ReviewDAO_imple implements ReviewDAO {
     }
 
 
+    // 마이페이지 최근 리뷰 n개 조회
+    @Override
+    public List<ReviewDTO> selectMyRecentReviews(String userid, int limit) throws SQLException {
 
+        List<ReviewDTO> list = new ArrayList<>();
+
+        try {
+            conn = ds.getConnection();
+
+            String sql =
+                " select r.review_id, " +
+                "        to_char(r.review_date,'yyyy-mm-dd') as review_date, " +
+                "        r.review_title, r.rating, " +
+                "        p.product_name, " +
+                "        case when c.review_comment_id is not null then 1 else 0 end as comment_count " +
+                "   from tbl_product_review r " +
+                "   join tbl_product p on p.product_id = r.fk_product_id " +
+                "   left join tbl_review_comment c " +
+                "     on c.fk_review_id = r.review_id and c.status = 1 " +
+                "  where r.fk_member_id = ? " +
+                "  order by r.review_date desc, r.review_id desc " +
+                "  fetch first ? rows only ";
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, userid);
+            pstmt.setInt(2, limit);
+
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                ReviewDTO dto = new ReviewDTO();
+
+                dto.setReview_id(rs.getLong("review_id"));
+                dto.setReview_date(rs.getString("review_date"));
+                dto.setReview_title(rs.getString("review_title"));
+                dto.setRating(rs.getInt("rating"));
+                dto.setProduct_name(rs.getString("product_name"));
+
+                // ✅ 답변 여부(1=완료, 0=대기)
+                dto.setCommentCount(rs.getInt("comment_count"));
+
+                list.add(dto);
+            }
+
+        } finally {
+            close();
+        }
+
+        return list;
+    }
+
+
+    // 내 리뷰 전체보기 - 총 개수
+    @Override
+    public int getTotalMyReviewCount(Map<String, String> paraMap) throws SQLException {
+
+        int totalCount = 0;
+
+        String userid = paraMap.get("userid");
+        String searchWord = paraMap.get("searchWord");
+
+        if(searchWord == null) searchWord = "";
+        searchWord = searchWord.trim();
+
+        try {
+            conn = ds.getConnection();
+
+            StringBuilder sql = new StringBuilder();
+            sql.append(" select count(*) ")
+               .append(" from tbl_product_review r ")
+               .append(" where r.fk_member_id = ? ");
+
+            if(!searchWord.isBlank()) {
+                sql.append(" and ( lower(r.review_title) like '%'||lower(?)||'%' ")
+                   .append("    or lower(r.review_content) like '%'||lower(?)||'%' ) ");
+            }
+
+            pstmt = conn.prepareStatement(sql.toString());
+
+            int idx = 1;
+            pstmt.setString(idx++, userid);
+
+            if(!searchWord.isBlank()) {
+                pstmt.setString(idx++, searchWord);
+                pstmt.setString(idx++, searchWord);
+            }
+
+            rs = pstmt.executeQuery();
+            rs.next();
+            totalCount = rs.getInt(1);
+
+        } finally {
+            close();
+        }
+
+        return totalCount;
+    }
+    
+    
+    
+    // 내 리뷰 전체보기 - 페이징 목록
+    @Override
+    public List<ReviewDTO> selectMyReviewListPaging(Map<String, String> paraMap) throws SQLException {
+
+        List<ReviewDTO> list = new ArrayList<>();
+
+        String userid = paraMap.get("userid");
+        String sort = paraMap.get("sort"); // recent | rating
+        String searchWord = paraMap.get("searchWord");
+        String currentShowPageNo = paraMap.get("currentShowPageNo");
+        String sizePerPage = paraMap.get("sizePerPage");
+
+        if(sort == null || sort.isBlank()) sort = "recent";
+        if(searchWord == null) searchWord = "";
+        searchWord = searchWord.trim();
+
+        if(currentShowPageNo == null || currentShowPageNo.isBlank()) currentShowPageNo = "1";
+        if(sizePerPage == null || sizePerPage.isBlank()) sizePerPage = "10";
+
+        int nCurrentPage = Integer.parseInt(currentShowPageNo);
+        int nSizePerPage = Integer.parseInt(sizePerPage);
+
+        String orderBy =
+            "rating".equalsIgnoreCase(sort)
+            ? " order by r.rating desc, r.review_date desc, r.review_id desc "
+            : " order by r.review_date desc, r.review_id desc ";
+
+        try {
+            conn = ds.getConnection();
+
+            StringBuilder sql = new StringBuilder();
+            sql.append(" select ")
+               .append("   r.review_id, ")
+               .append("   to_char(r.review_date,'yyyy-mm-dd') as review_date, ")
+               .append("   r.review_title, ")
+               .append("   r.rating, ")
+               .append("   p.product_name, ")
+               .append("   case when c.review_comment_id is not null then 1 else 0 end as comment_count ")
+               .append(" from tbl_product_review r ")
+               .append(" join tbl_product p on p.product_id = r.fk_product_id ")
+               .append(" left join tbl_review_comment c ")
+               .append("   on c.fk_review_id = r.review_id and c.status = 1 ")
+               .append(" where r.fk_member_id = ? ");
+
+            if(!searchWord.isBlank()) {
+                sql.append(" and ( lower(r.review_title) like '%'||lower(?)||'%' ")
+                   .append("    or lower(r.review_content) like '%'||lower(?)||'%' ) ");
+            }
+
+            sql.append(orderBy);
+            sql.append(" offset (? - 1) * ? rows fetch next ? rows only ");
+
+            pstmt = conn.prepareStatement(sql.toString());
+
+            int idx = 1;
+            pstmt.setString(idx++, userid);
+
+            if(!searchWord.isBlank()) {
+                pstmt.setString(idx++, searchWord);
+                pstmt.setString(idx++, searchWord);
+            }
+
+            pstmt.setInt(idx++, nCurrentPage);
+            pstmt.setInt(idx++, nSizePerPage);
+            pstmt.setInt(idx++, nSizePerPage);
+
+            rs = pstmt.executeQuery();
+
+            while(rs.next()) {
+                ReviewDTO dto = new ReviewDTO();
+                dto.setReview_id(rs.getLong("review_id"));
+                dto.setReview_date(rs.getString("review_date"));
+                dto.setReview_title(rs.getString("review_title"));
+                dto.setRating(rs.getInt("rating"));
+                dto.setProduct_name(rs.getString("product_name"));
+                dto.setCommentCount(rs.getInt("comment_count"));
+                list.add(dto);
+            }
+
+        } finally {
+            close();
+        }
+
+        return list;
+    }
 
 
 

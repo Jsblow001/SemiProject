@@ -42,5 +42,15 @@ public interface ReviewDAO {
     
     // 리뷰 상세 1건 보기 
     ReviewDTO selectReviewDetail(long reviewId) throws SQLException;
+    
+    // 마이페이지 최근 리뷰 n개 조회
+    List<ReviewDTO> selectMyRecentReviews(String userid, int limit) throws SQLException;
+
+    // 내 리뷰 전체보기 - 총 개수
+    int getTotalMyReviewCount(Map<String, String> paraMap) throws SQLException;
+
+    // 내 리뷰 전체보기 - 페이징 목록
+    List<ReviewDTO> selectMyReviewListPaging(Map<String, String> paraMap) throws SQLException;
+
 
 }
