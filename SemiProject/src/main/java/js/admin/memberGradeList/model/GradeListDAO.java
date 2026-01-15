@@ -15,5 +15,8 @@ public interface GradeListDAO {
 
 	// 실제 등급 업데이트 처리
 	int updateMemberGrade(String memberId, String newGrade) throws SQLException;
+
+	// 
+	int getMemberTotalAmount(String userid) throws SQLException;
 	
 }
