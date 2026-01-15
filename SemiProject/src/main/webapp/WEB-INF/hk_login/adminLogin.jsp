@@ -7,7 +7,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>CARIN | ADMIN LOGIN</title>
+<title>SISEON | ADMIN LOGIN</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- Google Font -->
@@ -77,7 +77,7 @@ body{font-family:'Poppins',sans-serif!important;background:#f3f3f3!important}
 <jsp:include page="../header.jsp" />
 
 <div class="login-wrap">
-    <div class="login-title">CARIN ADMIN</div>
+    <div class="login-title">SISEON ADMIN</div>
     <div class="login-subtitle">SYSTEM MANAGEMENT</div>
 
     <!-- 관리자 로그인 -->
