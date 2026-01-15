@@ -874,5 +874,68 @@ public class ReviewDAO_imple implements ReviewDAO {
     }
 
 
+    // 관리자 리뷰 댓글달기 (update + insert)
+    @Override
+    public int upsertReviewComment(long reviewId, String adminId, String commentContent) throws SQLException {
+
+        int result = 0;
+
+        try {
+            conn = ds.getConnection();
+
+            // 1) 해당 리뷰에 status=1 댓글이 이미 있는지 확인
+            String sqlCheck =
+                " select count(*) " +
+                "   from tbl_review_comment " +
+                "  where fk_review_id = ? and status = 1 ";
+
+            pstmt = conn.prepareStatement(sqlCheck);
+            pstmt.setLong(1, reviewId);
+            rs = pstmt.executeQuery();
+            rs.next();
+
+            int cnt = rs.getInt(1);
+
+            rs.close(); rs = null;
+            pstmt.close(); pstmt = null;
+
+            if(cnt > 0) {
+                // 2-A) 있으면 update (내용 + 관리자ID 갱신)
+                String sqlUpdate =
+                    " update tbl_review_comment " +
+                    "    set comment_content = ?, " +
+                    "        fk_admin_id = ? " +
+                    "  where fk_review_id = ? and status = 1 ";
+
+                pstmt = conn.prepareStatement(sqlUpdate);
+                pstmt.setString(1, commentContent);
+                pstmt.setString(2, adminId);
+                pstmt.setLong(3, reviewId);
+
+                result = pstmt.executeUpdate();
+            }
+            else {
+                // 2-B) 없으면 insert (FK_ADMIN_ID 반드시 포함!!)
+                String sqlInsert =
+                    " insert into tbl_review_comment " +
+                    " (review_comment_id, fk_review_id, fk_admin_id, comment_content, status) " +
+                    " values (seq_review_comment_id.nextval, ?, ?, ?, 1) ";
+
+                pstmt = conn.prepareStatement(sqlInsert);
+                pstmt.setLong(1, reviewId);
+                pstmt.setString(2, adminId);
+                pstmt.setString(3, commentContent);
+
+                result = pstmt.executeUpdate();
+            }
+
+        } finally {
+            close();
+        }
+
+        return (result >= 1 ? 1 : 0);
+    }
+
+
 
 }

@@ -52,5 +52,7 @@ public interface ReviewDAO {
     // 내 리뷰 전체보기 - 페이징 목록
     List<ReviewDTO> selectMyReviewListPaging(Map<String, String> paraMap) throws SQLException;
 
+    // 관리자 리뷰 댓글달기 (update + insert)
+    int upsertReviewComment(long reviewId, String adminId, String commentContent) throws SQLException;
 
 }

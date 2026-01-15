@@ -107,6 +107,41 @@
       <div class="admin-name">카린 올림</div>
     </div>
   </c:if>
+  
+  <!-- ✅ 관리자만 댓글 입력 가능 -->
+<c:if test="${isAdmin}">
+  <div style="margin-top:18px; border-top:1px solid #eee; padding-top:14px;">
+    <div style="font-size:12px; color:#666; margin-bottom:8px;">
+      관리자 댓글
+    </div>
+
+    <form method="post"
+          action="${pageContext.request.contextPath}/reviewCommentWrite.sp">
+      
+      <input type="hidden" name="reviewId" value="${review.review_id}" />
+
+      <!-- ✅ 저장 후 다시 이 상세로 돌아오기 -->
+      <input type="hidden" name="returnUrl"
+             value="${pageContext.request.contextPath}/reviewView.sp?reviewId=${review.review_id}" />
+
+      <textarea name="comment_content"
+                rows="4"
+                style="width:100%; padding:12px; border:1px solid #ddd; border-radius:10px; resize:none; font-size:13px;"
+                placeholder="관리자 댓글을 입력하세요.">${review.adminReply}</textarea>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
+        <button type="submit" class="btn dark"
+                onclick="return confirm('댓글을 저장할까요?');">
+          <c:choose>
+            <c:when test="${empty review.adminReply}">댓글 등록</c:when>
+            <c:otherwise>댓글 수정</c:otherwise>
+          </c:choose>
+        </button>
+      </div>
+    </form>
+  </div>
+</c:if>
+  
 
   <div class="btns">
     <button type="button" class="btn"
