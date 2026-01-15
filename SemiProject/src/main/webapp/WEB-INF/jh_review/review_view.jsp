@@ -104,7 +104,7 @@
   <c:if test="${not empty review.adminReply}">
     <div class="admin-reply">
       ${review.adminReply}
-      <div class="admin-name">카린 올림</div>
+      <div class="admin-name">시선 올림</div>
     </div>
   </c:if>
   
