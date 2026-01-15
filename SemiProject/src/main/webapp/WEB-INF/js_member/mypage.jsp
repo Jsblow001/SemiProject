@@ -279,6 +279,108 @@
             </table>
         </div>
         
+        <%-- 최근 리뷰 정보 테이블 --%>
+	      <div class="mt-5">
+	          <div class="d-flex justify-content-between align-items-end mb-3">
+	              <h4 style="font-size: 18px; font-weight: 600; margin: 0; color: #333;">최근 리뷰 정보</h4>
+	              <a href="<%= ctxPath %>/myReviewList.sp"
+	                 style="font-size: 12px; color: #999; text-decoration: none;">전체보기 ></a>
+	          </div>
+	      
+	          <table class="table" style="font-size: 14px; border-top: 2px solid #5D4037; background: #fff;">
+	              <thead class="bg-light text-center text-muted">
+	                  <tr>
+	                      <th style="width: 10%;">번호</th>
+	                      <th style="width: 15%;">날짜</th>
+	                      <th>상품명</th>
+	                      <th>리뷰제목</th>
+	                      <th style="width: 10%;">평점</th>
+	                      <th style="width: 12%;">답변</th>
+	                      <th style="width: 13%;">삭제</th>
+	                  </tr>
+	              </thead>
+	      
+	              <tbody class="text-center">
+	                  <c:choose>
+	                      <c:when test="${not empty recentReviewList}">
+	                          <c:forEach var="r" items="${recentReviewList}" varStatus="st">
+	                              <tr>
+	                                  <td>${st.count}</td>
+	                                  <td>${r.review_date}</td>
+	                                  <td>${r.product_name}</td>
+	      
+	                                  <td style="text-align:left;">
+	                                      <a href="<%=ctxPath%>/reviewView.sp?reviewId=${r.review_id}"
+	                                         style="color:#333;text-decoration:none;">
+	                                          ${r.review_title}
+	                                      </a>
+	                                  </td>
+	      
+	                                  <td>${r.rating}</td>
+	      
+	                                  <td>
+	                                      <c:choose>
+	                                          <c:when test="${r.commentCount > 0}">
+	                                              <span style="color:#5D4037;font-weight:600;">완료</span>
+	                                          </c:when>
+	                                          <c:otherwise>
+	                                              <span style="color:#999;">대기</span>
+	                                          </c:otherwise>
+	                                      </c:choose>
+	                                  </td>
+	      
+	                                  <!-- ✅ 삭제 버튼 -->
+	                                  <td>
+	                                      <a href="javascript:void(0);"
+	                                         onclick="goDeleteRecentReview('${r.review_id}')"
+	                                         style="font-size:12px;color:#c62828;">
+	                                          삭제
+	                                      </a>
+	                                  </td>
+	                              </tr>
+	                          </c:forEach>
+	                      </c:when>
+	      
+	                      <c:otherwise>
+	                          <tr>
+	                              <td colspan="7" class="py-5 text-muted">
+	                                  최근 작성한 리뷰가 없습니다.
+	                              </td>
+	                          </tr>
+	                      </c:otherwise>
+	                  </c:choose>
+	              </tbody>
+	          </table>
+	      </div>
+	      
+	      <script>
+	      function goDeleteRecentReview(reviewId){
+	          if(!confirm("정말 이 리뷰를 삭제할까요?\n삭제하면 복구할 수 없습니다.")) return;
+	      
+	          // ✅ 삭제 후 마이페이지로 돌아오기
+	          const returnUrl = "<%=ctxPath%>/mypage.sp";
+	      
+	          const f = document.createElement("form");
+	          f.method = "post";
+	          f.action = "<%=ctxPath%>/reviewDelete.sp";
+	      
+	          const i1 = document.createElement("input");
+	          i1.type = "hidden";
+	          i1.name = "reviewId";
+	          i1.value = reviewId;
+	      
+	          const i2 = document.createElement("input");
+	          i2.type = "hidden";
+	          i2.name = "returnUrl";
+	          i2.value = returnUrl;
+	      
+	          f.appendChild(i1);
+	          f.appendChild(i2);
+	      
+	          document.body.appendChild(f);
+	          f.submit();
+	      }
+	      </script>
         
         <%-- 계정 관리 영역 --%>
         <div class="account-box mt-5 pt-4 text-center">

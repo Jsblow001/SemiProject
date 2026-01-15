@@ -4,6 +4,9 @@ import sp.common.controller.AbstractController;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jh.review.domain.ReviewDTO;
+import jh.review.model.ReviewDAO;
+import jh.review.model.ReviewDAO_imple;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -77,6 +80,14 @@ public class MyPageController extends AbstractController {
         int endRow = 5;
         
         List<OrderDTO> recentOrderList = odao.selectMyOrderList(userid, null, startDate, endDate, startRow, endRow);
+        
+        /* ===============================
+         4-1. 최근 5개 리뷰 조회, request 영역에 저장
+	     =============================== */
+	     ReviewDAO rdao = new ReviewDAO_imple();
+	
+	     List<ReviewDTO> recentReviewList = rdao.selectMyRecentReviews(userid, 5);
+	     request.setAttribute("recentReviewList", recentReviewList);
 
         /* 5. request 영역에 저장 */
         request.setAttribute("recentOrderList", recentOrderList);
