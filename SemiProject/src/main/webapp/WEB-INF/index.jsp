@@ -115,6 +115,52 @@
   object-fit: contain;                /* 제품 사진은 contain 추천 */
   border-radius: 10px;
 }
+.carousel-control-prev-icon,
+.carousel-control-next-icon{
+  filter: invert(40%);  /* 대충 회색 느낌 */
+}
+
+/* ✅ Monthly Best 캐러셀 화살표를 바깥으로 이동 */
+#recipeCarousel{
+  position: relative; /* 컨트롤 absolute 기준 */
+}
+
+#recipeCarousel .carousel-control-prev{
+  left: -40px;   /* ✅ 숫자 조절 (20~60 추천) */
+  width: 40px;
+}
+
+#recipeCarousel .carousel-control-next{
+  right: -40px;  /* ✅ 숫자 조절 */
+  width: 40px;
+}
+
+/* 버튼 자체 크기 살짝 키우고 싶으면(선택) */
+#recipeCarousel .carousel-control-prev-icon,
+#recipeCarousel .carousel-control-next-icon{
+  width: 28px;
+  height: 28px;
+}
+
+@media (max-width: 991px){
+  #recipeCarousel .carousel-control-prev{ left: -18px; }
+  #recipeCarousel .carousel-control-next{ right: -18px; }
+}
+#recipeCarousel .carousel-inner{
+  width: 100%;
+}
+
+#recipeCarousel .carousel-item .monthly-best-row{
+  justify-content: center;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.monthly-best-col{
+  padding-left: 12px;
+  padding-right: 12px;
+  margin-bottom: 18px;
+}
 
   </style>
   
@@ -160,28 +206,9 @@
 							           alt="Image 3">
 							    </picture>
 						  	  </div>
-						  <%-- 
-					    <div class="carousel-item active">
-					      <img class="d-block w-100 carousel-img" src="img/index_upper_carousel/carousel-1.jpg" alt="Image">
-					    </div>
-					    <div class="carousel-item">
-					      <img class="d-block w-100 carousel-img" src="img/index_upper_carousel/carousel-2.jpg" alt="Image">
-					    </div>
-					    <div class="carousel-item">
-					      <img class="d-block w-100 carousel-img" src="img/index_upper_carousel/carousel-3.jpg" alt="Image">
-					    </div>
-					    --%>
+						 
 					</div>
-                    <a class="carousel-control-prev" href="#header-carousel" data-slide="prev">
-                        <div class="btn btn-dark" style="width: 45px; height: 45px;">
-                            <span class="carousel-control-prev-icon mb-n2"></span>
-                        </div>
-                    </a>
-                    <a class="carousel-control-next" href="#header-carousel" data-slide="next">
-                        <div class="btn btn-dark" style="width: 45px; height: 45px;">
-                            <span class="carousel-control-next-icon mb-n2"></span>
-                        </div>
-                    </a>
+                    
                 </div>
             </div>
         
@@ -221,14 +248,10 @@
 		        </c:if>
 		
 		      </c:forEach>
-		
+		      
+				
 		    </div>
-		  </div>
-		</div>
-
-	        	
-
-	            <a class="carousel-control-prev" href="#recipeCarousel" role="button" data-slide="prev">
+		    	<a class="carousel-control-prev" href="#recipeCarousel" role="button" data-slide="prev">
 	                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
 	                <span class="sr-only">Previous</span>
 	            </a>
@@ -236,6 +259,12 @@
 	                <span class="carousel-control-next-icon" aria-hidden="true"></span>
 	                <span class="sr-only">Next</span>
 	            </a>
+		  </div>
+		</div>
+
+	        	
+
+	            
 	        </div>
 	    </div>
 	</div>
