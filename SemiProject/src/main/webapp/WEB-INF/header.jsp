@@ -197,10 +197,10 @@
                     	<li class="nav-item dropdown" style="list-style: none;">
                     		<a class="nav-link dropdown-toggle menufont_size text-primary" href="#" id="adminDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">관리자전용</a>
                     		<div class="dropdown-menu dropdown-menu-right shadow border-0" aria-labelledby="adminDropdown">
-                    			<a class="dropdown-item text-primary" href="<%= ctxPath%>">회원관리</a>
+                    			<a class="dropdown-item text-primary" href="<%= ctxPath%>/admin/memberList.sp">회원관리</a>
                     			<a class="dropdown-item text-primary" href="<%= ctxPath%>/admin/allproductList.sp">상품관리</a>
-                    			<a class="dropdown-item text-primary" href="<%= ctxPath%>/qnaList.sp">문의관리</a>
-                    			<a class="dropdown-item text-primary" href="<%= ctxPath%>">운영관리</a>
+                    			<a class="dropdown-item text-primary" href="<%= ctxPath%>/adminQnaList.sp">문의관리</a>
+                    			<a class="dropdown-item text-primary" href="<%= ctxPath%>/revenue.sp">운영관리</a>
                     		</div>
                     	</li>
                     </c:if>
@@ -270,7 +270,13 @@
 					        </c:otherwise>
 					    </c:choose>
 					    
-                        <a href="<%= ctxPath%>/product/cartList.sp" class="btn p-0"><i class="fas fa-shopping-cart text-wood"></i></a>
+                        <a href="<%= ctxPath%>/product/cartList.sp" class="btn p-0 mr-3"><i class="fas fa-shopping-cart text-wood"></i></a>
+                        
+                        <c:if test="${not empty sessionScope.loginuser}">
+				            <a href="<%=ctxPath%>/logout.sp" class="btn p-0 mr-3"><i class="fas fa-sign-out-alt text-wood"></i></a>
+				        </c:if>
+                        
+                        
                     </div>
                 </div>
             </nav>
