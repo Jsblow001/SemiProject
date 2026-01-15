@@ -2,12 +2,15 @@ package sp.index.controller;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import hk.member.domain.MemberDTO;
 import sp.common.controller.AbstractController;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jh.review.model.ReviewDAO;
+import jh.review.model.ReviewDAO_imple;
 import ih.product.domain.ProductDTO;
 import ih.product.model.ProductDAO;
 import ih.product.model.ProductDAO_imple;
@@ -22,6 +25,7 @@ public class IndexController extends AbstractController {
 		
 		try {
 			ProductDAO pdao = new ProductDAO_imple();
+			ReviewDAO rdao = new ReviewDAO_imple();
 
 			HttpSession session = request.getSession();
 			MemberDTO loginuser = (MemberDTO) session.getAttribute("loginuser");
@@ -39,6 +43,14 @@ public class IndexController extends AbstractController {
 
 			// ✅ JSP에서 로그인 여부 체크용 (선택)
 			request.setAttribute("loginuser", loginuser);
+			
+			// ==================================================================== //
+			
+			
+
+			List<Map<String, Object>> monthlyBestList = rdao.selectMidRankProducts("recentSales", 8, userid);
+
+			request.setAttribute("monthlyBestList", monthlyBestList);
 
 			
 			super.setRedirect(false);

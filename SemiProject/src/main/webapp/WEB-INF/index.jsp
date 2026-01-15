@@ -11,27 +11,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <style type="text/css">
-/* ✅ 멀티 아이템 캐러셀(#recipeCarousel) 전용 */
-#recipeCarousel .carousel-inner .carousel-item.active,
-#recipeCarousel .carousel-inner .carousel-item-next,
-#recipeCarousel .carousel-inner .carousel-item-prev {
-  display: flex;
-}
 
-#recipeCarousel .carousel-inner .carousel-item-right.active,
-#recipeCarousel .carousel-inner .carousel-item-next {
-  transform: translateX(25%);
-}
-
-#recipeCarousel .carousel-inner .carousel-item-left.active,
-#recipeCarousel .carousel-inner .carousel-item-prev {
-  transform: translateX(-25%);
-}
-
-#recipeCarousel .carousel-inner .carousel-item-right,
-#recipeCarousel .carousel-inner .carousel-item-left {
-  transform: translateX(0);
-}
 /* index 상품 카드 공통 */
 .index-product .product-item { transition: transform .2s; border-radius: 10px; overflow: hidden; }
 .index-product .product-item:hover { transform: translateY(-8px); box-shadow: 0 10px 20px rgba(0,0,0,.1) !important; }
@@ -61,6 +41,81 @@
 /* 링크 hover 밑줄 제거 */
 .index-product a:hover{ text-decoration:none !important; }
 
+/* 캐러셀 이미지 기본: 찌그러짐 방지 + 꽉 채우기 */
+.carousel-img{
+  width: 100%;
+  height: 420px;          /* PC 기본 높이 */
+  object-fit: cover;      /* 비율 유지하며 채우고 넘치는 부분은 크롭 */
+  object-position: center;
+}
+
+/* 모바일에서는 너무 높으면 답답하니 높이 줄이기 */
+@media (max-width: 991px){
+  .carousel-img{
+    height: 220px;        /* 모바일 높이 */
+  }
+  .monthly-best-img{
+    height: 190px;    /* ✅ 모바일은 적당히 */
+  }
+}
+
+
+
+#recipeCarousel .carousel-inner{
+  overflow: hidden;
+}
+
+
+.monthly-best-img{
+  height: 260px;      /* ✅ PC에서 크게 */
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+.monthly-best-item{
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 6px 16px rgba(0,0,0,.06);
+  transition: transform .2s;
+}
+
+.monthly-best-item:hover{
+  transform: translateY(-4px);
+}
+
+/* ✅ 4개 세트가 컨테이너 좌우를 꽉 채우되, 간격 유지 */
+.monthly-best-row{
+  margin-left: -14px;
+  margin-right: -14px;
+}
+
+.monthly-best-col{
+  padding-left: 14px;
+  padding-right: 14px;
+  margin-bottom: 18px;  /* 아래 여백 */
+}
+
+/* ✅ 클릭 영역(카드 느낌) */
+.monthly-best-item{
+  background:#fff;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 6px 16px rgba(0,0,0,.06);
+  transition: transform .2s;
+}
+
+.monthly-best-item:hover{
+  transform: translateY(-4px);
+}
+
+/* ✅ 이미지 크기 반응형 */
+.monthly-best-img{
+  height: clamp(170px, 20vw, 340px);  /* 최소/유동/최대 */
+  object-fit: contain;                /* 제품 사진은 contain 추천 */
+  border-radius: 10px;
+}
+
   </style>
   
 <%-- 임시 이동 버튼 --%>
@@ -72,11 +127,40 @@
     
     <!-- Navbar Start -->
     <div class="container-fluid">
-        <div class="row border-top pt-10 px-xl-5">
+        
             <div class="col-lg">
                 
                 <div id="header-carousel" class="carousel slide" data-ride="carousel">
                     <div class="carousel-inner">
+                    	  	  <div class="carousel-item active">
+							    <picture>
+							      <!-- ✅ 모바일(991px 이하)일 때 -->
+							      <source media="(max-width: 991px)" srcset="img/index_upper_carousel/carousel-1_m.jpg">
+							      <!-- ✅ 기본(PC) -->
+							      <img class="d-block w-100 carousel-img"
+							           src="img/index_upper_carousel/carousel-1.jpg"
+							           alt="Image 1">
+							    </picture>
+							  </div>
+							
+							  <div class="carousel-item">
+							    <picture>
+							      <source media="(max-width: 991px)" srcset="img/index_upper_carousel/carousel-2_m.jpg">
+							      <img class="d-block w-100 carousel-img"
+							           src="img/index_upper_carousel/carousel-2.jpg"
+							           alt="Image 2">
+							    </picture>
+							  </div>
+							
+							  <div class="carousel-item">
+							    <picture>
+							      <source media="(max-width: 991px)" srcset="img/index_upper_carousel/carousel-3_m.jpg">
+							      <img class="d-block w-100 carousel-img"
+							           src="img/index_upper_carousel/carousel-3.jpg"
+							           alt="Image 3">
+							    </picture>
+						  	  </div>
+						  <%-- 
 					    <div class="carousel-item active">
 					      <img class="d-block w-100 carousel-img" src="img/index_upper_carousel/carousel-1.jpg" alt="Image">
 					    </div>
@@ -86,6 +170,7 @@
 					    <div class="carousel-item">
 					      <img class="d-block w-100 carousel-img" src="img/index_upper_carousel/carousel-3.jpg" alt="Image">
 					    </div>
+					    --%>
 					</div>
                     <a class="carousel-control-prev" href="#header-carousel" data-slide="prev">
                         <div class="btn btn-dark" style="width: 45px; height: 45px;">
@@ -99,41 +184,50 @@
                     </a>
                 </div>
             </div>
-        </div>
+        
     </div>
     <!-- Navbar End -->
 
 
 	<div class="container text-center my-5">
-	    <h2 class="mb-3">Monthly Best</h2>
+	    <h2 class="section-title px-5"><span class="px-2">MONTHLY BEST</span></h2>
 	    <div class="row mx-auto my-auto">
-	        <div id="recipeCarousel" class="carousel slide w-100" data-ride="carousel">
-	            <div class="carousel-inner w-100" role="listbox">
-	                <div class="carousel-item active">
-	                    <img class="d-block col-3 img-fluid" src="img/glasses/product_1.png">
-	                </div>
-	                <div class="carousel-item">
-	                    <img class="d-block col-3 img-fluid" src="img/glasses/product_4.png">
-	                </div>
-	                <div class="carousel-item">
-	                    <img class="d-block col-3 img-fluid" src="img/glasses/product_9.png">
-	                </div>
-	                <div class="carousel-item">
-	                    <img class="d-block col-3 img-fluid" src="img/glasses/product_20.png">
-	                </div>
-	                <div class="carousel-item">
-	                    <img class="d-block col-3 img-fluid" src="img/glasses/product_11.png">
-	                </div>
-	                <div class="carousel-item">
-	                    <img class="d-block col-3 img-fluid" src="img/glasses/product_13.png">
-	                </div>
-	                <div class="carousel-item">
-	                    <img class="d-block col-3 img-fluid" src="img/glasses/product_14.png">
-	                </div>
-	                <div class="carousel-item">
-	                    <img class="d-block col-3 img-fluid" src="img/glasses/product_17.png">
-	                </div>
-	            </div>
+		  <div id="recipeCarousel" class="carousel slide w-100" data-ride="carousel">
+		    <div class="carousel-inner w-100" role="listbox">
+		
+		      <c:forEach var="p" items="${monthlyBestList}" varStatus="st">
+		
+		        <!-- ✅ 4개마다 새 슬라이드 시작 -->
+		        <c:if test="${st.index % 4 == 0}">
+		          <div class="carousel-item ${st.index == 0 ? 'active' : ''}">
+		            <div class="row w-100 monthly-best-row">
+		        </c:if>
+		
+		              <!-- ✅ 이미지 1개 -->
+		              <div class="col-6 col-md-3 monthly-best-col">
+		                <a href="<%=request.getContextPath()%>/product/productDetail.sp?product_id=${p.productId}"
+		                   class="d-block monthly-best-item">
+		                  <img class="img-fluid w-100 monthly-best-img"
+		                       src="<%=request.getContextPath()%>/img/${p.pimage}"
+		                       alt="${p.code}"
+		                       loading="lazy">
+		                </a>
+		              </div>
+		
+		        <!-- ✅ 4개 채우면 슬라이드 닫기 -->
+		        <c:if test="${st.index % 4 == 3 || st.last}">
+		            </div>
+		          </div>
+		        </c:if>
+		
+		      </c:forEach>
+		
+		    </div>
+		  </div>
+		</div>
+
+	        	
+
 	            <a class="carousel-control-prev" href="#recipeCarousel" role="button" data-slide="prev">
 	                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
 	                <span class="sr-only">Previous</span>
@@ -148,7 +242,7 @@
 	
 
     <!-- 안경 인트로 Start -->
-    <div class="container-fluid pt-5">
+    <div class="container-fluid">
 		<div class="d-none d-md-block pb-5">
 		  	<img src="img/frame_on_the_table.jpg" class="img-fluid" alt="">
 		</div>
@@ -400,22 +494,9 @@
 <script type="text/javascript">
 $(document).ready(function(){
 	
-	$('#recipeCarousel').carousel({
-  	  interval :2000
-  	});
-
-	$('#recipeCarousel .carousel-item').each(function(){
-	    var next = $(this).next();
-	    if (!next.length) next = $(this).siblings(':first');
-
-	    next.children(':first-child').clone().appendTo($(this));
-
-	    for (var i=0;i<2;i++) {
-	        next = next.next();
-	        if (!next.length) next = $(this).siblings(':first');
-	        next.children(':first-child').clone().appendTo($(this));
-	    }
-	});
+  $('#recipeCarousel').carousel({
+    interval: 2000
+  });
 
 });
 </script>
