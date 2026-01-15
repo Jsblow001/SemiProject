@@ -935,6 +935,42 @@ public class ReviewDAO_imple implements ReviewDAO {
 
         return (result >= 1 ? 1 : 0);
     }
+    
+    
+    // 제품 상세 페이지 리뷰 불러오기
+    @Override
+    public List<ReviewDTO> getReviewsByProductId(String product_id) throws SQLException {
+       List<ReviewDTO> list = new ArrayList<>();
+        
+       
+        try {
+           conn = ds.getConnection();
+           
+           String sql = " SELECT * FROM tbl_product_review WHERE fk_product_id = ? ORDER BY review_date DESC ";
+           pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, product_id); // 특정 상품 ID만 필터링
+            rs = pstmt.executeQuery();
+            
+            while(rs.next()) {
+               ReviewDTO dto = new ReviewDTO();
+                
+                dto.setReview_id(rs.getLong("review_id"));
+                 dto.setFk_product_id(rs.getInt("fk_product_id"));
+                 dto.setFk_member_id(rs.getString("fk_member_id"));
+                 dto.setRating(rs.getInt("rating"));
+                 dto.setReview_title(rs.getString("review_title"));
+                 dto.setReview_content(rs.getString("review_content"));
+                 dto.setPraise_keywords(rs.getString("praise_keywords"));
+                 dto.setReview_date(rs.getString("review_date"));
+                 
+                 list.add(dto);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
 
 
 
