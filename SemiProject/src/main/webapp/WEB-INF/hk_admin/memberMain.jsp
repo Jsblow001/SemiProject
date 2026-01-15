@@ -8,6 +8,9 @@
 <meta charset="UTF-8">
 <title>관리자 | 회원관리 대시보드</title>
 
+<!-- Font Awesome (아이콘만 사용) -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
 <style>
 /* ===== 공통 ===== */
 body{font-family:'Pretendard',Arial,sans-serif;background:#f7f6f3;color:#333}
@@ -53,6 +56,8 @@ h2{font-size:23px!important;font-weight:700;letter-spacing:-.3px;color:#2f2b2a;m
 .stat-list li.male .label::before,.stat-list li.female .label::before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px}
 .stat-list li.male .label::before{background:#4a90e2}
 .stat-list li.female .label::before{background:#e91e63}
+
+
 </style>
 
 </head>
