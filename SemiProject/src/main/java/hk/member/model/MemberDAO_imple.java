@@ -522,7 +522,7 @@ public class MemberDAO_imple implements MemberDAO {
 	         conn = ds.getConnection();
 	
 	         String sql =
-	                 " SELECT MEMBER_ID, name, gender, email, registerday, status, idle " +
+	                 " SELECT MEMBER_ID, name, gender, email, registerday, status, idle, admin_memo " +
 	                 " FROM tbl_member " +
 	                 " WHERE MEMBER_ID != 'admin' " +
 	                 " ORDER BY registerday DESC " +
@@ -548,6 +548,7 @@ public class MemberDAO_imple implements MemberDAO {
 	             
 	             // 추가
 	             member.setIdle(rs.getInt("idle"));
+	             member.setAdmin_memo(rs.getString("admin_memo"));
 	             
 	             memberList.add(member);
 	         }
@@ -864,6 +865,8 @@ public class MemberDAO_imple implements MemberDAO {
 	            + "       m.registerday, "
 	            + "       m.status, "
 	            + "       m.grade_code, "
+	            + "       m.admin_memo, "
+	            + "       TO_CHAR(m.memo_updatedate, 'yyyy-mm-dd hh24:mi:ss') AS memo_updatedate, "
 	            + "       g.grade_name "
 	            + " FROM tbl_member m "
 	            + " JOIN tbl_grade g ON m.grade_code = g.grade_code "
@@ -889,6 +892,10 @@ public class MemberDAO_imple implements MemberDAO {
 	            // 추가(등급)
 	            member.setGrade_code(rs.getString("grade_code"));
 	            member.setGrade_name(rs.getString("grade_name"));
+	            
+	            member.setAdmin_memo(rs.getString("admin_memo"));
+	            member.setMemo_updatedate(rs.getString("memo_updatedate"));
+
 	        }
 
 	    } catch (Exception e) {
@@ -1150,8 +1157,32 @@ public class MemberDAO_imple implements MemberDAO {
 	    return totalCnt;
 	}
 
+	
+	
+	// 관리자 페이지 블랙리스트 등 메모 저장
+	@Override
+	public int updateAdminMemo(String userid, String adminMemo) throws SQLException {
 
+	    int n = 0;
 
+	    try {
+	        conn = ds.getConnection();
 
+	        String sql = " UPDATE tbl_member "
+	                   + " SET admin_memo = ?, memo_updatedate = SYSDATE "
+	                   + " WHERE member_id = ? ";
+
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, adminMemo);
+	        pstmt.setString(2, userid);
+
+	        n = pstmt.executeUpdate();
+
+	    } finally {
+	        close();
+	    }
+
+	    return n;
+	}
 
 }

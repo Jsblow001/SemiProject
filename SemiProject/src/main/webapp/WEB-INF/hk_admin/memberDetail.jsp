@@ -167,6 +167,23 @@ $(function(){
 			   ${member.grade_name}
             </td>
         </tr>
+        
+        <tr>
+        <th>관리자 메모</th>
+        <td>
+            <div class="memo-view">
+                <c:choose>
+                    <c:when test="${empty member.admin_memo}">
+                        <span class="memo-empty">등록된 메모 없음</span>
+                    </c:when>
+                    <c:otherwise>
+                        ${member.admin_memo}
+                    </c:otherwise>
+                </c:choose>
+            </div>
+        </td>
+    	</tr>
+        
     </table>
 
 	<!-- ==== 휴대폰 SMS(문자) 보내기 ==== -->
@@ -206,6 +223,32 @@ $(function(){
 	    </tr>
 	</table>
 
+	<div style="margin-top:25px; padding:18px; border:1px solid #eee; border-radius:4px;">
+    <h4 style="font-size:15px; font-weight:700; margin-bottom:10px;">
+        📝 관리자 메모 (최대 200자)
+    </h4>
+
+    <form method="post" action="<%=ctxPath%>/admin/memberAdminMemoUpdate.sp">
+        <input type="hidden" name="userid" value="${member.userid}" />
+
+        <textarea name="adminMemo"
+                  maxlength="200"
+                  style="width:100%; height:90px; padding:10px; border:1px solid #ccc; border-radius:3px; font-size:14px; resize:none;"
+                  placeholder="예) 반품 잦음 / CS 민감 / 연락 시 주의">${member.admin_memo}</textarea>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+            <div style="font-size:12px; color:#777;">
+                마지막 수정: ${empty member.memo_updatedate ? '없음' : member.memo_updatedate}
+            </div>
+
+            <button type="submit"
+                    style="padding:10px 16px; border:none; border-radius:3px; background:#6d4c41; color:#fff; font-weight:700; cursor:pointer;">
+                저장
+            </button>
+        </div>
+    </form>
+	</div>
+	
 
     <div class="btn-box">
         <a href="<%=ctxPath%>/admin/memberList.sp" class="admin-btn light">

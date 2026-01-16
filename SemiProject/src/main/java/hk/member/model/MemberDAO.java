@@ -91,6 +91,9 @@ public interface MemberDAO {
 	// 관리자 페이지 휴면 해제 처리
 	int idleReleaseMany(String[] useridArr) throws SQLException;
 
+	// 관리자 페이지 블랙리스트 등 메모 저장
+	int updateAdminMemo(String userid, String adminMemo) throws SQLException;
+
 	
 
 	

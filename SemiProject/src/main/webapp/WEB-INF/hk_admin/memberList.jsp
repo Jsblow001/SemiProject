@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <% String ctxPath = request.getContextPath(); %>
 
 <!DOCTYPE html>
@@ -58,6 +59,30 @@ a.reset-btn,
     font-family: 'Pretendard','Poppins',Arial,sans-serif;
     letter-spacing: -0.2px;
     font-weight: 600;
+}
+
+/* ===== 블랙리스트(주의회원) 아이콘 ===== */
+.warn-icon{
+    margin-left:6px;
+    color:#e53935;
+    font-size:13px;
+}
+.warn-icon:hover{
+    transform: scale(1.1);
+}
+
+/* ===== 아이콘 안내 ===== */
+.legend-box{
+    margin-top: 10px;
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    gap:10px;
+    font-size:12px;
+    color:#777;
+}
+.legend-box i{
+    color:#e53935;
 }
 
 </style>
@@ -126,6 +151,13 @@ $(function(){
     <%-- ===============================
          회원 목록 테이블
        =============================== --%>
+    <div class="legend-box">
+    <span>
+        <i class="fas fa-exclamation-triangle"></i>
+        : 블랙리스트(주의회원)
+    </span>
+	</div>
+    
     <table id="memberTbl">
         <thead>
             <tr>
@@ -150,7 +182,22 @@ $(function(){
                 <tr class="memberInfo">
                     <td>${status.count}</td>
                     <td class="userid">${m.userid}</td>
-                    <td>${m.name}</td>
+
+                    <%-- 이름 + 블랙리스트 아이콘 --%>
+                    <td>
+                        ${m.name}
+
+                        <c:if test="${not empty m.admin_memo 
+                                     and (fn:contains(m.admin_memo,'블랙')
+                                       or fn:contains(m.admin_memo,'주의')
+                                       or fn:contains(m.admin_memo,'진상')
+                                       or fn:contains(m.admin_memo,'환불')
+                                       or fn:contains(m.admin_memo,'반품'))}">
+                            <i class="fas fa-exclamation-triangle warn-icon"
+                               title="주의회원"></i>
+                        </c:if>
+                    </td>
+
                     <td>
                         <c:choose>
                             <c:when test="${m.gender == '1'}">남</c:when>
@@ -160,21 +207,22 @@ $(function(){
                     </td>
                     <td>${m.email}</td>
                     <td>${m.registerday}</td>
-                   <td>
-					    <c:choose>
-					        <c:when test="${m.status == 0}">
-					            탈퇴
-					        </c:when>
-					
-					        <c:when test="${m.status == 1 && m.idle == 1}">
-					            휴면
-					        </c:when>
-					
-					        <c:otherwise>
-					            정상
-					        </c:otherwise>
-					    </c:choose>
-					</td>
+
+                    <td>
+                        <c:choose>
+                            <c:when test="${m.status == 0}">
+                                탈퇴
+                            </c:when>
+
+                            <c:when test="${m.status == 1 && m.idle == 1}">
+                                휴면
+                            </c:when>
+
+                            <c:otherwise>
+                                정상
+                            </c:otherwise>
+                        </c:choose>
+                    </td>
 
                 </tr>
             </c:forEach>
