@@ -90,7 +90,7 @@ public class MemberDAO_imple implements MemberDAO {
                + "   GENDER, BIRTHDAY, POINT, STATUS, "
                + "   REGISTERDAY, LASTPWDCHANGEDATE, GRADE_CODE) "
                + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-               + "         0, 1, SYSDATE, SYSDATE, 1) ";
+               + "         5000, 1, SYSDATE, SYSDATE, 1) ";
 
          pstmt = conn.prepareStatement(sqlMember);
 
@@ -864,6 +864,7 @@ public class MemberDAO_imple implements MemberDAO {
 	            + "       m.mobile, "
 	            + "       m.registerday, "
 	            + "       m.status, "
+	            + "       m.point,  "
 	            + "       m.grade_code, "
 	            + "       m.admin_memo, "
 	            + "       TO_CHAR(m.memo_updatedate, 'yyyy-mm-dd hh24:mi:ss') AS memo_updatedate, "
@@ -895,6 +896,8 @@ public class MemberDAO_imple implements MemberDAO {
 	            
 	            member.setAdmin_memo(rs.getString("admin_memo"));
 	            member.setMemo_updatedate(rs.getString("memo_updatedate"));
+	            
+	            member.setPoint(rs.getInt("Point"));
 
 	        }
 

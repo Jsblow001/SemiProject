@@ -95,6 +95,55 @@ $(function(){
     });
 
 });
+
+
+function addMemberPoint(userid, point) {
+    // 1. 입력받기
+    let input = prompt(userid + "님에게 추가할 포인트 금액을 입력하세요", "0");
+
+    if (input !== null && input.trim() !== "") {
+        let addPoint = parseInt(input);
+
+        // 유효성 검사
+        if (isNaN(addPoint)) {
+            alert("숫자만 입력 가능합니다.");
+            return;
+        }
+        
+        // 2. 합계 계산 (화면 표시용)
+        let currentPoint = parseInt(point); 
+        let finalPoint = currentPoint + addPoint;
+
+        if(!confirm("현재 " + currentPoint + "P에 " + addPoint + "P를 더하여\n총 " + finalPoint + "P로 변경하시겠습니까?")) {
+            return;
+        }
+
+        // 3. 서버 DB 업데이트 (AJAX)
+        $.ajax({
+            url: "${pageContext.request.contextPath}/admin/updatePoint.sp",
+            type: "POST", // 포인트 수정은 POST 권장
+            data: {
+                "userid": userid,
+                "addPoint": addPoint // 추가할 포인트만 보낼지, 최종 결과(finalPoint)를 보낼지는 DAO 설계에 따라 선택
+            },
+            dataType: "json",
+            success: function(json) {
+                // json 응답 예시: {"n": 1}
+                if(json.n == 1) {
+                    alert("포인트 적립이 완료되었습니다.");
+                    // 성공 시 화면의 포인트 숫자만 바로 변경하거나 새로고침
+                    $("#currentPoint").text(finalPoint); 
+                    location.reload(); 
+                } else {
+                    alert("DB 업데이트에 실패했습니다.");
+                }
+            },
+            error: function() {
+                alert("서버 통신 오류가 발생했습니다.");
+            }
+        });
+    }
+}
 </script>
 
 
@@ -161,6 +210,11 @@ $(function(){
                 </c:choose>
             </td>
         </tr>
+        
+        <a class="admin-btn light" style="margin-left: 40px; cursor: pointer;" 
+             onclick="addMemberPoint('${member.userid}', ${member.point})">
+        포인트 추가
+  		  </a>
         <tr>
             <th>회원등급</th>
             <td>
