@@ -40,107 +40,115 @@ public class OrderDAO_imple implements OrderDAO {
         try { if (conn != null) conn.close(); } catch (Exception e) {}
     }
 
-    // ==================================================
-    // 1. 마이페이지 주문 목록 (+페이징)
-    // ==================================================
-    @Override
-    public List<OrderDTO> selectMyOrderList(
-            String memberId,
-            String status,
-            String startDate,
-            String endDate,
-            int startRow,
-            int endRow) throws SQLException {
+ // ==================================================
+ // 1. 마이페이지 주문 목록 (+페이징)  + claim_status 포함
+ // ==================================================
+ @Override
+ public List<OrderDTO> selectMyOrderList(
+         String memberId,
+         String status,
+         String startDate,
+         String endDate,
+         int startRow,
+         int endRow) throws SQLException {
 
-        List<OrderDTO> list = new ArrayList<>();
+     List<OrderDTO> list = new ArrayList<>();
 
-        try {
-            conn = ds.getConnection();
+     try {
+         conn = ds.getConnection();
 
-            // delivery status 4추가 되면서 터짐 방지 -> left join
-            String sql =
-                " SELECT * FROM ( " +
-                "   SELECT ROWNUM AS rno, A.* FROM ( " +
-                "     SELECT o.odrcode, o.odrdate, o.odrtotalprice, o.payment_status, " +
-                "            MIN(p.product_name) AS product_name, " +
-                "            SUM(d.odrqty) AS total_qty, " +
-                "            CASE o.payment_status " +
-                "              WHEN 0 THEN '결제대기' " +
-                "              WHEN 1 THEN '결제완료' " +
-                "              WHEN 2 THEN '결제취소' " +
-                "            END AS payment_status_name " +
-                "     FROM tbl_order o " +
-                "     LEFT JOIN tbl_order_detail d ON o.odrcode = d.fk_odrcode " +
-                "     LEFT JOIN tbl_product p ON d.fk_product_id = p.product_id " +
-                "     WHERE o.fk_member_id = ? ";
+         String sql =
+             " SELECT * FROM ( " +
+             "   SELECT ROWNUM AS rno, A.* FROM ( " +
+             "     SELECT o.odrcode, o.odrdate, o.odrtotalprice, o.payment_status, " +
+             "            MIN(p.product_name) AS product_name, " +
+             "            SUM(d.odrqty) AS total_qty, " +
+             
+             // ★ 추가: 주문별 클레임 상태 요약 (COMPLETED가 하나라도 있으면 COMPLETED)
+             "            NVL( MAX( CASE WHEN d.claim_status = 'COMPLETED' THEN 'COMPLETED' END ), 'NONE' ) AS claim_status, " +
 
-            // 상태 조건 (공백 방어)
-            if (status != null && !status.trim().isEmpty()) {
-                sql += " AND o.payment_status = ? ";
-            }
+             "            CASE o.payment_status " +
+             "              WHEN 0 THEN '결제대기' " +
+             "              WHEN 1 THEN '결제완료' " +
+             "              WHEN 2 THEN '결제취소' " +
+             "            END AS payment_status_name " +
+             "     FROM tbl_order o " +
+             "     LEFT JOIN tbl_order_detail d ON o.odrcode = d.fk_odrcode " +
+             "     LEFT JOIN tbl_product p ON d.fk_product_id = p.product_id " +
+             "     WHERE o.fk_member_id = ? ";
 
-            // 기간 조건
-            if (startDate != null && !startDate.trim().isEmpty()) {
-                sql += " AND o.odrdate >= TO_DATE(?, 'YYYY-MM-DD') ";
-            }
+         // 상태 조건 (공백 방어)
+         if (status != null && !status.trim().isEmpty()) {
+             sql += " AND o.payment_status = ? ";
+         }
 
-            if (endDate != null && !endDate.trim().isEmpty()) {
-                sql += " AND o.odrdate < TO_DATE(?, 'YYYY-MM-DD') + 1 ";
-            }
+         // 기간 조건
+         if (startDate != null && !startDate.trim().isEmpty()) {
+             sql += " AND o.odrdate >= TO_DATE(?, 'YYYY-MM-DD') ";
+         }
 
-            /* ===== GROUP BY + ORDER BY ===== */
-            sql +=
-                " GROUP BY o.odrcode, o.odrdate, o.odrtotalprice, o.payment_status " +
-                " ORDER BY o.odrdate DESC " +
-                "   ) A " +
-                " ) WHERE rno BETWEEN ? AND ? ";
+         if (endDate != null && !endDate.trim().isEmpty()) {
+             sql += " AND o.odrdate < TO_DATE(?, 'YYYY-MM-DD') + 1 ";
+         }
 
-            pstmt = conn.prepareStatement(sql);
+         // GROUP BY + ORDER BY
+         sql +=
+             " GROUP BY o.odrcode, o.odrdate, o.odrtotalprice, o.payment_status " +
+             " ORDER BY o.odrdate DESC " +
+             "   ) A " +
+             " ) WHERE rno BETWEEN ? AND ? ";
 
-            int idx = 1;
+         pstmt = conn.prepareStatement(sql);
 
-            // 회원 아이디
-            pstmt.setString(idx++, memberId);
+         int idx = 1;
 
-            // 상태
-            if (status != null && !status.trim().isEmpty()) {
-                pstmt.setInt(idx++, Integer.parseInt(status.trim()));
-            }
+         // 회원 아이디
+         pstmt.setString(idx++, memberId);
 
-            // 시작일
-            if (startDate != null && !startDate.trim().isEmpty()) {
-                pstmt.setString(idx++, startDate.trim());
-            }
+         // 상태
+         if (status != null && !status.trim().isEmpty()) {
+             pstmt.setInt(idx++, Integer.parseInt(status.trim()));
+         }
 
-            // 종료일
-            if (endDate != null && !endDate.trim().isEmpty()) {
-                pstmt.setString(idx++, endDate.trim());
-            }
+         // 시작일
+         if (startDate != null && !startDate.trim().isEmpty()) {
+             pstmt.setString(idx++, startDate.trim());
+         }
 
-            // 페이징
-            pstmt.setInt(idx++, startRow);
-            pstmt.setInt(idx++, endRow);
+         // 종료일
+         if (endDate != null && !endDate.trim().isEmpty()) {
+             pstmt.setString(idx++, endDate.trim());
+         }
 
-            rs = pstmt.executeQuery();
+         // 페이징
+         pstmt.setInt(idx++, startRow);
+         pstmt.setInt(idx++, endRow);
 
-            while (rs.next()) {
-                OrderDTO dto = new OrderDTO();
-                dto.setOdrCode(rs.getInt("odrcode"));
-                dto.setOdrDate(rs.getDate("odrdate"));
-                dto.setOdrTotalPrice(rs.getInt("odrtotalprice"));
-                dto.setPaymentStatus(rs.getInt("payment_status"));
-                dto.setPaymentStatusName(rs.getString("payment_status_name"));
-                dto.setProductName(rs.getString("product_name"));
-                dto.setTotalQty(rs.getInt("total_qty"));
-                list.add(dto);
-            }
+         rs = pstmt.executeQuery();
 
-        } finally {
-            close();
-        }
+         while (rs.next()) {
+             OrderDTO dto = new OrderDTO();
+             dto.setOdrCode(rs.getInt("odrcode"));
+             dto.setOdrDate(rs.getDate("odrdate"));
+             dto.setOdrTotalPrice(rs.getInt("odrtotalprice"));
+             dto.setPaymentStatus(rs.getInt("payment_status"));
+             dto.setPaymentStatusName(rs.getString("payment_status_name"));
+             dto.setProductName(rs.getString("product_name"));
+             dto.setTotalQty(rs.getInt("total_qty"));
 
-        return list;
-    }
+             // ★ 추가
+             dto.setClaimStatus(rs.getString("claim_status"));
+
+             list.add(dto);
+         }
+
+     } finally {
+         close();
+     }
+
+     return list;
+ }
+
 
     // ==================================================
     // 2. 주문 총 건수 (페이지바용)
