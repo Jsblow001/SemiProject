@@ -94,15 +94,15 @@
                     <div class="card dashboard-card p-4 h-100">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h5 class="font-weight-bold m-0">오늘의 예약 현황</h5>
-                            <select id="dashStoreId" class="form-control form-control-sm" style="width: 100px;">
-                                <option value="1">매장 1</option>
-                                <option value="2">매장 2</option>
-                                <option value="3">매장 3</option>
+                            <select id="dashStoreId" class="form-control form-control-sm" style="width: auto; min-width: 100px;">
+                                <option value="1">SISEON 도산점</option>
+                                <option value="2">SISEON 압구정점</option>
+                                <option value="3">SISEON 홍대점</option>
                             </select>
                         </div>
                         
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="small text-muted font-weight-bold" id="storeNameTag">매장 1 실시간</span>
+                            <span class="small text-muted font-weight-bold" id="storeNameTag">SISEON 도산점 실시간</span>
                             <span class="badge badge-dark" id="dashResCount">0건</span>
                         </div>
 
