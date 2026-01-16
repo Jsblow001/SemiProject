@@ -1041,6 +1041,37 @@ public class MemberDAO_imple implements MemberDAO {
 	    return n;
 	}
 
+	
+	
+	// 관리자 페이지 내 휴면회원 수 
+	@Override
+	public int getIdleMemberCount() throws SQLException {
+
+	    int count = 0;
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = " SELECT COUNT(*) "
+	                   + " FROM tbl_member "
+	                   + " WHERE member_id != 'admin' "
+	                   + "   AND status = 1 "     // 정상회원 중에서
+	                   + "   AND idle = 1 ";      // 휴면만
+
+	        pstmt = conn.prepareStatement(sql);
+	        rs = pstmt.executeQuery();
+
+	        if(rs.next()) {
+	            count = rs.getInt(1);
+	        }
+
+	    } finally {
+	        close();
+	    }
+
+	    return count;
+	}
+
 
 
 

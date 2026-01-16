@@ -20,7 +20,7 @@ h2{font-size:23px!important;font-weight:700;letter-spacing:-.3px;color:#2f2b2a;m
 /* ===== 대시보드 상단 ===== */
 .dashboard{display:flex;gap:20px;margin-bottom:50px}
 .dashboard-sub h2{font-size:15px;font-weight:600;color:#2f2b2a;margin-bottom:15px}
-.card-area.main-cards{flex:3;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card-area.main-cards{flex:3;display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
 .card{background:#fff;border-radius:4px;padding:25px 20px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.06);transition:.15s}
 .card:hover{transform:translateY(-4px)}
 .card h3{font-size:14px;color:#777;margin-bottom:15px;font-weight:500}
@@ -86,6 +86,12 @@ h2{font-size:23px!important;font-weight:700;letter-spacing:-.3px;color:#2f2b2a;m
             <h3>정상 회원</h3>
             <p>${empty activeCount ? 0 : activeCount}</p>
         </div>
+        
+         <div class="card">
+	        <h3>휴면 회원</h3>
+	        <p>${empty idleCount ? 0 : idleCount}</p>
+	    </div>
+        
         <div class="card">
             <h3>탈퇴 회원</h3>
             <p>${empty deleteCount ? 0 : deleteCount}</p>

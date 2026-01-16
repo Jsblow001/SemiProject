@@ -82,6 +82,9 @@ public interface MemberDAO {
 	// 휴면회원 해제하기
 	int idleRelease(String userid) throws SQLException;
 
+	// 관리자 페이지 내 휴면회원 수 
+	int getIdleMemberCount() throws SQLException;
+
 	
 
 	
