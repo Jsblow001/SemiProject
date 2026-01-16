@@ -1078,6 +1078,43 @@ public class MemberDAO_imple implements MemberDAO {
 	    return count;
 	}
 
+	
+	
+	// 관리자 페이지 휴면회원 조회
+	@Override
+	public List<MemberDTO> selectIdleMemberListForAdmin() throws SQLException {
+
+	    List<MemberDTO> list = new ArrayList<>();
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = " SELECT member_id, name, email, registerday "
+	                   + " FROM tbl_member "
+	                   + " WHERE status = 1 AND idle = 1 "
+	                   + " ORDER BY registerday DESC ";
+
+	        pstmt = conn.prepareStatement(sql);
+	        rs = pstmt.executeQuery();
+
+	        while(rs.next()) {
+	            MemberDTO m = new MemberDTO();
+	            m.setUserid(rs.getString("member_id"));
+	            m.setName(rs.getString("name"));
+	            m.setEmail(aes.decrypt(rs.getString("email")));
+	            m.setRegisterday(rs.getString("registerday"));
+
+	            list.add(m);
+	        }
+	    } catch (Exception e) {
+	    } finally {
+	        close();
+	    }
+
+	    return list;
+	}
+
+
 
 
 

@@ -85,6 +85,9 @@ public interface MemberDAO {
 	// 관리자 페이지 내 휴면회원 수 
 	int getIdleMemberCount() throws SQLException;
 
+	// 관리자 페이지 휴면회원 조회
+	List<MemberDTO> selectIdleMemberListForAdmin() throws SQLException;
+
 	
 
 	

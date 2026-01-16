@@ -57,6 +57,16 @@ h2{font-size:23px!important;font-weight:700;letter-spacing:-.3px;color:#2f2b2a;m
 .stat-list li.male .label::before{background:#4a90e2}
 .stat-list li.female .label::before{background:#e91e63}
 
+/* 상단 카드 */
+.card-link{
+    display:block;
+    text-decoration:none;
+    color:inherit;
+}
+.card-link:hover{
+    text-decoration:none;
+}
+
 
 </style>
 
@@ -76,27 +86,30 @@ h2{font-size:23px!important;font-weight:700;letter-spacing:-.3px;color:#2f2b2a;m
    =============================== --%>
 <div class="dashboard">
 
-    <%-- 왼쪽 : 동일 크기 카드 3개 --%>
+    <%-- 왼쪽 : 동일 크기 카드 4개 --%>
     <div class="card-area main-cards">
-        <a href="<%=ctxPath%>/admin/memberList.sp" class="card card-link">
-		    <h3>전체 회원</h3>
-		    <p>${empty totalCount ? 0 : totalCount}</p>
-		</a>
-        <div class="card">
-            <h3>정상 회원</h3>
-            <p>${empty activeCount ? 0 : activeCount}</p>
-        </div>
-        
-         <div class="card">
+
+	    <a href="<%=ctxPath%>/admin/memberList.sp" class="card card-link">
+	        <h3>전체 회원</h3>
+	        <p>${empty totalCount ? 0 : totalCount}</p>
+	    </a>
+	
+	    <a href="<%=ctxPath%>/admin/memberList.sp?mode=active" class="card card-link">
+	        <h3>정상 회원</h3>
+	        <p>${empty activeCount ? 0 : activeCount}</p>
+	    </a>
+	
+	    <a class="card card-link">
 	        <h3>휴면 회원</h3>
 	        <p>${empty idleCount ? 0 : idleCount}</p>
-	    </div>
-        
-        <div class="card">
-            <h3>탈퇴 회원</h3>
-            <p>${empty deleteCount ? 0 : deleteCount}</p>
-        </div>
-    </div>
+	    </a>
+	
+	    <a class="card card-link">
+	        <h3>탈퇴 회원</h3>
+	        <p>${empty deleteCount ? 0 : deleteCount}</p>
+	    </a>
+
+	</div>
 
     <%-- 오른쪽 : 오늘 가입 회원 --%>
     <div class="side-card">
@@ -111,7 +124,7 @@ h2{font-size:23px!important;font-weight:700;letter-spacing:-.3px;color:#2f2b2a;m
      하위 기능 이동
    =============================== --%>
 <div class="btn-area">
-    <a href="<%=ctxPath%>/admin/memberList.sp">회원 목록 보기</a>
+    <a href="<%=ctxPath%>/admin/Idlemember.sp">휴면 회원 관리하기</a>
 </div>
 
 <%-- ===============================
