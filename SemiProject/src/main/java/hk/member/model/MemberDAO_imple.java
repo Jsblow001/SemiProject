@@ -204,10 +204,11 @@ public class MemberDAO_imple implements MemberDAO {
 	                      + "        M.status, "
 	                      + "        M.registerday, "
 	                      + "        M.grade_code, "
+	                      + "        M.idle, "
 	                      + "        G.grade_name "
 	                      + " FROM tbl_member M "
 	                      + " JOIN tbl_grade G ON M.grade_code = G.grade_code "
-	                      + " WHERE M.member_id = ? AND M.passwd = ? AND M.status = 1 ";
+	                      + " WHERE M.member_id = ? AND M.passwd = ? ";
 
 	           pstmt = conn.prepareStatement(sql);
 	           pstmt.setString(1, paraMap.get("userid"));
@@ -240,7 +241,9 @@ public class MemberDAO_imple implements MemberDAO {
 	               member.setRegisterday(rs.getString("registerday"));
 	               member.setGrade_code(rs.getString("grade_code"));
 	               member.setGrade_name(rs.getString("grade_name"));
-
+	               
+	               // 휴면 회원 추가
+	               member.setIdle(rs.getInt("idle"));
 	           }
 
 	       } catch (Exception e) {
@@ -1009,6 +1012,35 @@ public class MemberDAO_imple implements MemberDAO {
 
 	    return success;
 	}
+
+	
+	
+	// 휴면 회원 해제하기
+	@Override
+	public int idleRelease(String userid) throws SQLException {
+
+	    int n = 0;
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = " update tbl_member "
+	                   + " set idle = 0 "
+	                   + "     idle_changedate = sysdate "
+	                   + " where member_id = ? ";
+
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, userid);
+
+	        n = pstmt.executeUpdate();
+
+	    } finally {
+	        close();
+	    }
+
+	    return n;
+	}
+
 
 
 

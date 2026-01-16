@@ -79,6 +79,9 @@ public interface MemberDAO {
 	// 관리자 페이지 內 회원 더미 50명 추가
 	int createDummyMembers(int i) throws SQLException;
 
+	// 휴면회원 해제하기
+	int idleRelease(String userid) throws SQLException;
+
 	
 
 	
