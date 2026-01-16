@@ -7,7 +7,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>CARIN | LOGIN</title>
+<title>SISEON | LOGIN</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- Google Font -->
@@ -55,14 +55,22 @@ body{font-family:'Poppins',sans-serif!important;background:#fbfaf8!important}
 
 /* 회원가입 */
 .btn-outline-secondary{
-    height:48px!important;
-    background:#fff!important;
-    border:1px solid #bdbdbd!important;
-    color:#5d4037!important;
+    height:46px!important;
     border-radius:0!important;
-    font-weight:500!important
+    font-size:.95rem!important;
+    font-weight:500!important;
+    letter-spacing:-.2px!important;
+    background:#f1ebe5!important;
+    border:1px solid #d2c4ba!important;
+    color:#5d4037!important;
+    transition:all .2s ease!important
 }
-.btn-outline-secondary:hover{background:#5d4037!important;border-color:#5d4037!important;color:#fff!important}
+
+.btn-outline-secondary:hover{
+    background:#e6dbd2!important;
+    border-color:#5d4037!important;
+    color:#3e2723!important
+}
 </style>
 
 </head>
@@ -73,7 +81,7 @@ body{font-family:'Poppins',sans-serif!important;background:#fbfaf8!important}
 <jsp:include page="../header.jsp" />
 
 <div class="login-wrap">
-    <div class="login-title">CARIN</div>
+    <div class="login-title">SISEON</div>
 
     <form name="loginFrm" method="post" action="<%=ctxPath%>/login.sp">
         <div class="form-group">
@@ -109,9 +117,6 @@ body{font-family:'Poppins',sans-serif!important;background:#fbfaf8!important}
 
 <!--  고정 푸터 -->
 <jsp:include page="../footer.jsp" />
-
-
-
 
 </body>
 </html>

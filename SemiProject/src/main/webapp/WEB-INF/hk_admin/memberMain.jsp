@@ -8,6 +8,9 @@
 <meta charset="UTF-8">
 <title>관리자 | 회원관리 대시보드</title>
 
+<!-- Font Awesome (아이콘만 사용) -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
 <style>
 /* ===== 공통 ===== */
 body{font-family:'Pretendard',Arial,sans-serif;background:#f7f6f3;color:#333}
@@ -17,7 +20,7 @@ h2{font-size:23px!important;font-weight:700;letter-spacing:-.3px;color:#2f2b2a;m
 /* ===== 대시보드 상단 ===== */
 .dashboard{display:flex;gap:20px;margin-bottom:50px}
 .dashboard-sub h2{font-size:15px;font-weight:600;color:#2f2b2a;margin-bottom:15px}
-.card-area.main-cards{flex:3;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card-area.main-cards{flex:3;display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
 .card{background:#fff;border-radius:4px;padding:25px 20px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.06);transition:.15s}
 .card:hover{transform:translateY(-4px)}
 .card h3{font-size:14px;color:#777;margin-bottom:15px;font-weight:500}
@@ -53,6 +56,18 @@ h2{font-size:23px!important;font-weight:700;letter-spacing:-.3px;color:#2f2b2a;m
 .stat-list li.male .label::before,.stat-list li.female .label::before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px}
 .stat-list li.male .label::before{background:#4a90e2}
 .stat-list li.female .label::before{background:#e91e63}
+
+/* 상단 카드 */
+.card-link{
+    display:block;
+    text-decoration:none;
+    color:inherit;
+}
+.card-link:hover{
+    text-decoration:none;
+}
+
+
 </style>
 
 </head>
@@ -71,21 +86,30 @@ h2{font-size:23px!important;font-weight:700;letter-spacing:-.3px;color:#2f2b2a;m
    =============================== --%>
 <div class="dashboard">
 
-    <%-- 왼쪽 : 동일 크기 카드 3개 --%>
+    <%-- 왼쪽 : 동일 크기 카드 4개 --%>
     <div class="card-area main-cards">
-        <a href="<%=ctxPath%>/admin/memberList.sp" class="card card-link">
-		    <h3>전체 회원</h3>
-		    <p>${empty totalCount ? 0 : totalCount}</p>
-		</a>
-        <div class="card">
-            <h3>정상 회원</h3>
-            <p>${empty activeCount ? 0 : activeCount}</p>
-        </div>
-        <div class="card">
-            <h3>탈퇴 회원</h3>
-            <p>${empty deleteCount ? 0 : deleteCount}</p>
-        </div>
-    </div>
+
+	    <a href="<%=ctxPath%>/admin/memberList.sp" class="card card-link">
+	        <h3>전체 회원</h3>
+	        <p>${empty totalCount ? 0 : totalCount}</p>
+	    </a>
+	
+	    <a href="<%=ctxPath%>/admin/memberList.sp?mode=active" class="card card-link">
+	        <h3>정상 회원</h3>
+	        <p>${empty activeCount ? 0 : activeCount}</p>
+	    </a>
+	
+	    <a class="card card-link">
+	        <h3>휴면 회원</h3>
+	        <p>${empty idleCount ? 0 : idleCount}</p>
+	    </a>
+	
+	    <a class="card card-link">
+	        <h3>탈퇴 회원</h3>
+	        <p>${empty deleteCount ? 0 : deleteCount}</p>
+	    </a>
+
+	</div>
 
     <%-- 오른쪽 : 오늘 가입 회원 --%>
     <div class="side-card">
@@ -100,7 +124,7 @@ h2{font-size:23px!important;font-weight:700;letter-spacing:-.3px;color:#2f2b2a;m
      하위 기능 이동
    =============================== --%>
 <div class="btn-area">
-    <a href="<%=ctxPath%>/admin/memberList.sp">회원 목록 보기</a>
+    <a href="<%=ctxPath%>/admin/idleMember.sp">휴면 회원 관리하기</a>
 </div>
 
 <%-- ===============================

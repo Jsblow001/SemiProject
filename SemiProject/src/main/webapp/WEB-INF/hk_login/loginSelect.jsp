@@ -7,7 +7,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>Login Select | CARIN</title>
+<title>Login Select | SISEON</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -29,7 +29,7 @@ body{background:#fbfaf8!important}
 /* ===============================
    콘텐츠 영역
    =============================== */
-.login-select-bg{padding-top:40px!important;padding-bottom:20px!important}
+.login-select-bg{padding-top:80px!important;padding-bottom:40px!important}
 
 /* 로그인 카드 */
 .login-select-wrapper{max-width:420px!important;margin:0 auto!important;background:#fff!important;padding:40px 35px!important;border-radius:14px!important;box-shadow:0 8px 28px rgba(0,0,0,.07)!important;text-align:center!important}
@@ -55,8 +55,23 @@ footer,.footer,#footer{margin-top:0!important;padding-top:0!important}
 /* ===============================
    회원가입 버튼
    =============================== */
-.btn-register{width:100%!important;padding:12px!important;font-size:.95rem!important;border-radius:6px!important;font-weight:500!important;background:#fff!important;border:1px solid #bdbdbd!important;color:#5d4037!important}
-.btn-register:hover{background:#5d4037!important;border-color:#5d4037!important;color:#fff!important}
+.btn-outline-secondary{
+    height:46px!important;
+    border-radius:0!important;
+    font-size:.95rem!important;
+    font-weight:500!important;
+    letter-spacing:-.2px!important;
+    background:#f1ebe5!important;
+    border:1px solid #d2c4ba!important;
+    color:#5d4037!important;
+    transition:all .2s ease!important
+}
+
+.btn-outline-secondary:hover{
+    background:#e6dbd2!important;
+    border-color:#5d4037!important;
+    color:#3e2723!important
+}
 </style>
 
 </head>
@@ -70,7 +85,7 @@ footer,.footer,#footer{margin-top:0!important;padding-top:0!important}
 <div class="login-select-bg">
     <div class="login-select-wrapper">
         <div class="login-title">LOGIN</div>
-        <div class="login-desc">CARIN에 오신 것을 환영합니다</div>
+        <div class="login-desc">SISEON에 오신 것을 환영합니다</div>
 
         <a href="<%= ctxPath %>/login.sp" class="btn btn-login btn-member">
             개인회원 로그인

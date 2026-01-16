@@ -3,6 +3,7 @@ package hk.member.controller;
 import java.util.List;
 
 import sp.common.controller.AbstractController;
+import hk.order.domain.OrderDTO;
 import hk.order.domain.OrderDetailDTO;
 import hk.order.model.OrderDAO;
 import hk.order.model.OrderDAO_imple;
@@ -51,11 +52,15 @@ public class OrderDetailController extends AbstractController {
 
         int odrCode = Integer.parseInt(odrCodeStr);
 
+     // ★ 주문 헤더(결제정보) 조회 추가
+        OrderDTO orderInfo = odao.selectOrderInfo(odrCode);
+
         /* ===============================
          * 3. 주문 상세 조회
          * =============================== */
         List<OrderDetailDTO> detailList = odao.selectOrderDetail(odrCode);
 
+        request.setAttribute("orderInfo", orderInfo); 
         request.setAttribute("detailList", detailList);
         request.setAttribute("odrCode", odrCode);
 

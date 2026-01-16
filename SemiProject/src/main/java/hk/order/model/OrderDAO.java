@@ -13,6 +13,9 @@ public interface OrderDAO {
     // 주문 상세
     List<OrderDetailDTO> selectOrderDetail(int odrCode) throws SQLException;
 
+	// 주문 상세 내 결제 정보 출력용
+	OrderDTO selectOrderInfo(int odrCode) throws SQLException;
+    
 	// 주문 총 건수 (페이지바용)
     int getOrderTotalCount(String userid, String status, String startDate, String endDate) throws SQLException;
 
@@ -39,5 +42,7 @@ public interface OrderDAO {
 
 	// 주문취소/교환/반품 신청 후 관리자 승인 -> 처리대기 -> 처리완료
 	int completeClaim(int odrDetailNo) throws SQLException;
+
+
 
 }

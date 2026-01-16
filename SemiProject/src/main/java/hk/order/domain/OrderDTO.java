@@ -16,6 +16,13 @@ public class OrderDTO {
     private String paymentStatusName; // 결제상태 한글
     private String productName;       // 대표 상품명
     private int totalQty;             // 총 수량
+    
+    // 클레임상태
+    private String claimStatus;
+    
+    // reject 상태
+    private String rejectReason;
+
 
     // getter / setter
     public int getOdrCode() { return odrCode; }
@@ -52,4 +59,24 @@ public class OrderDTO {
 
     public int getTotalQty() { return totalQty; }
     public void setTotalQty(int totalQty) { this.totalQty = totalQty; }
+	
+    // 클레임용 getter/setter
+    public String getClaimStatus() {
+		return claimStatus;
+	}
+	public void setClaimStatus(String claimStatus) {
+		this.claimStatus = claimStatus;
+	}
+
+	// reject 표기 용 getter/setter
+	public String getRejectReason() {
+	    return rejectReason;
+	}
+	
+	public void setRejectReason(String rejectReason) {
+	    this.rejectReason = rejectReason;
+	}
+	
+    
+    
 }
