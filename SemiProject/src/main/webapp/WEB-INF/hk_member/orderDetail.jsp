@@ -64,6 +64,20 @@
 
 <h3 style="font-size:18px;font-weight:600;margin-bottom:20px;">
     주문 상세내역 <span style="font-size:13px;color:#999;">(주문번호:${odrCode})</span>
+	
+	<!-- 주문/결제 정보 -->
+	<div style="background:#fff; border:1px solid #eee; border-radius:8px; padding:18px; margin-bottom:15px;">
+	    <div style="font-weight:600; margin-bottom:10px;">주문/결제 정보</div>
+	
+	    <div style="font-size:13px; color:#555; line-height:1.8;">
+	        주문번호 : <strong>${orderInfo.odrCode}</strong><br>
+	        주문일자 : <fmt:formatDate value="${orderInfo.odrDate}" pattern="yyyy-MM-dd"/><br>
+	        결제상태 : <strong>${orderInfo.paymentStatusName}</strong><br>
+	        주문금액 : <strong><fmt:formatNumber value="${orderInfo.odrTotalPrice}" pattern="#,###"/>원</strong>
+	    </div>
+	</div>
+
+
 </h3>
 
 <table class="detail-table">

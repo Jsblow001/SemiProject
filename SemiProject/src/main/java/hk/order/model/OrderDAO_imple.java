@@ -639,6 +639,48 @@ public class OrderDAO_imple implements OrderDAO {
 	     return result;
 	 }
 
+	 
+	 
+	// 주문 상세 내 결제 정보 출력용
+	 @Override
+	 public OrderDTO selectOrderInfo(int odrCode) throws SQLException {
+
+	     OrderDTO dto = null;
+
+	     try {
+	         conn = ds.getConnection();
+
+	         String sql =
+	             " SELECT odrcode, odrdate, odrtotalprice, payment_status " +
+	             " FROM tbl_order " +
+	             " WHERE odrcode = ? ";
+
+	         pstmt = conn.prepareStatement(sql);
+	         pstmt.setInt(1, odrCode);
+
+	         rs = pstmt.executeQuery();
+
+	         if(rs.next()) {
+	             dto = new OrderDTO();
+	             dto.setOdrCode(rs.getInt("odrcode"));
+	             dto.setOdrDate(rs.getDate("odrdate"));
+	             dto.setOdrTotalPrice(rs.getInt("odrtotalprice"));
+	             dto.setPaymentStatus(rs.getInt("payment_status"));
+
+	             int payStatus = rs.getInt("payment_status");
+	             if(payStatus == 0) dto.setPaymentStatusName("결제대기");
+	             else if(payStatus == 1) dto.setPaymentStatusName("결제완료");
+	             else if(payStatus == 2) dto.setPaymentStatusName("결제취소");
+	         }
+
+	     } finally {
+	         close();
+	     }
+
+	     return dto;
+	 }
+
+
 
 
 
