@@ -522,7 +522,7 @@ public class MemberDAO_imple implements MemberDAO {
 	         conn = ds.getConnection();
 	
 	         String sql =
-	                 " SELECT MEMBER_ID, name, gender, email, registerday, status " +
+	                 " SELECT MEMBER_ID, name, gender, email, registerday, status, idle " +
 	                 " FROM tbl_member " +
 	                 " WHERE MEMBER_ID != 'admin' " +
 	                 " ORDER BY registerday DESC " +
@@ -545,6 +545,9 @@ public class MemberDAO_imple implements MemberDAO {
 	
 	             //추가
 	             member.setStatus(rs.getInt("status"));
+	             
+	             // 추가
+	             member.setIdle(rs.getInt("idle"));
 	             
 	             memberList.add(member);
 	         }
@@ -674,7 +677,7 @@ public class MemberDAO_imple implements MemberDAO {
 		    try {
 		        conn = ds.getConnection();
 
-		        String sql = " SELECT MEMBER_ID, name, email, registerday, status "
+		        String sql = " SELECT MEMBER_ID, name, email, registerday, status, idle "
 		                   + " FROM tbl_member "
 		                   + " WHERE MEMBER_ID != 'admin' ";
 
@@ -705,6 +708,9 @@ public class MemberDAO_imple implements MemberDAO {
 		            member.setRegisterday(rs.getString("registerday"));
 		            member.setStatus(rs.getInt("status"));
 
+		            // 추가
+		             member.setIdle(rs.getInt("idle"));
+		            
 		            memberList.add(member);
 		        }
 		    }
