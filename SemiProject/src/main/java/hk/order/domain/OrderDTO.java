@@ -19,6 +19,9 @@ public class OrderDTO {
     
     // 클레임상태
     private String claimStatus;
+    
+    // reject 상태
+    private String rejectReason;
 
 
     // getter / setter
@@ -64,6 +67,16 @@ public class OrderDTO {
 	public void setClaimStatus(String claimStatus) {
 		this.claimStatus = claimStatus;
 	}
+
+	// reject 표기 용 getter/setter
+	public String getRejectReason() {
+	    return rejectReason;
+	}
+	
+	public void setRejectReason(String rejectReason) {
+	    this.rejectReason = rejectReason;
+	}
+	
     
     
 }
