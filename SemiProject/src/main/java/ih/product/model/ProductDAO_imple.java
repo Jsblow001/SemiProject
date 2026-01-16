@@ -508,16 +508,16 @@ public class ProductDAO_imple implements ProductDAO {
 	    return result;
 	}
 	
-	// 장바구니에서 주문하기
+	// 주문하기
 	@Override
 	public int orderAdd(Map<String, Object> paraMap) throws SQLException {
 	    int result = 0;
 	    
 	    try {
 	        conn = ds.getConnection();
-	        conn.setAutoCommit(false); // [트랜잭션 시작] 수동 커밋 모드
+	        conn.setAutoCommit(false); 
 
-	        // 주문 메인 테이블(tbl_order)에 인서트
+	        // 주문 메인 테이블인서트
 	        String sql = " insert into tbl_order(odrcode, fk_member_id, fk_addr_id, odrtotalprice, odrtotalpoint, payment_status) "
 	                   + " values(seq_odrcode.nextval, ?, ?, ?, ?, 1) ";
 	        
@@ -534,24 +534,22 @@ public class ProductDAO_imple implements ProductDAO {
 	            return 0;
 	        }
 
+	        // 주문 상품 목록 구성 (단건, 장바구니)
 	        String orderType = (String)paraMap.get("orderType");
 	        List<Map<String, Object>> itemList = new ArrayList<>();
 
 	        if("direct".equals(orderType)) {
-	            // [단건 주문] 
 	            Map<String, Object> directItem = new HashMap<>();
 	            directItem.put("product_id", paraMap.get("product_id"));
 	            directItem.put("qty", paraMap.get("qty"));
 	            directItem.put("sale_price", paraMap.get("sale_price"));
 	            itemList.add(directItem);
 	        } else {
-	            // [장바구니 주문]
 	            String cartIds = String.valueOf(paraMap.get("cartIds"));
 	            String sql_cart = " select c.fk_product_id, c.cart_qty, p.sale_price "
 	                            + " from tbl_cart c join tbl_product p on c.fk_product_id = p.product_id "
 	                            + " where c.cart_id in (" + cartIds + ") ";
 	            
-	            // 별도의 pstmt2와 rs2를 사용하여 메인 커넥션을 유지
 	            try (PreparedStatement pstmt2 = conn.prepareStatement(sql_cart);
 	                 ResultSet rs2 = pstmt2.executeQuery()) {
 	                while(rs2.next()) {
@@ -564,12 +562,12 @@ public class ProductDAO_imple implements ProductDAO {
 	            }
 	        }
 
-	        // 상세 인서트 및 재고 차감
+	        // 주문 상세 인서트 및 재고 차감
 	        int n2_total = 1;
 	        int n3_total = 1;
 
 	        for(Map<String, Object> item : itemList) {
-	            // 주문 상세 테이블(tbl_order_detail) 인서트
+	            // 주문 상세 테이블 인서트
 	            sql = " insert into tbl_order_detail(odrdetailno, fk_odrcode, fk_product_id, odrqty, odrprice) "
 	                + " values(seq_odrdetailno.nextval, seq_odrcode.currval, ?, ?, ?) ";
 	            
@@ -580,7 +578,7 @@ public class ProductDAO_imple implements ProductDAO {
 	            
 	            if(pstmt.executeUpdate() != 1) { n2_total = 0; break; }
 
-	            // 제품 재고량 업데이트(차감) - 재고가 주문량보다 많을 때만 성공
+	            // 제품 재고량 차감 (재고 부족시 실패)
 	            sql = " update tbl_product set stock = stock - ? "
 	                + " where product_id = ? and stock >= ? ";
 	            
@@ -593,41 +591,55 @@ public class ProductDAO_imple implements ProductDAO {
 	            if(pstmt.executeUpdate() != 1) { n3_total = 0; break; }
 	        }
 
-	        // 장바구니 비우기 (장바구니 주문인 경우에만)
+	        //  장바구니 비우기 (장바구니 주문인 경우만)
 	        int n4 = 1;
 	        if("cart".equals(orderType)) {
 	            String cartIds = String.valueOf(paraMap.get("cartIds"));
 	            sql = " delete from tbl_cart where cart_id in (" + cartIds + ") ";
 	            pstmt = conn.prepareStatement(sql);
-	            n4 = pstmt.executeUpdate(); // 삭제된 행이 1개 이상이면 성공
+	            n4 = pstmt.executeUpdate();
 	        }
 	        
-	        // 회원 포인트 업데이트
-	        sql = " update tbl_member set point = point + ? "
-	            + " where member_id = ? ";
+	        // 5포인트 처리 (사용 차감 & 적립 가산)
+	        int n5_1 = 1; // 사용 차감 결과
+	        int n5_2 = 1; // 적립 가산 결과
 
-	        pstmt = conn.prepareStatement(sql);
+	        // [사용 포인트 차감]
+	        int usePoint = Integer.parseInt(String.valueOf(paraMap.get("usePoint")));
+	        if(usePoint > 0) {
+	            sql = " update tbl_member set point = point - ? where member_id = ? ";
+	            pstmt = conn.prepareStatement(sql);
+	            pstmt.setInt(1, usePoint);
+	            pstmt.setString(2, String.valueOf(paraMap.get("userid")));
+	            n5_1 = pstmt.executeUpdate();
+	        }
 
-	        pstmt.setInt(1, Integer.parseInt(String.valueOf(paraMap.get("totalPoint"))));
-	        pstmt.setString(2, String.valueOf(paraMap.get("userid")));
+	        // [신규 포인트 적립]
+	        int totalPoint = Integer.parseInt(String.valueOf(paraMap.get("totalPoint")));
+	        if(totalPoint > 0) {
+	            sql = " update tbl_member set point = point + ? where member_id = ? ";
+	            pstmt = conn.prepareStatement(sql);
+	            pstmt.setInt(1, totalPoint);
+	            pstmt.setString(2, String.valueOf(paraMap.get("userid")));
+	            n5_2 = pstmt.executeUpdate();
+	        }
 
-	        int n5 = pstmt.executeUpdate();
-
-	        if(n1 == 1 && n2_total == 1 && n3_total == 1 && n4 > 0 && n5 == 1) {
-	            conn.commit();   // [전체 성공]
+	        // 최종 트랜잭션 확정
+	        if(n1 == 1 && n2_total == 1 && n3_total == 1 && n4 > 0 && n5_1 == 1 && n5_2 == 1) {
+	            conn.commit();   // 모든 작업 성공 시 DB 반영
 	            result = 1;
 	        } else {
-	            conn.rollback(); // [하나라도 실패 시 전체 취소]
+	            conn.rollback(); // 하나라도 실패 시 전체 취소
 	            result = 0;
 	        }
 
 	    } catch (Exception e) { 
-	        if(conn != null) conn.rollback(); // 예외 발생 시 무조건 롤백
+	        if(conn != null) conn.rollback(); 
 	        e.printStackTrace(); 
 	        result = 0;
 	    } finally {
-	        if(conn != null) conn.setAutoCommit(true); // 커밋 모드 복구
-	        close(); // 커넥션 반납
+	        if(conn != null) conn.setAutoCommit(true); 
+	        close(); 
 	    }
 
 	    return result;
@@ -686,7 +698,8 @@ public class ProductDAO_imple implements ProductDAO {
 	            map.put("product_id", rs.getString("fk_product_id")); // 상세 테이블용
 	            map.put("cart_qty", rs.getInt("cart_qty"));           // 주문 수량
 	            map.put("sale_price", rs.getInt("sale_price"));       // 실제 DB 가격
-
+	            map.put("product_name", rs.getString("product_name")); 
+	            map.put("pimage", rs.getString("pimage"));
 	            orderList.add(map);
 	        }
 	    } finally {

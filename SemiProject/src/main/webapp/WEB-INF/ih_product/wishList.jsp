@@ -123,10 +123,23 @@
 								            <i class="fas fa-heart"></i>
 								        </button>
 								            
-								        <button type="button" class="btn-cart-custom cart-btn-${p.product_id}" 
-								                onclick="goCart('${p.product_id}', '1', '${pageContext.request.contextPath}')">
-								            <i class="fas fa-shopping-cart mr-5 ml-2"></i>
-								        </button>
+								        <c:choose>
+										    <c:when test="${p.stock > 0}">
+										        <button type="button" class="btn-cart-custom cart-btn-${p.product_id}" 
+										                onclick="goCart('${p.product_id}', '1', '${pageContext.request.contextPath}')">
+										            <i class="fas fa-shopping-cart mr-5 ml-2"></i>
+										        </button>
+										    </c:when>
+
+										    <c:otherwise>
+										        <button type="button" class="btn-cart-custom" 
+										                style="background-color: #e9ecef; color: #adb5bd; cursor: not-allowed;"
+										                onclick="alert('죄송합니다. 이 상품은 현재 품절되어 장바구니에 담을 수 없습니다.')">
+										            <i class="fas fa-shopping-cart mr-5 ml-2"></i>
+										        </button>
+										    </c:otherwise>
+										</c:choose>
+								    
 								    </div>
 								</div>
 

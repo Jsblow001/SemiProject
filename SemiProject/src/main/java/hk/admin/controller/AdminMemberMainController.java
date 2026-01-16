@@ -43,7 +43,7 @@ public class AdminMemberMainController extends AbstractController {
         int totalCount  = mdao.getTotalMemberCount();     // 전체 회원 수
         int activeCount = mdao.getActiveMemberCount();    // 정상 회원
         int deleteCount = mdao.getDeleteMemberCount();    // 탈퇴 회원
-
+        int idleCount = mdao.getIdleMemberCount();        // 휴면 회원 수
         
         /* ==================================================
          * 2-1. 오늘 회원가입 수 조회
@@ -96,6 +96,8 @@ public class AdminMemberMainController extends AbstractController {
         request.setAttribute("recentMemberList", recentMemberList);
         request.setAttribute("gradeCountList", gradeCountList);
         request.setAttribute("genderCountList", genderCountList);
+        
+        request.setAttribute("idleCount", idleCount);
         
         /* ==================================================
          * 4. 회원관리 대시보드 JSP 이동

@@ -101,7 +101,7 @@
                     </div>
                     <div class="d-inline-flex align-items-center">
                         <a href="<%= ctxPath %>/admin.sp" class="btn p-0 mr-3"><i class="fas fa-user text-wood"></i></a>
-                        <a href="#" class="btn p-0"><i class="fas fa-sign-out-alt text-wood"></i></a>
+                        <a href="<%=ctxPath%>/logout.sp" class="btn p-0"><i class="fas fa-sign-out-alt text-wood"></i></a>
                     </div>
                 </div>
             </nav>

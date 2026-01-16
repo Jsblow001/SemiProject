@@ -89,7 +89,7 @@ public class MyQnaListController extends AbstractController {
 
         // [다음]
         if (pageNo <= totalPage) {
-            pageBar += "<li><a href='" + request.getContextPath() + "/customer/myQnaList.spp?currentShowPageNo=" + pageNo + "'>[다음]</a></li>";
+            pageBar += "<li><a href='" + request.getContextPath() + "/customer/myQnaList.sp?currentShowPageNo=" + pageNo + "'>[다음]</a></li>";
         }
 
         // [마지막]

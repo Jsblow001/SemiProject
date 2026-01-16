@@ -50,6 +50,25 @@ td{padding:14px;border-bottom:1px solid #d5d5d5}
 /* ===== 보조 버튼 (목록으로) ===== */
 a.admin-btn.light,a.admin-btn.light:link,a.admin-btn.light:visited{background:#e6e4e1;color:#3e3a39!important;text-decoration:none}
 a.admin-btn.light:hover{background:#d8d5d1;color:#2f2b2a!important}
+
+/* 포인트 버튼 (강조색) */
+.admin-btn.point{
+    background:#6d4c41;
+    color:#fff;
+    border:none;
+}
+.admin-btn.point:hover{
+    background:#5a3f36;
+}
+
+/* 관리자 기능 버튼들 정렬 */
+.admin-btn-area{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
 </style>
 
 
@@ -95,6 +114,55 @@ $(function(){
     });
 
 });
+
+
+function addMemberPoint(userid, point) {
+    // 1. 입력받기
+    let input = prompt(userid + "님에게 추가할 포인트 금액을 입력하세요", "0");
+
+    if (input !== null && input.trim() !== "") {
+        let addPoint = parseInt(input);
+
+        // 유효성 검사
+        if (isNaN(addPoint)) {
+            alert("숫자만 입력 가능합니다.");
+            return;
+        }
+        
+        // 2. 합계 계산 (화면 표시용)
+        let currentPoint = parseInt(point); 
+        let finalPoint = currentPoint + addPoint;
+
+        if(!confirm("현재 " + currentPoint + "P에 " + addPoint + "P를 더하여\n총 " + finalPoint + "P로 변경하시겠습니까?")) {
+            return;
+        }
+
+        // 3. 서버 DB 업데이트 (AJAX)
+        $.ajax({
+            url: "${pageContext.request.contextPath}/admin/updatePoint.sp",
+            type: "POST", // 포인트 수정은 POST 권장
+            data: {
+                "userid": userid,
+                "addPoint": addPoint // 추가할 포인트만 보낼지, 최종 결과(finalPoint)를 보낼지는 DAO 설계에 따라 선택
+            },
+            dataType: "json",
+            success: function(json) {
+                // json 응답 예시: {"n": 1}
+                if(json.n == 1) {
+                    alert("포인트 적립이 완료되었습니다.");
+                    // 성공 시 화면의 포인트 숫자만 바로 변경하거나 새로고침
+                    $("#currentPoint").text(finalPoint); 
+                    location.reload(); 
+                } else {
+                    alert("DB 업데이트에 실패했습니다.");
+                }
+            },
+            error: function() {
+                alert("서버 통신 오류가 발생했습니다.");
+            }
+        });
+    }
+}
 </script>
 
 
@@ -161,12 +229,47 @@ $(function(){
                 </c:choose>
             </td>
         </tr>
+        
         <tr>
             <th>회원등급</th>
             <td>
 			   ${member.grade_name}
             </td>
         </tr>
+        
+        <tr>
+		  <th>현재 포인트</th>
+		  <td style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+		      
+		      <div style="font-weight:700;">
+		          <span id="currentPoint">${member.point}</span> P
+		      </div>
+		
+		      <button class="admin-btn point" type="button"
+		              onclick="addMemberPoint('${member.userid}', ${member.point})">
+		          포인트 추가
+		      </button>
+		
+		  </td>
+		</tr>
+
+        
+        <tr>
+        <th>관리자 메모</th>
+        <td>
+            <div class="memo-view">
+                <c:choose>
+                    <c:when test="${empty member.admin_memo}">
+                        <span class="memo-empty">등록된 메모 없음</span>
+                    </c:when>
+                    <c:otherwise>
+                        ${member.admin_memo}
+                    </c:otherwise>
+                </c:choose>
+            </div>
+        </td>
+    	</tr>
+        
     </table>
 
 	<!-- ==== 휴대폰 SMS(문자) 보내기 ==== -->
@@ -195,17 +298,43 @@ $(function(){
 	                </div>
 	
 	                <!-- 버튼 -->
-	                <div class="sms-btn-area">
-	                    <button id="btnSend" class="admin-btn">문자 전송</button>
-	                    <span id="smsResult" class="admin-btn"></span>
-	                </div>
-	
+			         <div class="sms-btn-area">
+					    <button id="btnSend" class="admin-btn" type="button">문자 전송</button>
+					    <span id="smsResult" class="sms-result"></span>
+					</div>
+
 	            </div>
 	
 	        </td>
 	    </tr>
 	</table>
 
+	<div style="margin-top:25px; padding:18px; border:1px solid #eee; border-radius:4px;">
+    <h4 style="font-size:15px; font-weight:700; margin-bottom:10px;">
+        📝 관리자 메모 (최대 200자)
+    </h4>
+
+    <form method="post" action="<%=ctxPath%>/admin/memberAdminMemoUpdate.sp">
+        <input type="hidden" name="userid" value="${member.userid}" />
+
+        <textarea name="adminMemo"
+                  maxlength="200"
+                  style="width:100%; height:90px; padding:10px; border:1px solid #ccc; border-radius:3px; font-size:14px; resize:none;"
+                  placeholder="예) 반품 잦음 / CS 민감 / 연락 시 주의">${member.admin_memo}</textarea>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+            <div style="font-size:12px; color:#777;">
+                마지막 수정: ${empty member.memo_updatedate ? '없음' : member.memo_updatedate}
+            </div>
+
+            <button type="submit"
+                    style="padding:10px 16px; border:none; border-radius:3px; background:#6d4c41; color:#fff; font-weight:700; cursor:pointer;">
+                저장
+            </button>
+        </div>
+    </form>
+	</div>
+	
 
     <div class="btn-box">
         <a href="<%=ctxPath%>/admin/memberList.sp" class="admin-btn light">
