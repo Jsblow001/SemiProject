@@ -87,5 +87,27 @@ public class MemberDAO_imple implements MemberDAO {
 	    return result;
 	}
 
+	// 포인트 업데이트
+	@Override
+	public int updateMemberPoint(Map<String, Object> paraMap) throws SQLException {
+	    int result = 0;
+	    try {
+	        conn = ds.getConnection();
+	        
+	        // 기존 포인트에 더하는 쿼리 (update 연산 이용)
+	        String sql = " update tbl_member set point = point + ? "
+	                   + " where member_id = ? ";
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setInt(1, (int)paraMap.get("addPoint"));
+	        pstmt.setString(2, (String)paraMap.get("userid"));
+	        
+	        result = pstmt.executeUpdate();
+	        
+	    } finally {
+	        close();
+	    }
+	    return result;
+	}
 	
 }
