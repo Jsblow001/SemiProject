@@ -5,7 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -132,6 +134,53 @@ public class ProductDAO_imple implements ProductDAO {
         }
         return result;
     }
+
+    
+    // tbl_map(위,경도) 테이블에 있는 정보를 가져오기(select)
+    @Override
+    public List<Map<String, String>> selectStoreMap() throws SQLException {
+
+        List<Map<String, String>> mapList = new ArrayList<>();
+
+        try {
+            conn = ds.getConnection();
+
+            String sql =
+                " select storeID, storeName, storeUrl, storeImg, storeAddress " +
+                "      , lat, lng, zindex " +
+                "      , tel, hours, reserveUrl " +
+                " from tbl_map " +
+                " order by zindex asc ";
+
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+
+            while(rs.next()) {
+                Map<String, String> map = new HashMap<>();
+
+                map.put("STOREID", rs.getString("storeID"));
+                map.put("STORENAME", rs.getString("storeName"));
+                map.put("STOREURL", rs.getString("storeUrl"));
+                map.put("STOREIMG", rs.getString("storeImg"));
+                map.put("STOREADDRESS", rs.getString("storeAddress"));
+                map.put("LAT", String.valueOf(rs.getDouble("lat")));
+                map.put("LNG", String.valueOf(rs.getDouble("lng")));
+                map.put("ZINDEX", String.valueOf(rs.getInt("zindex")));
+
+                // ✅ 추가
+                map.put("TEL", rs.getString("tel"));
+                map.put("HOURS", rs.getString("hours"));
+                map.put("RESERVEURL", rs.getString("reserveUrl"));
+
+                mapList.add(map);
+            }
+
+        } finally {
+            close(); // 너 프로젝트 close() 방식에 맞게
+        }
+
+        return mapList;
+    }// end of public List<Map<String, String>> selectStoreMap() throws SQLException
 
 
 }
