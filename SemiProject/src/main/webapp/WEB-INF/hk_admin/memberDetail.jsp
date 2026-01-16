@@ -50,6 +50,25 @@ td{padding:14px;border-bottom:1px solid #d5d5d5}
 /* ===== 보조 버튼 (목록으로) ===== */
 a.admin-btn.light,a.admin-btn.light:link,a.admin-btn.light:visited{background:#e6e4e1;color:#3e3a39!important;text-decoration:none}
 a.admin-btn.light:hover{background:#d8d5d1;color:#2f2b2a!important}
+
+/* 포인트 버튼 (강조색) */
+.admin-btn.point{
+    background:#6d4c41;
+    color:#fff;
+    border:none;
+}
+.admin-btn.point:hover{
+    background:#5a3f36;
+}
+
+/* 관리자 기능 버튼들 정렬 */
+.admin-btn-area{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
 </style>
 
 
@@ -211,16 +230,29 @@ function addMemberPoint(userid, point) {
             </td>
         </tr>
         
-        <a class="admin-btn light" style="margin-left: 40px; cursor: pointer;" 
-             onclick="addMemberPoint('${member.userid}', ${member.point})">
-        포인트 추가
-  		  </a>
         <tr>
             <th>회원등급</th>
             <td>
 			   ${member.grade_name}
             </td>
         </tr>
+        
+        <tr>
+		  <th>현재 포인트</th>
+		  <td style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+		      
+		      <div style="font-weight:700;">
+		          <span id="currentPoint">${member.point}</span> P
+		      </div>
+		
+		      <button class="admin-btn point" type="button"
+		              onclick="addMemberPoint('${member.userid}', ${member.point})">
+		          포인트 추가
+		      </button>
+		
+		  </td>
+		</tr>
+
         
         <tr>
         <th>관리자 메모</th>
@@ -266,11 +298,11 @@ function addMemberPoint(userid, point) {
 	                </div>
 	
 	                <!-- 버튼 -->
-	                <div class="sms-btn-area">
-	                    <button id="btnSend" class="admin-btn">문자 전송</button>
-	                    <span id="smsResult" class="admin-btn"></span>
-	                </div>
-	
+			         <div class="sms-btn-area">
+					    <button id="btnSend" class="admin-btn" type="button">문자 전송</button>
+					    <span id="smsResult" class="sms-result"></span>
+					</div>
+
 	            </div>
 	
 	        </td>
