@@ -164,7 +164,8 @@
 
   </style>
   
-
+<a class="dropdown-item text-info" href="${pageContext.request.contextPath}/storeLocation1.sp">매장찾기</a>
+<a class="dropdown-item text-info" href="${pageContext.request.contextPath}/storeLocation2.sp">매장찾기</a>
     
     <!-- Navbar Start -->
     <div class="container-fluid">
