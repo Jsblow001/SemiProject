@@ -1,5 +1,6 @@
 package ih.product.model;
 
+import java.io.UnsupportedEncodingException;
 import java.sql.*;
 import java.util.*;
 import javax.naming.*;
@@ -7,6 +8,8 @@ import javax.sql.DataSource;
 
 import ih.product.domain.AdminOrderDTO;
 import sp.util.security.AES256;
+import sp.util.security.SecretMyKey;
+
 
 public class AdminOrderDAO_imple implements AdminOrderDAO {
 
@@ -15,13 +18,15 @@ public class AdminOrderDAO_imple implements AdminOrderDAO {
     private PreparedStatement pstmt;
     private ResultSet rs;
 
+    private AES256 aes;
     // 생성자
     public AdminOrderDAO_imple() {
         try {
             Context initContext = new InitialContext();
             Context envContext = (Context)initContext.lookup("java:/comp/env");
-            ds = (DataSource)envContext.lookup("SemiProject"); 
-        } catch (NamingException e) {
+            ds = (DataSource)envContext.lookup("SemiProject");
+            aes = new AES256(SecretMyKey.KEY);
+        } catch (NamingException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
     }
@@ -124,25 +129,21 @@ public class AdminOrderDAO_imple implements AdminOrderDAO {
                 odto.setOdrcode(rs.getString("odrcode"));
                 odto.setFk_userid(rs.getString("fk_member_id"));
                 odto.setName(rs.getString("name"));
-                /*
-                try {
-                    String mobile = rs.getString("mobile");
-                    String email = rs.getString("email");
+                
+                String mobile = rs.getString("mobile");
+                String email = rs.getString("email");
 
-                    odto.setMobile(AES256.decrypt(mobile)); 
-                    odto.setEmail(AES256.decrypt(email));
-                    
+                try {
+                    // 값이 있을 때만 복호화 시도
+                    odto.setMobile(mobile != null ? aes.decrypt(mobile) : "");
+                    odto.setEmail(email != null ? aes.decrypt(email) : "");
                 } catch (Exception e) {
-                    // 복호화 실패 시 원본 출력
-                    odto.setMobile(rs.getString("mobile"));
-                    odto.setEmail(rs.getString("email"));
+                    // 복호화 실패 시 로그를 남겨 원인 파악
+                    e.printStackTrace(); 
+                    odto.setMobile(mobile);
+                    odto.setEmail(email);
                 }
-                */
-                odto.setOdrcode(rs.getString("odrcode"));
-                odto.setFk_userid(rs.getString("fk_member_id"));
-                odto.setName(rs.getString("name"));
-                odto.setMobile(rs.getString("mobile"));
-                odto.setEmail(rs.getString("email"));
+                
                 odto.setPostcode(rs.getString("postcode"));
                 odto.setAddress(rs.getString("address"));
                 odto.setDetailaddress(rs.getString("detailaddress"));
