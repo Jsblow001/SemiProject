@@ -88,6 +88,9 @@ public interface MemberDAO {
 	// 관리자 페이지 휴면회원 조회
 	List<MemberDTO> selectIdleMemberListForAdmin() throws SQLException;
 
+	// 관리자 페이지 휴면 해제 처리
+	int idleReleaseMany(String[] useridArr) throws SQLException;
+
 	
 
 	

@@ -1114,6 +1114,42 @@ public class MemberDAO_imple implements MemberDAO {
 	    return list;
 	}
 
+	
+	
+	// 관리자 페이지 휴면회원 해제
+	@Override
+	public int idleReleaseMany(String[] useridArr) throws SQLException {
+
+	    int totalCnt = 0;
+
+	    try {
+	        conn = ds.getConnection();
+	        conn.setAutoCommit(false);
+
+	        String sql = " update tbl_member "
+	                   + " set idle = 0 "
+	                   + "   , idle_changedate = sysdate "
+	                   + " where member_id = ? ";
+
+	        pstmt = conn.prepareStatement(sql);
+
+	        for(String userid : useridArr) {
+	            pstmt.setString(1, userid);
+	            totalCnt += pstmt.executeUpdate();
+	        }
+
+	        conn.commit();
+
+	    } catch(SQLException e) {
+	        if(conn != null) conn.rollback();
+	        throw e;
+	    } finally {
+	        close();
+	    }
+
+	    return totalCnt;
+	}
+
 
 
 

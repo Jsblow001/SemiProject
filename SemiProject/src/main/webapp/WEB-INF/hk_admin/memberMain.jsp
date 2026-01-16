@@ -124,7 +124,7 @@ h2{font-size:23px!important;font-weight:700;letter-spacing:-.3px;color:#2f2b2a;m
      하위 기능 이동
    =============================== --%>
 <div class="btn-area">
-    <a href="<%=ctxPath%>/admin/Idlemember.sp">휴면 회원 관리하기</a>
+    <a href="<%=ctxPath%>/admin/idleMember.sp">휴면 회원 관리하기</a>
 </div>
 
 <%-- ===============================
