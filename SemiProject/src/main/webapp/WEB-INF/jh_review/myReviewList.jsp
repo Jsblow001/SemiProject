@@ -4,6 +4,7 @@
 <%
     String ctxPath = request.getContextPath();
 %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <!DOCTYPE html>
 <html lang="ko">
@@ -159,9 +160,11 @@ body {
 function goDeleteReview(reviewId){
     if(!confirm("정말 이 리뷰를 삭제할까요?\n삭제하면 복구할 수 없습니다.")) return;
 
-    // ✅ 삭제 후 돌아올 URL(현재 리스트 상태 유지)
+    // ✅ searchWord 안전 인코딩
+    const sw = encodeURIComponent("${fn:escapeXml(searchWord)}");
+
     const returnUrl =
-        "<%=ctxPath%>/myReviewList.sp?page=${page}&sort=${sort}&searchWord=${searchWord}";
+        "<%=ctxPath%>/myReviewList.sp?page=${page}&sort=${sort}&searchWord=" + sw;
 
     const f = document.createElement("form");
     f.method = "post";
@@ -184,6 +187,7 @@ function goDeleteReview(reviewId){
     f.submit();
 }
 </script>
+
 
 </head>
 
@@ -298,33 +302,54 @@ function goDeleteReview(reviewId){
         </tbody>
     </table>
 
-    <!-- 페이지네이션 -->
-    <ul class="pagination">
+	<!-- 페이지네이션 -->
+	<ul class="pagination">
+	
+	    <!-- ⏮ 맨처음 -->
+	    <li class="page-item ${page == 1 ? 'disabled' : ''}">
+	        <a class="page-link"
+	           href="<%=ctxPath%>/myReviewList.sp?page=1&sort=${sort}&searchWord=${searchWord}">
+	            «
+	        </a>
+	    </li>
+	
+	    <!-- ◀ 이전 -->
+	    <li class="page-item ${page == 1 ? 'disabled' : ''}">
+	        <a class="page-link"
+	           href="<%=ctxPath%>/myReviewList.sp?page=${page - 1}&sort=${sort}&searchWord=${searchWord}">
+	            ‹
+	        </a>
+	    </li>
+	
+	    <!-- ✅ 페이지바(startPage ~ endPage) -->
+	    <c:forEach var="i" begin="${startPage}" end="${endPage}">
+	        <li class="page-item ${page == i ? 'active' : ''}">
+	            <a class="page-link"
+	               href="<%=ctxPath%>/myReviewList.sp?page=${i}&sort=${sort}&searchWord=${searchWord}">
+	                ${i}
+	            </a>
+	        </li>
+	    </c:forEach>
+	
+	    <!-- ▶ 다음 -->
+	    <li class="page-item ${page == totalPage ? 'disabled' : ''}">
+	        <a class="page-link"
+	           href="<%=ctxPath%>/myReviewList.sp?page=${page + 1}&sort=${sort}&searchWord=${searchWord}">
+	            ›
+	        </a>
+	    </li>
+	
+	    <!-- ⏭ 맨끝 -->
+	    <li class="page-item ${page == totalPage ? 'disabled' : ''}">
+	        <a class="page-link"
+	           href="<%=ctxPath%>/myReviewList.sp?page=${totalPage}&sort=${sort}&searchWord=${searchWord}">
+	            »
+	        </a>
+	    </li>
+	
+	</ul>
 
-        <li class="page-item ${page == 1 ? 'disabled' : ''}">
-            <a class="page-link"
-               href="<%=ctxPath%>/myReviewList.sp?page=${page - 1}&sort=${sort}&searchWord=${searchWord}">
-                ‹
-            </a>
-        </li>
 
-        <c:forEach begin="1" end="${totalPage}" var="i">
-            <li class="page-item ${page == i ? 'active' : ''}">
-                <a class="page-link"
-                   href="<%=ctxPath%>/myReviewList.sp?page=${i}&sort=${sort}&searchWord=${searchWord}">
-                    ${i}
-                </a>
-            </li>
-        </c:forEach>
-
-        <li class="page-item ${page == totalPage ? 'disabled' : ''}">
-            <a class="page-link"
-               href="<%=ctxPath%>/myReviewList.sp?page=${page + 1}&sort=${sort}&searchWord=${searchWord}">
-                ›
-            </a>
-        </li>
-
-    </ul>
 
 </div>
 

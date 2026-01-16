@@ -33,9 +33,9 @@
   <div class="top">
     <label>매장</label>
     <select id="storeId">
-      <option value="1">매장1</option>
-      <option value="2">매장2</option>
-      <option value="3">매장3</option>
+      <option value="1">SISEON 도산점</option>
+      <option value="2">SISEON 압구정점</option>
+      <option value="3">SISEON 홍대점</option>
     </select>
 
     <label>날짜</label>

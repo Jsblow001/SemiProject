@@ -30,7 +30,7 @@ public class MyReviewListController extends AbstractController {
             return;
         }
 
-        String userid = loginuser.getUserid();  // fk_member_id가 userid 문자열로 쓰이는 구조 전제
+        String userid = loginuser.getUserid();
 
         // 파라미터 받기
         String page = request.getParameter("page");
@@ -51,7 +51,7 @@ public class MyReviewListController extends AbstractController {
         }
         if(currentShowPageNo < 1) currentShowPageNo = 1;
 
-        int sizePerPage = 10;  // 주문내역처럼 10개
+        int sizePerPage = 10;
 
         // DAO 파라미터
         Map<String, String> paraMap = new HashMap<>();
@@ -75,6 +75,16 @@ public class MyReviewListController extends AbstractController {
         // ✅ 페이징 목록
         List<ReviewDTO> myReviewList = rdao.selectMyReviewListPaging(paraMap);
 
+        // ==========================================================
+        // ✅ 페이지바(블록) 계산 (예: 1~5, 6~10 ...)
+        int blockSize = 5;
+
+        int startPage = ((currentShowPageNo - 1) / blockSize) * blockSize + 1;
+        int endPage = startPage + blockSize - 1;
+        if(endPage > totalPage) endPage = totalPage;
+
+        // ==========================================================
+
         // JSP로 전달
         request.setAttribute("myReviewList", myReviewList);
 
@@ -85,7 +95,11 @@ public class MyReviewListController extends AbstractController {
         request.setAttribute("sort", sort);
         request.setAttribute("searchWord", searchWord);
 
-        // JSP 경로(너가 만든 myReviewList.jsp 위치에 맞추면 됨)
+        // ✅ 페이지바용
+        request.setAttribute("blockSize", blockSize);
+        request.setAttribute("startPage", startPage);
+        request.setAttribute("endPage", endPage);
+
         super.setRedirect(false);
         super.setViewPage("/WEB-INF/jh_review/myReviewList.jsp");
     }

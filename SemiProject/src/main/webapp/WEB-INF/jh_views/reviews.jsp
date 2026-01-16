@@ -18,6 +18,81 @@
 <c:set var="sort" value="${empty param.sort ? (empty sort ? 'recent' : sort) : param.sort}" />
 <c:set var="searchWord" value="${empty param.searchWord ? (empty searchWord ? '' : searchWord) : param.searchWord}" />
 
+<script>
+  const ctxPath = "<%= request.getContextPath() %>";
+  const isLogin = ${sessionScope.loginuser == null ? "false" : "true"};
+</script>
+
+<style>
+.pager{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;     /* 줄바꿈 허용 */
+  padding: 10px 0;
+}
+
+.pager a, .pager span{
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+  min-width:34px;
+  height:34px;
+  border-radius:8px;
+  border:1px solid #ddd;
+  padding:0 10px;
+  font-size:14px;
+}
+
+.pager .active{
+  font-weight:700;
+  border-color:#111;
+}
+
+.pager .arrow{
+  font-weight:700;
+}
+
+.pager .disabled{
+  opacity:.35;
+}
+
+.reportInner{
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+
+.reportMsg{
+  flex:1;
+  padding:10px 12px;
+  border:1px solid #ddd;
+  border-radius:10px;
+  font-size:14px;
+  outline:none;
+}
+
+.reportMsg:focus{
+  border-color:#111;
+}
+
+.btnReportSubmit{
+  padding:10px 14px;
+  border:0;
+  border-radius:10px;
+  background:#111;
+  color:#fff;
+  font-size:13px;
+  cursor:pointer;
+}
+
+.btnReportSubmit:hover{
+  opacity:0.92;
+}
+
+</style>
+
 <div class="wrap">
   <div class="inner">
     <div class="page-title">Reviews</div>
@@ -295,9 +370,29 @@
 	                </c:if>
 	
 	                <div class="r-actions">
-	                  <a>💬 댓글 ${r.commentCount}</a>
-	                  <a href="#">⚑ 신고</a>
+	                  <!-- ✅ 신고 버튼 -->
+					  <a href="javascript:void(0);"
+					     class="btnReport"
+					     data-review-id="${r.review_id}">
+					    ⚑ 신고
+					  </a>
 	                </div>
+	                
+	                <!-- ✅ 신고 입력창(처음엔 숨김) -->
+					<div class="reportBox" id="reportBox_${r.review_id}" style="display:none; margin-top:10px;">
+					  <div class="reportInner">
+					    <input type="text"
+					           class="reportMsg"
+					           maxlength="200"
+					           placeholder="신고 내용을 입력해주세요." />
+					
+					    <button type="button"
+					            class="btnReportSubmit"
+					            data-review-id="${r.review_id}">
+					      작성완료
+					    </button>
+					  </div>
+					</div>
 	
 	                <c:if test="${not empty r.adminReply}">
 	                  <div class="admin-reply">
@@ -305,6 +400,7 @@
 	                    <div class="admin-name">시선 올림</div>
 	                  </div>
 	                </c:if>
+	                
                 </a>
               </div>
             </div>
@@ -314,42 +410,62 @@
     </div>
 
     <!-- 페이지네이션 -->
-    <c:if test="${not empty totalPage && totalPage > 1}">
-      <div class="pager" style="margin-top:26px;">
-        <c:choose>
-          <c:when test="${currentShowPageNo > 1}">
-            <a class="arrow"
-               href="${pageContext.request.contextPath}/reviews.sp?midSort=${midSort}&sort=${sort}&searchWord=${fn:escapeXml(searchWord)}&currentShowPageNo=${currentShowPageNo-1}#allReviews"
-               aria-label="이전">&lsaquo;</a>
-          </c:when>
-          <c:otherwise>
-            <span class="arrow" aria-label="이전">&lsaquo;</span>
-          </c:otherwise>
-        </c:choose>
+	<c:if test="${totalPage > 1}">
+	  <div class="pager" style="margin-top:26px;">
+	
+	    <!-- ◀ 이전 블록 -->
+	    <c:if test="${startPage > 1}">
+	      <a class="arrow"
+	         href="${pageContext.request.contextPath}/reviews.sp?midSort=${midSort}&sort=${sort}&searchWord=${fn:escapeXml(searchWord)}&currentShowPageNo=${startPage-1}#allReviews"
+	         aria-label="이전 블록">&laquo;</a>
+	    </c:if>
+	
+	    <!-- ◀ 이전 페이지 -->
+	    <c:choose>
+	      <c:when test="${currentShowPageNo > 1}">
+	        <a class="arrow"
+	           href="${pageContext.request.contextPath}/reviews.sp?midSort=${midSort}&sort=${sort}&searchWord=${fn:escapeXml(searchWord)}&currentShowPageNo=${currentShowPageNo-1}#allReviews"
+	           aria-label="이전">&lsaquo;</a>
+	      </c:when>
+	      <c:otherwise>
+	        <span class="arrow disabled">&lsaquo;</span>
+	      </c:otherwise>
+	    </c:choose>
+	
+	    <!-- 페이지 번호 (블록만 출력) -->
+	    <c:forEach var="p" begin="${startPage}" end="${endPage}">
+	      <c:choose>
+	        <c:when test="${p == currentShowPageNo}">
+	          <span class="active">${p}</span>
+	        </c:when>
+	        <c:otherwise>
+	          <a href="${pageContext.request.contextPath}/reviews.sp?midSort=${midSort}&sort=${sort}&searchWord=${fn:escapeXml(searchWord)}&currentShowPageNo=${p}#allReviews">${p}</a>
+	        </c:otherwise>
+	      </c:choose>
+	    </c:forEach>
+	
+	    <!-- ▶ 다음 페이지 -->
+	    <c:choose>
+	      <c:when test="${currentShowPageNo < totalPage}">
+	        <a class="arrow"
+	           href="${pageContext.request.contextPath}/reviews.sp?midSort=${midSort}&sort=${sort}&searchWord=${fn:escapeXml(searchWord)}&currentShowPageNo=${currentShowPageNo+1}#allReviews"
+	           aria-label="다음">&rsaquo;</a>
+	      </c:when>
+	      <c:otherwise>
+	        <span class="arrow disabled">&rsaquo;</span>
+	      </c:otherwise>
+	    </c:choose>
+	
+	    <!-- ▶ 다음 블록 -->
+	    <c:if test="${endPage < totalPage}">
+	      <a class="arrow"
+	         href="${pageContext.request.contextPath}/reviews.sp?midSort=${midSort}&sort=${sort}&searchWord=${fn:escapeXml(searchWord)}&currentShowPageNo=${endPage+1}#allReviews"
+	         aria-label="다음 블록">&raquo;</a>
+	    </c:if>
+	
+	  </div>
+	</c:if>
 
-        <c:forEach var="p" begin="1" end="${totalPage}">
-          <c:choose>
-            <c:when test="${p == currentShowPageNo}">
-              <span class="active">${p}</span>
-            </c:when>
-            <c:otherwise>
-              <a href="${pageContext.request.contextPath}/reviews.sp?midSort=${midSort}&sort=${sort}&searchWord=${fn:escapeXml(searchWord)}&currentShowPageNo=${p}#allReviews">${p}</a>
-            </c:otherwise>
-          </c:choose>
-        </c:forEach>
-
-        <c:choose>
-          <c:when test="${currentShowPageNo < totalPage}">
-            <a class="arrow"
-               href="${pageContext.request.contextPath}/reviews.sp?midSort=${midSort}&sort=${sort}&searchWord=${fn:escapeXml(searchWord)}&currentShowPageNo=${currentShowPageNo+1}#allReviews"
-               aria-label="다음">&rsaquo;</a>
-          </c:when>
-          <c:otherwise>
-            <span class="arrow" aria-label="다음">&rsaquo;</span>
-          </c:otherwise>
-        </c:choose>
-      </div>
-    </c:if>
 
     <a href="${pageContext.request.contextPath}/reviewWrite.sp"
        class="btn btn-dark shadow review-float-btn" id="reviewFloatBtn">
@@ -360,6 +476,83 @@
 </div>
 
 <script>
+
+/* =========================
+0) 로그인 체크 -> 컨펌창 -> 입력창 -> 작성완료 -> 새로고침 jquery
+========================= */ 
+$(function(){
+
+  // ✅ 신고 버튼 클릭
+  $(document).on("click", ".btnReport", function(){
+
+    const reviewId = $(this).data("review-id");
+
+    // 1) 로그인 안 했으면 alert → 로그인 이동
+    if(!isLogin){
+      alert("로그인 후 이용해주세요.");
+
+      // 로그인 후 돌아오고 싶으면 goBackURL 추가 가능
+      const goBackURL = encodeURIComponent(location.pathname + location.search + location.hash);
+      location.href = ctxPath + "/loginSelect.sp?goBackURL=" + goBackURL;
+
+      return;
+    }
+
+    // 2) 로그인 상태면 confirm
+    if(!confirm("해당 리뷰를 신고하시겠습니까?")){
+      return;
+    }
+
+    // 3) 다른 신고 입력창 닫고, 해당 리뷰 입력창만 열기
+    $(".reportBox").not("#reportBox_" + reviewId).slideUp(150);
+
+    $("#reportBox_" + reviewId).slideDown(180, function(){
+      $(this).find(".reportMsg").focus();
+
+      // ✅ 자연스럽게 입력창으로 스크롤 이동
+      this.scrollIntoView({ behavior:"smooth", block:"center" });
+    });
+  });
+
+
+  // ✅ 작성완료 버튼 클릭 → 신고 접수
+  $(document).on("click", ".btnReportSubmit", function(){
+
+    const reviewId = $(this).data("review-id");
+    const $box = $("#reportBox_" + reviewId);
+
+    const reportContent = $box.find(".reportMsg").val().trim();
+
+    if(reportContent.length < 3){
+      alert("신고 내용을 3자 이상 입력해주세요.");
+      return;
+    }
+
+    $.ajax({
+      url: ctxPath + "/reviewReport.sp",
+      type: "POST",
+      data: {
+        reviewId: reviewId,
+        reportContent: reportContent
+      },
+      dataType: "json",
+      success: function(res){
+        if(res.ok){
+          alert("신고가 접수되었습니다.");
+          location.reload();
+        } else {
+          alert(res.message || "신고 접수에 실패했습니다.");
+        }
+      },
+      error: function(){
+        alert("서버 오류가 발생했습니다.");
+      }
+    });
+  });
+
+});
+
+
 /* =========================
    1) 직접검색 슬라이드 토글
 ========================= */
@@ -395,7 +588,7 @@
   var btn = document.getElementById('reviewFloatBtn');
   if(!btn) return;
 
-  var baseRight = 30;
+  var baseRight = 70;
   var baseBottom = 30;
 
   function findFooter(){

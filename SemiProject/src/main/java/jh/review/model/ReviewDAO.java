@@ -57,4 +57,20 @@ public interface ReviewDAO {
 
     // 제품 상세 페이지 리뷰 불러오기
     List<ReviewDTO> getReviewsByProductId(String product_id) throws SQLException;
+    
+    // 리뷰 신고(인서트)
+    int insertReviewReport(long review_id, String member_id, String reportContent) throws Exception;
+
+    // 신고목록조회 
+    List<Map<String, String>> selectReviewReports(long review_id) throws SQLException;
+    
+    // ✅ 관리자 리뷰 관리(미답변)
+    int getTotalUnansweredReviewCount() throws Exception;
+    List<ReviewDTO> selectUnansweredReviewPaging(Map<String, String> paraMap) throws Exception;
+
+    // ✅ 관리자 리뷰 관리(신고된)
+    int getTotalReportedReviewCount() throws Exception;
+    List<Map<String, String>> selectReportedReviewPaging(Map<String, String> paraMap) throws Exception;
+
+
 }

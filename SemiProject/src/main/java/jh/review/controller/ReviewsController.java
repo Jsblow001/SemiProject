@@ -56,6 +56,7 @@ public class ReviewsController extends AbstractController {
         MemberDTO loginuser = (MemberDTO) session.getAttribute("loginuser");
         String userid = (loginuser != null) ? loginuser.getUserid() : null;
 
+        
         // ===== 리스트/페이징 =====
         int totalCount = rdao.getTotalReviewCount(paraMap);
         int totalPage = (int) Math.ceil((double) totalCount / Integer.parseInt(sizePerPage));
@@ -67,6 +68,15 @@ public class ReviewsController extends AbstractController {
         paraMap.put("currentShowPageNo", String.valueOf(nCurrentPage));
 
         List<ReviewDTO> allReviews = rdao.selectReviewListPaging(paraMap);
+        
+        // ===== 페이지 블록 처리 (10개씩 보여주기) =====
+        int blockSize = 10; // 한 번에 보여줄 페이지 수
+
+        int startPage = ((nCurrentPage - 1) / blockSize) * blockSize + 1;
+        int endPage = startPage + blockSize - 1;
+        if (endPage > totalPage) endPage = totalPage;
+
+
 
         // ===== midrank =====
         int limit = 4;
@@ -82,6 +92,9 @@ public class ReviewsController extends AbstractController {
         request.setAttribute("mid_recentSales", rdao.selectMidRankProducts("recentSales", limit, userid)); // ✅ 최근 30일 판매량
         request.setAttribute("mid_avgRating",  rdao.selectMidRankProducts("avgRating",  limit, userid));
         request.setAttribute("mid_newProduct", rdao.selectMidRankProducts("newProduct", limit, userid));
+        
+        request.setAttribute("startPage", startPage);
+        request.setAttribute("endPage", endPage);
 
         super.setRedirect(false);
         super.setViewPage("/WEB-INF/jh_views/reviews.jsp");

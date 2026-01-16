@@ -30,6 +30,11 @@ public class ReviewDTO {
 
     private List<String> photos = new ArrayList<>();  // 최대 2장 노출
     private List<String> tags = new ArrayList<>();    // 칭찬 키워드(복수)
+    
+    
+    private String pimage;   // 상품 이미지 파일명
+
+
 
     // ===== getter/setter =====
     public long getReview_id() { return review_id; }
@@ -85,4 +90,7 @@ public class ReviewDTO {
 
     public List<String> getTags() { return tags; }
     public void setTags(List<String> tags) { this.tags = tags; }
+    
+    public String getPimage() { return pimage; }
+    public void setPimage(String pimage) { this.pimage = pimage; }
 }
