@@ -32,7 +32,7 @@ public class OrderFormController extends AbstractController {
         String cartIds = request.getParameter("cartIds");      // 장바구니 주문 시 
         String productId = request.getParameter("product_id"); // 상세페이지 바로구매 시
         String qty = request.getParameter("qty");              // 상세페이지 바로구매 시
-
+        
         if(cartIds == null && productId == null) {
             super.setRedirect(true);
             super.setViewPage(request.getContextPath() + "/index.sp");

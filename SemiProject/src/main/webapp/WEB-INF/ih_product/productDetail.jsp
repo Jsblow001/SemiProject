@@ -141,16 +141,30 @@
 		        <i class="far fa-heart text-danger wish-icon-${pdto.product_id}" style="font-size: 1.2rem;"></i>
 			    </button>
 			    
-			    <button type="button" class="btn btn-outline-secondary p-0 cart-btn-${pdto.product_id}" 
-			            style="flex: 1; height: 50px; display: flex; align-items: center; justify-content: center;"
-			            onclick="goCart('${pdto.product_id}', document.getElementById('order_qty').value, '<%= ctxPath %>')">
-			        <i class="fas fa-shopping-cart cart-icon-bold cart-icon-${pdto.product_id}" style="font-size: 1.2rem;"></i>
-			    </button>
+			    <%-- ------------------------------------------------------------------------------------------------------ --%>
+			     <c:choose>
+				    <c:when test="${pdto.stock > 0}">
+					    <button type="button" class="btn btn-outline-secondary p-0 cart-btn-${pdto.product_id}" 
+					            style="flex: 1; height: 50px; display: flex; align-items: center; justify-content: center;"
+					            onclick="goCart('${pdto.product_id}', document.getElementById('order_qty').value, '<%= ctxPath %>')">
+					        <i class="fas fa-shopping-cart cart-icon-bold cart-icon-${pdto.product_id}" style="font-size: 1.2rem;"></i>
+					    </button>
+				    </c:when>
+					<c:otherwise>
+				        <button type="button" class="btn btn-outline-secondary p-0 cart-btn-${pdto.product_id}" 
+					            style="flex: 1; height: 50px; display: flex; align-items: center; justify-content: center;"
+					            onclick="alert('죄송합니다. 해당 상품은 현재 품절되어 장바구니에 담을 수 없습니다.')">
+				        	<i class="fas fa-shopping-cart cart-icon-bold cart-icon-${pdto.product_id}" style="font-size: 1.2rem;"></i>
+				        </button>
+				    </c:otherwise>
+				</c:choose>
+			    <%-- ------------------------------------------------------------------------------------------------------ --%>
 			    
 			    <button class="btn btn-dark" style="flex: 3; height: 50px; font-weight: bold;" ${pdto.stock == 0 ? 'disabled' : ''} 
 			            onclick="buyProduct('${pdto.product_id}', '${pdto.product_name}')">
 			        ${pdto.stock == 0 ? '품절' : '바로 구매하기'}
 			    </button>
+			    
                 </div>
                 
             </div>

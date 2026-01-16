@@ -85,12 +85,28 @@
 							    <i class="far fa-heart text-danger mr-1 wish-icon-${p.product_id}"></i>
 							    <span class="small text-dark">Wish</span>
 							</button>
+					
+							<%-- ------------------------------------------------------------------------------------------------------ --%>
+						    <c:choose>
+							    <%-- 재고가 있는 경우 (정상 버튼) --%>
+							    <c:when test="${p.stock > 0}">
+							        <button type="button" class="btn btn-cart p-0 cart-btn-${p.product_id}" 
+							                onclick="goCart('${p.product_id}', '1', '${pageContext.request.contextPath}')">
+							            <i class="fas fa-shopping-cart text-dark mr-1 cart-icon-${p.product_id}"></i>
+							            <span class="small text-dark">Cart</span>
+							        </button>
+							    </c:when>
 							
-							<button type="button" class="btn btn-cart p-0 cart-btn-${p.product_id}" 
-							        onclick="goCart('${p.product_id}', '1', '${pageContext.request.contextPath}')">
-							    <i class="fas fa-shopping-cart text-dark mr-1 cart-icon-${p.product_id}"></i>
-							    <span class="small text-dark">Cart</span>
-							</button>
+							    <%-- 재고가 없는 경우 (품절 버튼) --%>
+							    <c:otherwise>
+							        <button type="button" class="btn p-0" " 
+							                onclick="alert('죄송합니다. 해당 상품은 현재 품절되어 장바구니에 담을 수 없습니다.')">
+							            <i class="fas fa-shopping-cart text-muted mr-1"></i>
+							            <span class="small text-muted">Cart</span>
+							        </button>
+							    </c:otherwise>
+							</c:choose>
+						    <%-- ------------------------------------------------------------------------------------------------------ --%>
 							
                         </div>
                     </div>
