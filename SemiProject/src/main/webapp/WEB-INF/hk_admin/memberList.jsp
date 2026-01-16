@@ -160,12 +160,22 @@ $(function(){
                     </td>
                     <td>${m.email}</td>
                     <td>${m.registerday}</td>
-                    <td>
-                        <c:choose>
-                            <c:when test="${m.status == 1}">정상</c:when>
-                            <c:otherwise>탈퇴</c:otherwise>
-                        </c:choose>
-                    </td>
+                   <td>
+					    <c:choose>
+					        <c:when test="${m.status == 0}">
+					            탈퇴
+					        </c:when>
+					
+					        <c:when test="${m.status == 1 && m.idle == 1}">
+					            휴면
+					        </c:when>
+					
+					        <c:otherwise>
+					            정상
+					        </c:otherwise>
+					    </c:choose>
+					</td>
+
                 </tr>
             </c:forEach>
         </tbody>
