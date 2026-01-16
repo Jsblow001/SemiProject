@@ -31,6 +31,11 @@ public class MemberDTO {
 	private boolean requirePwdChange = false;
 	// 마지막으로 암호를 변경한 날짜가 현재시각으로 부터 3개월이 지났으면 true
 	// 마지막으로 암호를 변경한 날짜가 현재시각으로 부터 3개월이 지나지 않았으면 false
+	
+	// 블랙리스트 용
+	private String admin_memo;
+	private String memo_updatedate;
+
 
 	// ============================================================== //	   
 
@@ -181,6 +186,21 @@ public class MemberDTO {
 	}
 	public void setTotal_amount(int total_amount) {
 		this.total_amount = total_amount;
+	}
+	
+	
+	// 블랙리스트 getter/setter
+	public String getAdmin_memo() {
+		return admin_memo;
+	}
+	public void setAdmin_memo(String admin_memo) {
+		this.admin_memo = admin_memo;
+	}
+	public String getMemo_updatedate() {
+		return memo_updatedate;
+	}
+	public void setMemo_updatedate(String memo_updatedate) {
+		this.memo_updatedate = memo_updatedate;
 	}
 	
 }

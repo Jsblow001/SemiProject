@@ -46,8 +46,11 @@ public interface MemberDAO {
 	// 관리자 페이지 內 메인 페이지 - 회원 요약 데이터 (정상회원 수)
 	int getActiveMemberCount() throws SQLException;
 	
-	// 관리자 페이지 內 메인 페이지 - 회원 요약 데이터 (정상회원 수)
+	// 관리자 페이지 內 메인 페이지 - 회원 요약 데이터 (탈퇴회원 수)
 	int getDeleteMemberCount() throws SQLException;
+	
+	// 관리자 페이지 내 휴면회원 수 
+	int getIdleMemberCount() throws SQLException;
 	
 	// 관리자 페이지 內 회원 전체 목록 조회 (+ 페이징 처리)
 	List<MemberDTO> selectAllMemberForAdmin(int startRno, int endRno) throws SQLException;
@@ -80,10 +83,7 @@ public interface MemberDAO {
 	int createDummyMembers(int i) throws SQLException;
 
 	// 휴면회원 해제하기
-	int idleRelease(String userid) throws SQLException;
-
-	// 관리자 페이지 내 휴면회원 수 
-	int getIdleMemberCount() throws SQLException;
+	int idleRelease(String userid) throws SQLException;	
 
 	// 관리자 페이지 휴면회원 조회
 	List<MemberDTO> selectIdleMemberListForAdmin() throws SQLException;
