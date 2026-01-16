@@ -5,21 +5,19 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>CARIN | 개인정보처리방침</title>
+<title>SISEON | 개인정보처리방침</title>
 
 <style>
-.terms-wrap{
-    max-width:1100px;margin:20px auto 120px;padding:0 16px;box-sizing:border-box
-}
-.terms-title{font-size:26px;font-weight:700;margin-bottom:8px}
-.terms-sub{font-size:14px;color:#666;margin-bottom:24px}
-
-.terms-box{
-    border:1px solid #ddd;border-radius:12px;background:#fff;
-    padding:24px;font-size:14.5px;line-height:1.9;
-    max-height:1500px;overflow-y:auto;
-    white-space:pre-line
-}
+body{background:linear-gradient(180deg,#f7f8fa 0%,#f3f4f6 100%);color:#222;font-family:'Pretendard','Noto Sans KR',sans-serif}
+.terms-wrap{max-width:1080px;margin:60px auto 160px;padding:0 20px;box-sizing:border-box}
+.terms-title{font-size:30px;font-weight:800;letter-spacing:-0.6px;margin-bottom:6px;color:#1f1f1f}
+.terms-sub{font-size:14px;color:#8a8a8a;margin-bottom:34px}
+.terms-box{background:#fff;border:1px solid #e5e7eb;border-radius:20px;padding:42px 46px;font-size:15px;line-height:1.9;color:#2b2b2b;max-height:720px;overflow-y:auto;white-space:pre-line;box-shadow:0 10px 30px rgba(0,0,0,0.06)}
+.terms-box strong{color:#111;font-weight:600}
+.terms-box::-webkit-scrollbar{width:8px}
+.terms-box::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#c7c9d1,#aeb2bf);border-radius:6px}
+.terms-box::-webkit-scrollbar-track{background:transparent}
+.terms-footer{margin-top:22px;font-size:13px;color:#999;text-align:right;letter-spacing:-0.2px}
 </style>
 
 </head>
@@ -33,12 +31,12 @@
 <div class="terms-wrap">
 
     <div class="terms-title">Personal Information Processing Policy</div>
-    <div class="terms-sub">카린선글라스 개인정보처리방침</div>
+    <div class="terms-sub">시선(SISEON) 개인정보처리방침</div>
 
     <div class="terms-box">
-		쌍용교육센터 세미프로젝트 1팀(이하 ‘팀플’이라 한다)는 개인정보보호법 제30조에 따라 정보주체의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 하기 위하여 다음과 같이 개인정보 처리지침을 두고 있습니다.
+		시선(SISEON)은 개인정보보호법 제30조에 따라 정보주체의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 하기 위하여 다음과 같이 개인정보 처리지침을 두고 있습니다.
 
-		제1조(개인정보의 처리목적)회사는 다음의 목적을 위하여 개인정보를 처리합니다.
+		<strong>제1조(개인정보의 처리목적)회사는 다음의 목적을 위하여 개인정보를 처리합니다.</strong>
 		
 		처리하고 있는 개인정보는 다음의 목적 이외의 용도로는 이용되지 않으며, 이용 목적이 변경되는 경우에는 개인정보 보호법 제18조에 따라 별도의 동의를 받는 등 필요한 조치를 이행할 예정입니다.
 		
@@ -54,7 +52,7 @@
 		4. 마케팅 및 광고에의 활용
 		﻿신규 서비스(제품) 개발 및 맞춤서비스 제공, 이벤트 및 광고성 정보 및 참여기회 제공, 서비스의 유효성 확인, 회원의 서비스 이용 통계 활용 등 목적
 		
-		제2조(개인정보의 처리 및 보유기간)
+		<strong>제2조(개인정보의 처리 및 보유기간)</strong>
 		
 		① 회사는 법령에 따른 개인정보 보유․이용기간 또는 정보주체로부터 개인정보를 수집시에 동의받은 개인정보 보유․이용기간 내에서 개인정보를 처리․보유합니다.
 		
@@ -159,13 +157,13 @@
 		
 		▶ 개인정보 보호책임자
 		
-		성명 : 민만기
+		성명 : 김쌍용
 		
 		직책 : 이사
 		
 		연락처 : 070-7424-8812
 		
-		이메일 : stardream@carin2014.com
+		이메일 : stardream@ssangyong20.com
 		
 		팩스번호 : 070-7469-8700
 		

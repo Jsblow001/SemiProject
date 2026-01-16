@@ -9,7 +9,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>CARIN | PASSWORD FIND</title>
+<title>SISEON | PASSWORD FIND</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- Google Font -->

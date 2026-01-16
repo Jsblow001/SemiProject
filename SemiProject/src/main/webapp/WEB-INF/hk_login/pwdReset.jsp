@@ -8,7 +8,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>CARIN | 비밀번호 재설정</title>
+<title>SISEON | 비밀번호 재설정</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 

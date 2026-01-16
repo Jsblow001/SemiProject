@@ -9,7 +9,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>CARIN | 주문내역</title>
+<title>SISEON | 주문내역</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -39,6 +39,25 @@ body {
 .order-tabs a.active {
     color:#333;
     font-weight:600;
+}
+
+/* ===== 취소/교환/반품 버튼 ===== */
+.btn-cancel{
+    display:inline-block;
+    padding:6px 14px;
+    font-size:12px;
+    font-weight:500;
+    color:#3b2f2a;
+    background:#f5f3ef;
+    border:1px solid #e3e0dc;
+    border-radius:16px;
+    text-decoration:none;
+    transition:all .2s ease;
+}
+.btn-cancel:hover{
+    background:#3b2f2a;
+    color:#fff;
+    border-color:#3b2f2a;
 }
 
 /* ===== 필터 영역 ===== */
@@ -282,12 +301,12 @@ body {
 
                             <!-- 취소/교환/반품 신청 (팝업창) -->
                             <td>
-							    <a href="javascript:void(0);" 
-							       onclick="openCancelPopup('${o.odrCode}','${o.paymentStatusName}')"
-							       style="font-size:12px;color:#999;">
-							       신청
+							    <a href="javascript:void(0);"
+							       class="btn-cancel"
+							       onclick="openCancelPopup('${o.odrCode}','${o.paymentStatusName}')">
+							        신청
 							    </a>
-						    </td>
+							</td>
 
                             <!-- 주문상세 -->
                             <td>
