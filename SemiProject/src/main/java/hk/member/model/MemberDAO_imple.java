@@ -90,7 +90,7 @@ public class MemberDAO_imple implements MemberDAO {
                + "   GENDER, BIRTHDAY, POINT, STATUS, "
                + "   REGISTERDAY, LASTPWDCHANGEDATE, GRADE_CODE) "
                + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-               + "         0, 1, SYSDATE, SYSDATE, 1) ";
+               + "         5000, 1, SYSDATE, SYSDATE, 1) ";
 
          pstmt = conn.prepareStatement(sqlMember);
 
@@ -204,10 +204,11 @@ public class MemberDAO_imple implements MemberDAO {
 	                      + "        M.status, "
 	                      + "        M.registerday, "
 	                      + "        M.grade_code, "
+	                      + "        M.idle, "
 	                      + "        G.grade_name "
 	                      + " FROM tbl_member M "
 	                      + " JOIN tbl_grade G ON M.grade_code = G.grade_code "
-	                      + " WHERE M.member_id = ? AND M.passwd = ? AND M.status = 1 ";
+	                      + " WHERE M.member_id = ? AND M.passwd = ? ";
 
 	           pstmt = conn.prepareStatement(sql);
 	           pstmt.setString(1, paraMap.get("userid"));
@@ -240,7 +241,9 @@ public class MemberDAO_imple implements MemberDAO {
 	               member.setRegisterday(rs.getString("registerday"));
 	               member.setGrade_code(rs.getString("grade_code"));
 	               member.setGrade_name(rs.getString("grade_name"));
-
+	               
+	               // 휴면 회원 추가
+	               member.setIdle(rs.getInt("idle"));
 	           }
 
 	       } catch (Exception e) {
@@ -519,7 +522,7 @@ public class MemberDAO_imple implements MemberDAO {
 	         conn = ds.getConnection();
 	
 	         String sql =
-	                 " SELECT MEMBER_ID, name, gender, email, registerday, status " +
+	                 " SELECT MEMBER_ID, name, gender, email, registerday, status, idle, admin_memo " +
 	                 " FROM tbl_member " +
 	                 " WHERE MEMBER_ID != 'admin' " +
 	                 " ORDER BY registerday DESC " +
@@ -542,6 +545,10 @@ public class MemberDAO_imple implements MemberDAO {
 	
 	             //추가
 	             member.setStatus(rs.getInt("status"));
+	             
+	             // 추가
+	             member.setIdle(rs.getInt("idle"));
+	             member.setAdmin_memo(rs.getString("admin_memo"));
 	             
 	             memberList.add(member);
 	         }
@@ -671,7 +678,7 @@ public class MemberDAO_imple implements MemberDAO {
 		    try {
 		        conn = ds.getConnection();
 
-		        String sql = " SELECT MEMBER_ID, name, email, registerday, status "
+		        String sql = " SELECT MEMBER_ID, name, email, registerday, status, idle "
 		                   + " FROM tbl_member "
 		                   + " WHERE MEMBER_ID != 'admin' ";
 
@@ -702,6 +709,9 @@ public class MemberDAO_imple implements MemberDAO {
 		            member.setRegisterday(rs.getString("registerday"));
 		            member.setStatus(rs.getInt("status"));
 
+		            // 추가
+		             member.setIdle(rs.getInt("idle"));
+		            
 		            memberList.add(member);
 		        }
 		    }
@@ -854,7 +864,10 @@ public class MemberDAO_imple implements MemberDAO {
 	            + "       m.mobile, "
 	            + "       m.registerday, "
 	            + "       m.status, "
+	            + "       m.point,  "
 	            + "       m.grade_code, "
+	            + "       m.admin_memo, "
+	            + "       TO_CHAR(m.memo_updatedate, 'yyyy-mm-dd hh24:mi:ss') AS memo_updatedate, "
 	            + "       g.grade_name "
 	            + " FROM tbl_member m "
 	            + " JOIN tbl_grade g ON m.grade_code = g.grade_code "
@@ -880,6 +893,12 @@ public class MemberDAO_imple implements MemberDAO {
 	            // 추가(등급)
 	            member.setGrade_code(rs.getString("grade_code"));
 	            member.setGrade_name(rs.getString("grade_name"));
+	            
+	            member.setAdmin_memo(rs.getString("admin_memo"));
+	            member.setMemo_updatedate(rs.getString("memo_updatedate"));
+	            
+	            member.setPoint(rs.getInt("Point"));
+
 	        }
 
 	    } catch (Exception e) {
@@ -1010,6 +1029,163 @@ public class MemberDAO_imple implements MemberDAO {
 	    return success;
 	}
 
+	
+	
+	// 휴면 회원 해제하기
+	@Override
+	public int idleRelease(String userid) throws SQLException {
 
+	    int n = 0;
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = " update tbl_member "
+	                   + " set idle = 0 "
+	                   + "     idle_changedate = sysdate "
+	                   + " where member_id = ? ";
+
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, userid);
+
+	        n = pstmt.executeUpdate();
+
+	    } finally {
+	        close();
+	    }
+
+	    return n;
+	}
+
+	
+	
+	// 관리자 페이지 내 휴면회원 수 
+	@Override
+	public int getIdleMemberCount() throws SQLException {
+
+	    int count = 0;
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = " SELECT COUNT(*) "
+	                   + " FROM tbl_member "
+	                   + " WHERE member_id != 'admin' "
+	                   + "   AND status = 1 "     // 정상회원 중에서
+	                   + "   AND idle = 1 ";      // 휴면만
+
+	        pstmt = conn.prepareStatement(sql);
+	        rs = pstmt.executeQuery();
+
+	        if(rs.next()) {
+	            count = rs.getInt(1);
+	        }
+
+	    } finally {
+	        close();
+	    }
+
+	    return count;
+	}
+
+	
+	
+	// 관리자 페이지 휴면회원 조회
+	@Override
+	public List<MemberDTO> selectIdleMemberListForAdmin() throws SQLException {
+
+	    List<MemberDTO> list = new ArrayList<>();
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = " SELECT member_id, name, email, registerday "
+	                   + " FROM tbl_member "
+	                   + " WHERE status = 1 AND idle = 1 "
+	                   + " ORDER BY registerday DESC ";
+
+	        pstmt = conn.prepareStatement(sql);
+	        rs = pstmt.executeQuery();
+
+	        while(rs.next()) {
+	            MemberDTO m = new MemberDTO();
+	            m.setUserid(rs.getString("member_id"));
+	            m.setName(rs.getString("name"));
+	            m.setEmail(aes.decrypt(rs.getString("email")));
+	            m.setRegisterday(rs.getString("registerday"));
+
+	            list.add(m);
+	        }
+	    } catch (Exception e) {
+	    } finally {
+	        close();
+	    }
+
+	    return list;
+	}
+
+	
+	
+	// 관리자 페이지 휴면회원 해제
+	@Override
+	public int idleReleaseMany(String[] useridArr) throws SQLException {
+
+	    int totalCnt = 0;
+
+	    try {
+	        conn = ds.getConnection();
+	        conn.setAutoCommit(false);
+
+	        String sql = " update tbl_member "
+	                   + " set idle = 0 "
+	                   + "   , idle_changedate = sysdate "
+	                   + " where member_id = ? ";
+
+	        pstmt = conn.prepareStatement(sql);
+
+	        for(String userid : useridArr) {
+	            pstmt.setString(1, userid);
+	            totalCnt += pstmt.executeUpdate();
+	        }
+
+	        conn.commit();
+
+	    } catch(SQLException e) {
+	        if(conn != null) conn.rollback();
+	        throw e;
+	    } finally {
+	        close();
+	    }
+
+	    return totalCnt;
+	}
+
+	
+	
+	// 관리자 페이지 블랙리스트 등 메모 저장
+	@Override
+	public int updateAdminMemo(String userid, String adminMemo) throws SQLException {
+
+	    int n = 0;
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = " UPDATE tbl_member "
+	                   + " SET admin_memo = ?, memo_updatedate = SYSDATE "
+	                   + " WHERE member_id = ? ";
+
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, adminMemo);
+	        pstmt.setString(2, userid);
+
+	        n = pstmt.executeUpdate();
+
+	    } finally {
+	        close();
+	    }
+
+	    return n;
+	}
 
 }

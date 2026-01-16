@@ -66,6 +66,12 @@ public class LoginController extends AbstractController {
 
 			MemberDTO loginuser = mdao.login(paraMap);
 
+			/*
+			 * System.out.println("로그인 idle=" + loginuser.getIdle() + ", status=" +
+			 * loginuser.getStatus() + ", userid=" + loginuser.getUserid());
+			 * 
+			 */
+			
 			if (loginuser == null) {
 				request.setAttribute("message", "아이디 또는 비밀번호가 틀렸습니다.");
 				request.setAttribute("loc", failLoc);         // 변경
@@ -74,7 +80,7 @@ public class LoginController extends AbstractController {
 				super.setViewPage("/WEB-INF/msg.jsp");
 			}
 			else {
-
+				// 탈퇴회원
 				if (loginuser.getStatus() == 0) {
 					request.setAttribute("message", "탈퇴한 회원입니다.");
 					request.setAttribute("loc", failLoc);
@@ -84,16 +90,15 @@ public class LoginController extends AbstractController {
 					return;
 				}
 
+				// 휴면회원
 				if (loginuser.getIdle() == 1) {
-					request.setAttribute("message", "휴면 상태의 계정입니다.");
-					request.setAttribute("loc", failLoc);
-
-					super.setRedirect(false);
-					super.setViewPage("/WEB-INF/msg.jsp");
-					return;
+				    request.setAttribute("userid", userid);
+				    super.setRedirect(false);
+				    super.setViewPage("/WEB-INF/hk_login/idleAccount.jsp");
+				    return;
 				}
 
-				// 로그인 성공
+				// 로그인 성공 (정상회원)
 				HttpSession session = request.getSession();
 				session.setAttribute("loginuser", loginuser);
 
