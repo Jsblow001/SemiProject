@@ -128,6 +128,7 @@ body {
     color:#999;
 }
 
+
 /* ===== 주문상세 버튼 ===== */
 .btn-order-detail {
     display:inline-block;
@@ -147,6 +148,18 @@ body {
     color:#fff;
     border-color:#3b2f2a;
 }
+
+.badge {
+    display:inline-block;
+    padding:4px 10px;
+    font-size:12px;
+    border-radius:12px;
+}
+.badge.wait { background:#eee; color:#555; }
+.badge.approve { background:#f1e4d8; color:#8e6e53; }
+.badge.complete { background:#e3e3e3; color:#333; }
+.badge.reject { background:#f8d7da; color:#c0392b; }
+
 
 /* ===== 페이지네이션 ===== */
 .pagination {
@@ -198,9 +211,9 @@ body {
 	/* 취소 교환 반품 팝업창 */
 	function openCancelPopup(odrCode, status, claimStatus){
 
-        // ★ 처리완료면 팝업 막고 알림
-        if(claimStatus === 'COMPLETED'){
-            alert("이미 처리 완료된 건입니다.\n추가 신청이 불가능합니다.");
+        // 처리된 상태면 신청 막기
+        if(claimStatus === 'APPROVED' || claimStatus === 'REJECTED' || claimStatus === 'COMPLETED'){
+            alert("이미 처리된 클레임 건입니다.\n추가 신청이 불가능합니다.");
             return;
         }
 
@@ -211,6 +224,7 @@ body {
 	    );
 	}
 </script>
+
 
 <jsp:include page="../header.jsp"/>
 
@@ -305,25 +319,43 @@ body {
 
                             <td>${o.paymentStatusName}</td>
 
-                            <!-- 신청 버튼 (일단 유지) -->
-                            <td>
-                                <a href="javascript:void(0);"
-                                   class="btn-cancel"
-                                  onclick="openCancelPopup('${o.odrCode}','${o.paymentStatusName}','${o.claimStatus}')">
-                                    신청
-                                </a>
-                            </td>
+                            <!-- 신청 버튼 -->
+                           <td>
+							    <a href="javascript:void(0);"
+							       class="btn-cancel"
+							       onclick="openCancelPopup('${o.odrCode}','${o.paymentStatusName}','${o.claimStatus}')">
+							        신청
+							    </a>
+							</td>
+
 
                             <!-- 클레임 상태 -->
-                            <td>
-                                <c:choose>
-                                    <c:when test="${o.claimStatus == 'REQUEST'}">요청중</c:when>
-                                    <c:when test="${o.claimStatus == 'APPROVED'}">처리대기</c:when>
-                                    <c:when test="${o.claimStatus == 'COMPLETED'}">처리완료</c:when>
-                                    <c:when test="${o.claimStatus == 'REJECTED'}">반려</c:when>
-                                    <c:otherwise>-</c:otherwise>
-                                </c:choose>
-                            </td>
+                              <td>
+						        <c:choose>
+						            <c:when test="${o.claimStatus == 'REQUEST'}">
+						                <span class="badge wait">요청중</span>
+						            </c:when>
+						
+						            <c:when test="${o.claimStatus == 'APPROVED'}">
+						                <span class="badge approve">처리대기</span>
+						            </c:when>
+						
+						            <c:when test="${o.claimStatus == 'COMPLETED'}">
+						                <span class="badge complete">처리완료</span>
+						            </c:when>
+						
+						            <c:when test="${o.claimStatus == 'REJECTED'}">
+						                <span class="badge reject">반려</span>
+						                <div style="margin-top:6px;font-size:12px;color:#999;">
+						                    사유: ${o.rejectReason}
+						                </div>
+						            </c:when>
+						
+						            <c:otherwise>
+						                -
+						            </c:otherwise>
+						        </c:choose>
+						    </td>
 
                             <td>
                                 <a href="<%=ctxPath%>/orderDetail.sp?odrcode=${o.odrCode}"

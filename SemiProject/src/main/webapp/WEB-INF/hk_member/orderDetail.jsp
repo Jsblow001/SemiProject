@@ -76,8 +76,7 @@
     <th>단가</th>
     <th>합계</th>
     <th>배송상태</th>
-    <th>클레임 상태</th>
-    <th>배송일</th>
+
 </tr>
 </thead>
 
@@ -118,42 +117,12 @@
             </c:otherwise>
         </c:choose>
     </td>
-
-    <!--  클레임 상태 + 반려 사유 -->
-    <td>
-        <c:choose>
-            <c:when test="${d.claimStatus == 'REQUEST'}">
-                <span class="badge wait">요청중</span>
-            </c:when>
-
-            <c:when test="${d.claimStatus == 'APPROVED'}">
-                <span class="badge approve">처리대기</span>
-            </c:when>
-
-            <c:when test="${d.claimStatus == 'COMPLETED'}">
-                <span class="badge complete">처리완료</span>
-            </c:when>
-
-            <c:when test="${d.claimStatus == 'REJECTED'}">
-                <span class="badge reject">반려</span>
-                <div style="margin-top:6px;font-size:12px;color:#999;">
-                    사유: ${d.rejectReason}
-                </div>
-            </c:when>
-
-            <c:otherwise>
-                -
-            </c:otherwise>
-        </c:choose>
-    </td>
-
-    <td>${d.deliveryDate}</td>
 </tr>
 </c:forEach>
 
 <c:if test="${empty detailList}">
 <tr>
-    <td colspan="9" style="padding:40px;color:#999;">
+    <td colspan="7" style="padding:40px;color:#999;">
         주문 상세 정보가 없습니다.
     </td>
 </tr>
