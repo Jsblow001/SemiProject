@@ -160,6 +160,46 @@
 
     a.prod-link { color: #333; text-decoration: none; font-weight: 600; }
     a.prod-link:hover { text-decoration: underline; }
+    .admin-pagination-area {
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+    }
+
+    .pagination {
+        display: flex;
+        list-style: none;
+        padding: 0;
+        gap: 5px;
+    }
+
+    .pagination .page-link {
+        color: #777;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        padding: 6px 12px;
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: none;
+        border-radius: 2px;
+        transition: all 0.2s;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #f2f1ee;
+        color: #333;
+    }
+    .pagination .page-item.active .page-link {
+        background-color: #6d4c41 !important; /* 필터 버튼과 같은 계열 색상 */
+        border-color: #6d4c41 !important;
+        color: #fff !important;
+    }
+
+    .pagination .page-item:first-child .page-link,
+    .pagination .page-item:last-child .page-link {
+        font-weight: bold;
+        background-color: #faf9f7;
+    }
 </style>
 </head>
 
@@ -221,6 +261,9 @@
                         </td>
                         <td>
                             <c:choose>
+						        <c:when test="${p.pstatus == 0}">
+						            <span class="badge-custom" style="background: #666; color: #fff;">판매중지(삭제됨)</span>
+						        </c:when>
                                 <c:when test="${p.stock == 0}">
                                     <span class="badge-custom status-soldout">품절</span>
                                 </c:when>
@@ -251,6 +294,15 @@
             </c:if>
         </tbody>
     </table>
+    
+    <div class="admin-pagination-area">
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                ${pageBar}
+            </ul>
+        </nav>
+        
+    </div>
 </div>
 
 <script>
