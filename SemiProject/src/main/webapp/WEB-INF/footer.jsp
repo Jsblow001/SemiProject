@@ -63,10 +63,10 @@
             <div class="col-lg-3 col-md-6 mb-5 ml-3">
                 <p class="font-weight-bold mb-3" style="color: var(--dark-wood); padding-bottom: 5px;">Customer Service</p>
                 <div class="d-flex flex-column" style="font-size: 0.9rem;">
-                    <a class="text-dark mb-2" href="#">QnA</a>
-                    <a class="text-dark mb-2" href="#">배송조회</a>
-                    <a class="text-dark mb-2" href="#">A/S 접수</a>
-                    <a class="text-dark mb-2" href="#">매장찾기</a>
+                    <a class="text-dark mb-2" href="<%= ctxPath %>/qnaList.sp">QnA</a>
+                    <a class="text-dark mb-2" href="<%= ctxPath %>/orderList.sp">주문조회</a>
+                    <a class="text-dark mb-2" href="<%= ctxPath %>/reservation.sp">예약하기</a>
+                    <a class="text-dark mb-2" href="<%= ctxPath %>/storeLocation2.sp">매장찾기</a>
                     <a class="text-dark mb-2" href="<%= ctxPath %>/terms.sp">이용약관</a>
                     <a class="text-dark mb-2" href="<%= ctxPath %>/information.sp">개인정보처리방침</a>
                 </div>
