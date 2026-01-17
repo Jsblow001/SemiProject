@@ -86,6 +86,7 @@
     <div class="row px-xl-5">
         <c:if test="${not empty productList}">
             <c:forEach var="p" items="${productList}">
+            <c:if test="${p.pstatus == 1}">
                 <div class="col-lg-3 col-md-4 col-sm-6 pb-4">
                     <div class="card product-item border-0 mb-4 h-100 shadow-sm">
                         
@@ -145,6 +146,7 @@
                         </div>
                     </div>
                 </div>
+                </c:if>
             </c:forEach>
             
 			<div class="col-12 mt-5">
