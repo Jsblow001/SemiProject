@@ -63,6 +63,123 @@
         }
         .product-img-container { width: 100%; }
     }
+    
+    /* 관리자 메뉴 래퍼 */
+    .admin-manage-wrap {
+        border-top: 1px dashed #ddd;
+        padding-top: 25px;
+    }
+
+    /* ADMIN 배지 */
+    .admin-badge {
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        color: #999;
+        border: 1px solid #ddd;
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
+
+    /* 버튼 그룹 컨테이너 */
+    .admin-btn-group {
+        display: flex;
+        align-items: center;
+        background: #fdfdfd;
+        border: 1px solid #e0e0e0;
+        border-radius: 30px;
+        padding: 4px 16px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+
+    /* 공통 버튼 스타일 */
+    .btn-admin-edit, .btn-admin-del {
+        background: none;
+        border: none;
+        padding: 6px 8px;
+        font-size: 13px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    /* 수정 버튼 */
+    .btn-admin-edit { color: #4A90E2; }
+    .btn-admin-edit:hover { color: #235fa7; transform: translateY(-1px); }
+
+    /* 삭제 버튼 */
+    .btn-admin-del { color: #E94E4E; }
+    .btn-admin-del:hover { color: #b33232; transform: translateY(-1px); }
+
+    /* 세로 구분선 */
+    .divider-v {
+        width: 1px;
+        height: 12px;
+        background: #eee;
+        margin: 0 8px;
+    }
+
+    /* 아이콘 크기 미세조정 */
+    .admin-btn-group i {
+        font-size: 12px;
+    }
+
+    @media (max-width: 767px) {
+        .admin-manage-wrap {
+            margin-bottom: 50px;
+        }
+    }
+    
+    .admin-category-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background-color: #f8f9fa; /* 아주 연한 회색 */
+        padding: 4px 10px;
+        border-radius: 4px;
+        border: 1px solid #e9ecef;
+    }
+
+    /* ADMIN 태그 부분 */
+    .admin-tag {
+        font-size: 9px;
+        font-weight: 800;
+        color: #fff;
+        background-color: var(--dark-wood); /* 브랜드 컬러 사용 */
+        padding: 1px 5px;
+        border-radius: 2px;
+        letter-spacing: 0.5px;
+    }
+
+    /* 텍스트 부분 */
+    .category-id-text {
+        font-size: 11px;
+        color: #666;
+        letter-spacing: -0.2px;
+    }
+
+    .category-id-text strong {
+        color: #333;
+        margin-left: 2px;
+    }
+    .product-img-container {
+        width: 100%; 
+        margin: 0;
+    }
+    
+    .sticky-sidebar {
+        padding: 40px 25px;
+        min-height: 550px;
+    }
+
+    @media (min-width: 768px) {
+        .row { align-items: flex-start; }
+    }
+    
+    
 </style>
 
 <div class="container mt-5 mb-5">
@@ -78,17 +195,15 @@
         <div class="col-md-4">
         	
         	<%-- 카테고리 ID 표시 부분 (관리자만 보이게) --%>
-			<nav aria-label="breadcrumb">
-			    <ol class="breadcrumb">
-			        <c:if test="${sessionScope.loginuser.userid == 'admin'}">
-			            <li class="breadcrumb-label mr-2 text-primary font-weight-bold">
-			                [관리자 전용] Category ID: ${pdto.fk_category_id}
-			            </li>
-			        </c:if>
-
-			    </ol>
-			</nav>
-
+			<c:if test="${not empty sessionScope.loginuser and sessionScope.loginuser.userid eq 'admin'}">
+			    <div class="admin-category-badge mb-2">
+			        <span class="admin-tag">ADMIN</span>
+			        <span class="category-id-text">Category ID : <strong>${pdto.fk_category_id}</strong></span>
+			    </div>
+			</c:if>
+			<%-- 카테고리 ID 표시 부분 (관리자만 보이게) --%>
+			
+			<%-- 상품 설명 --%>
             <div class="sticky-sidebar">
                 <h2 class="font-weight-bold mb-4">${pdto.product_name}</h2>
                 <div class="price-box mb-5">
@@ -105,7 +220,7 @@
 	                ${pdto.product_description}
 	            </p>
 				 -->
-				 
+				<%-- ------------------------------------------------------------------------------------------------------ --%> 
 				<div class="mt-3">
 	                <c:choose>
 	                    <c:when test="${pdto.stock > 0}">
@@ -116,7 +231,7 @@
 	                    </c:otherwise>
 	                </c:choose>
 	            </div>
-		
+				<%-- ------------------------------------------------------------------------------------------------------ --%>
                 <c:if test="${pdto.stock > 0}">
                     <div class="mb-5 p-3 border rounded bg-light d-flex justify-content-between align-items-center">
                         <label for="order_qty" class="font-weight-bold">수량</label>
@@ -132,7 +247,7 @@
                         </div>
                     </div>
                 </c:if>
-                
+                <%-- ------------------------------------------------------------------------------------------------------ --%>
 				<div class="d-flex mt-2" style="gap: 10px; align-items: center;">
 				
                 <button type="button" class="btn btn-outline-secondary p-0 wish-btn-${pdto.product_id}" 
@@ -166,29 +281,36 @@
 			    </button>
 			    
                 </div>
-                
+                <%-- ------------------------------------------------------------------------------------------------------ --%>
+                <%-- 관리자 전용 상품 수정&삭제 버튼 --%>
+				<c:if test="${sessionScope.loginuser.userid == 'admin'}">
+				    <div class="admin-manage-wrap mt-5 mb-4">
+				        <div class="d-flex align-items-center justify-content-end" style="gap: 12px;">
+				            <span class="admin-badge">ADMIN ONLY</span>
+				            
+				            <div class="admin-btn-group">
+				                <button type="button" class="btn-admin-edit" 
+				                        onclick="location.href='<%= ctxPath%>/admin/productUpdate.sp?product_id=${pdto.product_id}'"
+				                        title="상품 정보 수정">
+				                    <i class="fas fa-pen"></i>
+				                    <span>Edit</span>
+				                </button>
+				                
+				                <div class="divider-v"></div>
+				                
+				                <button type="button" class="btn-admin-del" 
+				                        onclick="delProduct('${pdto.product_id}', '${pdto.product_name}')"
+				                        title="상품 삭제">
+				                    <i class="fas fa-trash-alt"></i>
+				                    <span>Delete</span>
+				                </button>
+				            </div>
+				        </div>
+				    </div>
+				</c:if>
+                <%-- 관리자 전용 상품 수정&삭제 버튼 --%>
             </div>
-            
-             <%-- 하단 수정/삭제 버튼 부분 (관리자만 보이게) --%>
-			<c:if test="${sessionScope.loginuser.userid == 'admin'}">
-			    <div class="mt-4 text-right">
-			        <div class="alert alert-warning d-inline-block p-2">
-			            <small class="font-weight-bold">상품 관리 메뉴:</small>
-			            <small>
-			                <button class="btn btn-sm btn-outline-primary px-3" 
-                                    onclick="location.href='<%= ctxPath%>/admin/productUpdate.sp?product_id=${pdto.product_id}'">
-                                <i class="fas fa-edit mr-1"></i>상품 수정
-                            </button>
-			                
-			                <button class="btn btn-sm btn-outline-danger px-3" 
-                                    onclick="delProduct('${pdto.product_id}', '${pdto.product_name}')">
-                                <i class="fas fa-trash-alt mr-1"></i>상품 삭제
-                            </button>
-			            </small>
-			        </div>
-			    </div>
-			</c:if>
-            
+            <%-- 상품 설명 --%>
         </div>
 
         <div class="col-md-6">
