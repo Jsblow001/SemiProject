@@ -39,6 +39,40 @@
     .btn-wish, .btn-cart { border: none; background: none; transition: all 0.2s; }
     .btn-wish:hover i { font-weight: 900; } 
     .btn-cart:hover i { color: #f39c12; }
+    
+    /* 페이지네이션 커스텀 */
+    .pagination .page-item {
+        margin: 0 3px;
+    }
+    
+    .pagination .page-link {
+        color: #333;
+        background-color: #fff;
+        border: 1px solid #eee;
+        border-radius: 5px !important; /* 각진 버튼보다 부드러운 느낌 */
+        padding: 8px 16px;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+    /* 마우스 호버 시 */
+    .pagination .page-link:hover {
+        background-color: #f8f9fa;
+        color: #000;
+        border-color: #ddd;
+    }
+    /* 현재 페이지 표시 (Active) */
+    .pagination .page-item.active .page-link {
+        background-color: #333 !important; /* 현재 페이지는 검정색 배경 */
+        border-color: #333 !important;
+        color: #fff !important;
+    }
+
+    /* 화살표 아이콘 크기 조절 */
+    .pagination .page-link span {
+        font-size: 1.2rem;
+        line-height: 1;
+    }
 </style>
 
 <jsp:include page="../header.jsp" />
@@ -112,6 +146,15 @@
                     </div>
                 </div>
             </c:forEach>
+            
+			<div class="col-12 mt-5">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        ${pageBar}
+                    </ul>
+                </nav>
+            </div>
+            
         </c:if>
 
         <c:if test="${empty productList}">
