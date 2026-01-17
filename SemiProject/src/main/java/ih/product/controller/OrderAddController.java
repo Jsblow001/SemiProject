@@ -2,8 +2,8 @@ package ih.product.controller;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import hk.member.domain.MemberDTO;
+import ih.product.domain.ProductDTO;
 import ih.product.model.ProductDAO;
 import ih.product.model.ProductDAO_imple;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,7 +18,6 @@ public class OrderAddController extends AbstractController {
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
         
-        // 로그인 여부 확인
         HttpSession session = request.getSession();
         MemberDTO loginuser = (MemberDTO) session.getAttribute("loginuser");
         
@@ -35,7 +34,7 @@ public class OrderAddController extends AbstractController {
             return;
         }
 
-        // --- (JSP)로부터 전달받은 파라미터 ---
+        // 파라미터 받기
         String cartIds = request.getParameter("cartIds");   
         String productId = request.getParameter("product_id"); 
         String qty = request.getParameter("qty");
@@ -43,31 +42,59 @@ public class OrderAddController extends AbstractController {
         String totalPriceStr = request.getParameter("total_price"); 
         String salePrice = request.getParameter("sale_price");
         String usePointStr = request.getParameter("use_point");
-        if(usePointStr == null || usePointStr.isEmpty()) {
-            usePointStr = "0";
+        
+        if(usePointStr == null || usePointStr.isEmpty()) usePointStr = "0";
+        if(totalPriceStr == null || totalPriceStr.isEmpty()) totalPriceStr = "0";
+        if(salePrice == null || salePrice.isEmpty()) salePrice = "0";
+
+        // -------------------------------------------------------------
+        // 판매 중지 상품 실시간 검증 로직 
+        // -------------------------------------------------------------
+        boolean isAllAvailable = true;
+        String unavailableProductName = "";
+
+        if(cartIds != null && !cartIds.isEmpty()) {
+            // 장바구니 주문 시: 선택한 모든 장바구니 아이템의 pstatus 확인
+            String[] arr_cartId = cartIds.split(",");
+            for(String cart_id : arr_cartId) {
+                // 장바구니 번호로 상품의 실시간 정보를 가져오는 메소드 
+                ProductDTO pdto = pdao.getProductByCartId(cart_id); 
+                if(pdto == null || pdto.getPstatus() == 0) {
+                    isAllAvailable = false;
+                    unavailableProductName = (pdto != null) ? pdto.getProduct_name() : "일부";
+                    break;
+                }
+            }
+        } else {
+            // 단건 주문 시: 해당 상품의 pstatus 확인
+            ProductDTO pdto = pdao.selectOneProduct(productId, loginuser.getUserid());
+            if(pdto == null || pdto.getPstatus() == 0) {
+                isAllAvailable = false;
+                unavailableProductName = (pdto != null) ? pdto.getProduct_name() : "해당";
+            }
         }
 
-        if(totalPriceStr == null || totalPriceStr.isEmpty()) {
-            totalPriceStr = "0";
+        if(!isAllAvailable) {
+            request.setAttribute("message", "[" + unavailableProductName + "] 상품은 판매가 종료되어 주문할 수 없습니다.");
+            request.setAttribute("loc", request.getContextPath() + "/product/cartList.sp");
+            super.setRedirect(false);
+            super.setViewPage("/WEB-INF/msg.jsp");
+            return;
         }
+        // -------------------------------------------------------------
 
-        if(salePrice == null || salePrice.isEmpty()) {
-            salePrice = "0";
-        }
-
+        // 파라미터 
         Map<String, Object> paraMap = new HashMap<>();
         paraMap.put("userid", loginuser.getUserid());
         paraMap.put("addr_id", addr_id);
         paraMap.put("cartIds", cartIds); 
-        paraMap.put("usePoint", usePointStr); // [추가] DAO로 전달할 사용 포인트
+        paraMap.put("usePoint", usePointStr);
 
         if(cartIds != null && !cartIds.isEmpty()) {
-            // 장바구니 주문
             paraMap.put("totalPrice", Integer.parseInt(totalPriceStr));
             paraMap.put("totalPoint", (int)(Integer.parseInt(totalPriceStr) * 0.01));
             paraMap.put("orderType", "cart");
         } else {
-            // 상세페이지 단건 주문
             int i_qty = Integer.parseInt(qty);
             int i_salePrice = Integer.parseInt(salePrice);
             int totalPrice = i_qty * i_salePrice;
@@ -80,14 +107,13 @@ public class OrderAddController extends AbstractController {
             paraMap.put("orderType", "direct");
         }
 
-        // DB 트랜잭션 처리 (주문 + 재고차감 + 장바구니비우기 + 포인트차감/적립)
+        // DB 트랜잭션 처리
         int n = pdao.orderAdd(paraMap);
 
         if (n == 1) {
-            // 기존 포인트 - 사용 포인트 + 적립 포인트
             int currentPoint = loginuser.getPoint();
             int used = Integer.parseInt(usePointStr);
-            int earned = Integer.parseInt(String.valueOf(paraMap.get("totalPoint")));
+            int earned = (int)paraMap.get("totalPoint");
             loginuser.setPoint(currentPoint - used + earned);
 
             super.setRedirect(true);
@@ -95,7 +121,6 @@ public class OrderAddController extends AbstractController {
         } else {
             request.setAttribute("message", "주문 처리 중 오류가 발생했습니다.");
             request.setAttribute("loc", "javascript:history.back()");
-            
             super.setRedirect(false);
             super.setViewPage("/WEB-INF/msg.jsp");
         }
