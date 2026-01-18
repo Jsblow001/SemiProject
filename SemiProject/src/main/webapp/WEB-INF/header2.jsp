@@ -159,7 +159,9 @@
                             <div class="collapse" id="questionSub">
                                 <div class="sub-menu-list">
                                     <a href="<%= ctxPath %>/adminQnaList.sp">QnA 관리</a>
-                                    <a href="<%= ctxPath %>/admin/revenueData.sp">리뷰 관리</a>
+                                    <a href="<%= ctxPath %>/adminReviewManage.sp">리뷰 관리</a>
+                                    
+                                    
                                 </div>
                             </div>
                         </div>

@@ -18,6 +18,7 @@ public class ProductDTO {
     private String category_name;       // 카테고리 이름 
     private String spec_name;           // 스텍 이름
     private int is_wish;                // DB에서 가져온 찜하기 상태 변수
+    private int pstatus; 				// 1:판매중, 0:삭제(판매중지)
     // ------------------------------------------------ // 
     
     // Getter & Setter
@@ -133,5 +134,11 @@ public class ProductDTO {
 		this.is_wish = is_wish;
 	}
 
-    
+	public int getPstatus() { 
+		return pstatus;
+	}
+	
+	public void setPstatus(int pstatus) { 
+		this.pstatus = pstatus;
+	}
 }

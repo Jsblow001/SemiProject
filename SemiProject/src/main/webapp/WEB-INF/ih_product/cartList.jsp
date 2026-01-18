@@ -4,14 +4,15 @@
 
 <jsp:include page="../header.jsp" />
 
-<script src="${pageContext.request.contextPath}/js/ih_product/product.js"></script>
-
 <style>
     .cart-img { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; }
+    /* 판매 중지 상품 이미지 흑백 처리 */
+    .cart-img.disabled { filter: grayscale(100%); opacity: 0.6; }
     .table td { vertical-align: middle !important; }
     .qty-input { width: 50px; text-align: center; border: 1px solid #ddd; }
     .total-section { background-color: #f8f9fa; padding: 20px; border-radius: 10px; }
     .cart-checkbox { width: 18px; height: 18px; cursor: pointer; }
+    .status-badge { font-size: 0.75rem; padding: 3px 8px; border-radius: 12px; }
 </style>
 
 <div class="container mt-5">
@@ -36,35 +37,56 @@
                 <tbody>
                     <c:if test="${not empty cartList}">
                         <c:forEach var="cart" items="${cartList}">
-                            <tr>
+                            <tr <c:if test="${cart.pdto.pstatus == 0}">style="background-color: #fcfcfc;"</c:if>>
                                 <td>
-                                    <input type="checkbox" name="cartCheck" class="cart-checkbox chk" 
-                                           value="${cart.cart_id}" 
-                                           data-unit-price="${cart.pdto.sale_price}"
-                                           data-price="${cart.pdto.sale_price * cart.cart_qty}" checked>
+                                    <c:choose>
+                                        <c:when test="${cart.pdto.pstatus == 1}">
+                                            <input type="checkbox" name="cartCheck" class="cart-checkbox chk" 
+                                                   value="${cart.cart_id}" 
+                                                   data-unit-price="${cart.pdto.sale_price}"
+                                                   data-price="${cart.pdto.sale_price * cart.cart_qty}" checked>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <%-- 판매중지 상품은 체크 불가능 --%>
+                                            <input type="checkbox" class="cart-checkbox" disabled>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </td>
+
                                 <td>
-                                    <img src="${pageContext.request.contextPath}/img/${cart.pdto.pimage}" class="cart-img">
+                                    <img src="${pageContext.request.contextPath}/img/${cart.pdto.pimage}" 
+                                         class="cart-img ${cart.pdto.pstatus == 0 ? 'disabled' : ''}">
                                 </td>
                                 <td>
                                     <strong>${cart.pdto.product_name}</strong>
+                                    <c:if test="${cart.pdto.pstatus == 0}">
+                                        <br><span class="badge badge-secondary status-badge">판매 종료</span>
+                                    </c:if>
                                 </td>
                                 <td>
                                     <fmt:formatNumber value="${cart.pdto.sale_price}" pattern="#,###" />원
                                 </td>
                                 <td>
-                                    <div class="d-flex align-items-center">
-                                        <button class="btn btn-sm btn-light border" 
-                                                onclick="updateQty('${cart.cart_id}', -1, '${pageContext.request.contextPath}')">-</button>
-                                        
-                                        <input type="text" class="qty-input mx-2" value="${cart.cart_qty}" readonly>
-                                        
-                                        <button class="btn btn-sm btn-light border" 
-                                                onclick="updateQty('${cart.cart_id}', 1, '${pageContext.request.contextPath}')">+</button>
-                                    </div>
+                                    <c:choose>
+                                        <c:when test="${cart.pdto.pstatus == 1}">
+                                            <div class="d-flex align-items-center">
+                                                <button class="btn btn-sm btn-light border" 
+                                                        onclick="updateQty('${cart.cart_id}', -1, '${pageContext.request.contextPath}')">-</button>
+                                                <input type="text" class="qty-input mx-2" value="${cart.cart_qty}" readonly>
+                                                <button class="btn btn-sm btn-light border" 
+                                                        onclick="updateQty('${cart.cart_id}', 1, '${pageContext.request.contextPath}')">+</button>
+                                            </div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="text-muted">구매불가</span>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </td>
                                 <td>
-                                    <fmt:formatNumber value="${cart.pdto.sale_price * cart.cart_qty}" pattern="#,###" />원
+                                    <c:if test="${cart.pdto.pstatus == 1}">
+                                        <fmt:formatNumber value="${cart.pdto.sale_price * cart.cart_qty}" pattern="#,###" />원
+                                    </c:if>
+                                    <c:if test="${cart.pdto.pstatus == 0}">-</c:if>
                                 </td>
                                 <td>
                                     <button class="btn btn-sm btn-outline-danger" 
@@ -110,54 +132,39 @@
 
 <script>
     $(document).ready(function() {
-
         calculateTotal();
 
-        // [전체 선택] 체크박스 이벤트
         $("#checkAll").on("click", function() {
-            $(".chk").prop("checked", $(this).is(":checked"));
+            // disabled가 아닌 체크박스만 선택
+            $(".chk").not(":disabled").prop("checked", $(this).is(":checked"));
             calculateTotal();
         });
 
-        // [개별 체크박스] 클릭 이벤트
         $(document).on("click", ".chk", function() {
-            let total = $(".chk").length;
+            let total = $(".chk").not(":disabled").length;
             let checked = $(".chk:checked").length;
             $("#checkAll").prop("checked", total === checked);
             calculateTotal();
         });
     });
 
-    // 실시간 금액 계산 함수
     function calculateTotal() {
         let totalSum = 0;
-        
-        // 체크된 항목들의 price 합산
         $(".chk:checked").each(function() {
             let price = $(this).attr("data-price");
-            if(price) {
-                totalSum += parseInt(price);
-            }
+            if(price) totalSum += parseInt(price);
         });
 
-        // 배송비 계산 (5만원 이상 무료)
-        let delivery = 0;
-        if(totalSum > 0 && totalSum < 50000) {
-            delivery = 3000;
-        }
-
+        let delivery = (totalSum > 0 && totalSum < 50000) ? 3000 : 0;
         let finalPrice = totalSum + delivery;
 
-        // 화면 갱신
         $("#display-totalSum").text(totalSum.toLocaleString() + "원");
         $("#display-delivery").text(delivery.toLocaleString() + "원");
         $("#display-finalPrice").text(finalPrice.toLocaleString() + "원");
     }
 
-    // 주문 페이지 이동
     function goOrder() {
         let checkCnt = $(".chk:checked").length;
-        
         if(checkCnt == 0) {
             alert("주문할 상품을 선택하세요.");
             return;

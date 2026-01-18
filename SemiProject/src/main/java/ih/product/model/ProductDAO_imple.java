@@ -37,7 +37,7 @@ public class ProductDAO_imple implements ProductDAO {
         }
     }
 
-    // 카테고리 번호를 받아 해당 카테고리 상품만 조회
+    // 페이징 처리를 한 카테고리별 상품 조회
     @Override
     public List<ProductDTO> selectProductByCategory(String categoryId, String userid) throws SQLException {
         
@@ -77,6 +77,7 @@ public class ProductDAO_imple implements ProductDAO {
     }
 
     // 상품 상세 정보 조회
+ // 상품 상세 정보 조회
     @Override
     public ProductDTO selectOneProduct(String productId, String userid) throws SQLException {
         ProductDTO pdto = null;
@@ -84,12 +85,12 @@ public class ProductDAO_imple implements ProductDAO {
             conn = ds.getConnection();
             
             String sql = " SELECT P.*,"
-            		   + " (SELECT count(*) FROM tbl_wishlist WHERE product_id = P.product_id AND member_id = ?) AS is_wish "
-            		   + " FROM tbl_product P "
-            		   + " WHERE P.product_id = ? ";
+                       + " (SELECT count(*) FROM tbl_wishlist WHERE product_id = P.product_id AND member_id = ?) AS is_wish "
+                       + " FROM tbl_product P "
+                       + " WHERE P.product_id = ? ";
             
             pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, userid); // String으로 받아도 DB가 숫자로 자동 변환 .
+            pstmt.setString(1, userid); 
             pstmt.setString(2, productId);
             
             rs = pstmt.executeQuery();
@@ -105,8 +106,8 @@ public class ProductDAO_imple implements ProductDAO {
                 pdto.setFk_spec_id(rs.getInt("fk_spec_id"));
                 pdto.setProduct_description(rs.getString("product_description"));
                 pdto.setPimage(rs.getString("pimage"));
-                // 만약 DTO에 point 필드가 있다면 추가
-                // pdto.setPoint(rs.getInt("point")); 
+                pdto.setPstatus(rs.getInt("pstatus")); 
+                pdto.setIs_wish(rs.getInt("is_wish"));
             }
         } finally {
             close();
@@ -174,26 +175,43 @@ public class ProductDAO_imple implements ProductDAO {
         return productList;
     } // end of public List<ProductDTO> selectProductAll() throws SQLException ----
     
-    // 관리자전용 - 등록된 상품 리스트
+
+    // 페이징이 적용된 관리자용 전체 상품 리스트 조회
     @Override
-    public List<ProductDTO> selectAllProduct(String category) throws SQLException {
+    public List<ProductDTO> selectAllProductPaging(Map<String, String> paraMap) throws SQLException {
         List<ProductDTO> productList = new ArrayList<>();
+        
+        String category = paraMap.get("category");
+        int startRno = Integer.parseInt(paraMap.get("startRno"));
+        int endRno = Integer.parseInt(paraMap.get("endRno"));
+
         try {
             conn = ds.getConnection();
             
-            String sql = " SELECT * FROM tbl_product ";
-            
-            if(category != null && !category.isEmpty()) {
-                sql += " WHERE fk_category_id = ? ";
+            String sql = " SELECT * "
+                       + " FROM ( "
+                       + "     SELECT rownum AS RNO, T.* "
+                       + "     FROM ( "
+                       + "         SELECT product_id, product_name, pimage, sale_price, stock, fk_category_id, pstatus "
+                       + "         FROM tbl_product ";
+
+            if(category != null && !category.trim().isEmpty()) {
+                sql += "         WHERE pstatus = 1 AND fk_category_id = ? ";
             }
-            
-            sql += " ORDER BY product_id DESC ";
-            
+
+            sql += "         ORDER BY product_id DESC "
+                 + "     ) T "
+                 + " ) "
+                 + " WHERE RNO BETWEEN ? AND ? ";
+
             pstmt = conn.prepareStatement(sql);
             
-            if(category != null && !category.isEmpty()) {
-                pstmt.setString(1, category);
+            int colIndex = 1;
+            if(category != null && !category.trim().isEmpty()) {
+                pstmt.setString(colIndex++, category);
             }
+            pstmt.setInt(colIndex++, startRno);
+            pstmt.setInt(colIndex++, endRno);
             
             rs = pstmt.executeQuery();
             
@@ -205,14 +223,14 @@ public class ProductDAO_imple implements ProductDAO {
                 pdto.setPimage(rs.getString("pimage"));
                 pdto.setSale_price(rs.getInt("sale_price"));
                 pdto.setStock(rs.getInt("stock"));
-
+                pdto.setPstatus(rs.getInt("pstatus"));
                 productList.add(pdto);
             }
         } finally {
             close();
         }
         return productList;
-    } // end of public List<ProductDTO> selectAllProduct(String category) throws SQLException ----
+    }
     
     // 관리자전용 - 상품 수정
     @Override
@@ -243,19 +261,41 @@ public class ProductDAO_imple implements ProductDAO {
     } // end of public int updateProduct(ProductDTO pdto) throws SQLException ----
     
     // 관리자전용 - 상품 삭제
-    @Override
     public int deleteProduct(String productId) throws SQLException {
         int result = 0;
         try {
             conn = ds.getConnection();
+
+            // 1. 주문내역(tbl_order_detail)과 리뷰(tbl_product_review) 존재 여부 합산 체크
+            // 주의: tbl_order_detail 테이블 이름이 실제 DB와 일치하는지 꼭 확인하세요!
+            String checkSql = " SELECT "
+                            + " (SELECT count(*) FROM tbl_order_detail WHERE FK_PRODUCT_ID = ?) + "
+                            + " (SELECT count(*) FROM tbl_product_review WHERE fk_product_id = ?) " 
+                            + " AS total_count FROM dual ";
             
-            // 상품 테이블에서 해당 ID 삭제
-            String sql = " DELETE FROM tbl_product WHERE product_id = ? ";
-            
+            pstmt = conn.prepareStatement(checkSql);
+            pstmt.setString(1, productId);
+            pstmt.setString(2, productId);
+            rs = pstmt.executeQuery();
+
+            int totalCount = 0;
+            if (rs.next()) {
+                totalCount = rs.getInt("total_count");
+            }
+
+            String sql = "";
+            if (totalCount == 0) {
+                // 자식 레코드가 하나도 없으면 진짜 삭제 (DELETE)
+                sql = " DELETE FROM tbl_product WHERE product_id = ? ";
+            } else {
+                // 자식 레코드가 있으면 무결성 제약조건 때문에 삭제 대신 상태만 변경 (UPDATE)
+                sql = " UPDATE tbl_product SET pstatus = 0 WHERE product_id = ? ";
+            }
+
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, productId);
-            
             result = pstmt.executeUpdate();
+
         } finally {
             close();
         }
@@ -329,7 +369,7 @@ public class ProductDAO_imple implements ProductDAO {
 	        conn = ds.getConnection();
 	        
 	        // tbl_wish, tbl_product -> JOIN
-	        String sql = " SELECT P.product_id, P.product_name, P.pimage, P.sale_price, P.stock " +
+	        String sql = " SELECT P.product_id, P.product_name, P.pimage, P.sale_price, P.stock, P.pstatus " +
 	                     " FROM tbl_wishlist W JOIN tbl_product P " +
 	                     " ON W.product_id = P.product_id " +
 	                     " WHERE W.member_id = ? " +
@@ -347,7 +387,7 @@ public class ProductDAO_imple implements ProductDAO {
 	            pdto.setPimage(rs.getString("pimage"));
 	            pdto.setSale_price(rs.getInt("sale_price"));
 	            pdto.setStock(rs.getInt("stock"));
-	            
+	            pdto.setPstatus(rs.getInt("pstatus"));
 	            wishList.add(pdto);
 	        }
 	        
@@ -426,7 +466,7 @@ public class ProductDAO_imple implements ProductDAO {
 	        
 	        // 장바구니 정보와 상품 정보를 JOIN하여 가져옵니다.
 	        String sql = " SELECT C.cart_id, C.fk_member_id, C.fk_product_id, C.cart_qty, " +
-	                     "        P.product_name, P.pimage, P.sale_price, P.stock " +
+	                     "        P.product_name, P.pimage, P.sale_price, P.pstatus, P.stock " +
 	                     " FROM tbl_cart C JOIN tbl_product P " +
 	                     " ON C.fk_product_id = P.product_id " +
 	                     " WHERE C.fk_member_id = ? " +
@@ -448,6 +488,7 @@ public class ProductDAO_imple implements ProductDAO {
 	            pdto.setProduct_name(rs.getString("product_name"));
 	            pdto.setPimage(rs.getString("pimage"));
 	            pdto.setSale_price(rs.getInt("sale_price"));
+	            pdto.setPstatus(rs.getInt("pstatus"));
 	            pdto.setStock(rs.getInt("stock"));
 	            
 	            // CartDTO에 ProductDTO를 꽂아줍니다.
@@ -786,4 +827,226 @@ public class ProductDAO_imple implements ProductDAO {
 	    }
 	    return n;
 	}
+	
+	// 페이징 처리를 한 카테고리별 상품 조회
+	@Override
+	public List<ProductDTO> selectProductByCategoryPaging(Map<String, String> paraMap) throws SQLException {
+	    
+	    List<ProductDTO> productList = new ArrayList<>();
+	    
+	    try {
+	        conn = ds.getConnection();
+	        
+	        // Oracle 페이징의 핵심: 3중 서브쿼리 (정렬 -> 번호매기기 -> 범위자르기)
+	        String sql = " SELECT * "
+	                   + " FROM ( "
+	                   + "     SELECT rownum AS RNO, T.* "
+	                   + "     FROM ( "
+	                   + "         SELECT product_id, product_name, pimage, sale_price, list_price, stock, fk_category_id, pstatus, "
+	                   + "                (SELECT count(*) FROM tbl_wishlist WHERE product_id = P.product_id AND member_id = ?) AS is_wish "
+	                   + "         FROM tbl_product P "
+	                   + "         WHERE pstatus = 1 AND fk_category_id = ? "
+	                   + "         ORDER BY product_id DESC "
+	                   + "     ) T "
+	                   + " ) "
+	                   + " WHERE RNO BETWEEN ? AND ? ";
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        
+	        pstmt.setString(1, paraMap.get("userid")); 
+	        pstmt.setInt(2, Integer.parseInt(paraMap.get("categoryId"))); 
+	        pstmt.setInt(3, Integer.parseInt(paraMap.get("startRno"))); // 시작 행 번호
+	        pstmt.setInt(4, Integer.parseInt(paraMap.get("endRno")));   // 끝 행 번호
+	        
+	        rs = pstmt.executeQuery();
+	        
+	        while(rs.next()) {
+	            ProductDTO pdto = new ProductDTO();
+	            pdto.setProduct_id(rs.getInt("product_id"));
+	            pdto.setProduct_name(rs.getString("product_name"));
+	            pdto.setPimage(rs.getString("pimage"));
+	            pdto.setSale_price(rs.getInt("sale_price"));
+	            pdto.setList_price(rs.getInt("list_price"));
+	            pdto.setStock(rs.getInt("stock"));
+	            pdto.setFk_category_id(rs.getInt("fk_category_id"));
+	            pdto.setIs_wish(rs.getInt("is_wish"));
+	            pdto.setPstatus(rs.getInt("pstatus"));
+	            productList.add(pdto);
+	        }
+	    } finally {
+	        close();
+	    }
+	    return productList;
+	}
+
+	// 페이지바를 만들기 위한 해당 카테고리의 총 상품 개수 조회
+	@Override
+	public int getTotalCountByCategory(String categoryId) throws SQLException {
+	    int totalCount = 0;
+	    try {
+	        conn = ds.getConnection();
+	        String sql = " SELECT count(*) FROM tbl_product WHERE fk_category_id = ? ";
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, categoryId);
+	        rs = pstmt.executeQuery();
+	        if(rs.next()) {
+	            totalCount = rs.getInt(1);
+	        }
+	    } finally {
+	        close();
+	    }
+	    return totalCount;
+	}
+	
+	
+	// 페이지바 생성
+	public String getPageBar(int currentShowPageNo, int sizePerPage, int totalCount, String categoryId) {
+	    
+	    String pageBar = "";
+	    
+	    int blockSize = 5;    // 한 블럭당 보여줄 페이지 번호 개수 (예: [1] [2] [3] [4] [5])
+	    int loop = 1;         // blockSize만큼 반복하기 위한 변수
+	    
+	    // 전체 페이지 수 계산
+	    int totalPage = (int) Math.ceil((double) totalCount / sizePerPage);
+	    
+	    // 시작 페이지 번호 계산 (현재 페이지가 3이면 1, 현재 페이지가 7이면 6)
+	    int pageNo = ((currentShowPageNo - 1) / blockSize) * blockSize + 1;
+
+	    // [이전] 버튼
+	    if (pageNo != 1) {
+	        pageBar += "<li class='page-item'>" +
+	                   "  <a class='page-link' href='productList.sp?category=" + categoryId + "&currentShowPageNo=" + (pageNo - 1) + "' aria-label='Previous'>" +
+	                   "    <span aria-hidden='true'>&laquo;</span>" +
+	                   "  </a>" +
+	                   "</li>";
+	    }
+
+	    // 페이지 번호 생성 (반복문)
+	    while (!(loop > blockSize || pageNo > totalPage)) {
+	        if (pageNo == currentShowPageNo) {
+	            // 현재 내가 보고 있는 페이지 (클릭 안되게 active 처리)
+	            pageBar += "<li class='page-item active'><span class='page-link'>" + pageNo + "</span></li>";
+	        } else {
+	            // 다른 페이지 번호
+	            pageBar += "<li class='page-item'><a class='page-link' href='productList.sp?category=" + categoryId + "&currentShowPageNo=" + pageNo + "'>" + pageNo + "</a></li>";
+	        }
+	        pageNo++;
+	        loop++;
+	    }
+
+	    // [다음] 버튼 
+	    if (pageNo <= totalPage) {
+	        pageBar += "<li class='page-item'>" +
+	                   "  <a class='page-link' href='productList.sp?category=" + categoryId + "&currentShowPageNo=" + pageNo + "' aria-label='Next'>" +
+	                   "    <span aria-hidden='true'>&raquo;</span>" +
+	                   "  </a>" +
+	                   "</li>";
+	    }
+
+	    return pageBar;
+	}
+	
+	// 페이지바를 만들기 위한 해당 카테고리의 총 상품 개수
+	@Override
+	public int getTotalProductCount(String category) throws SQLException {
+	    int totalCount = 0;
+	    try {
+	        conn = ds.getConnection();
+	        String sql = " SELECT count(*) FROM tbl_product ";
+	        
+	        if(category != null && !category.trim().isEmpty()) {
+	            sql += " WHERE fk_category_id = ? ";
+	        }
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        
+	        if(category != null && !category.trim().isEmpty()) {
+	            pstmt.setString(1, category);
+	        }
+	        
+	        rs = pstmt.executeQuery();
+	        if(rs.next()) {
+	            totalCount = rs.getInt(1);
+	        }
+	    } finally {
+	        close();
+	    }
+	    return totalCount;
+	}
+	
+	// 관리자 전용 페이지바 생성 
+	@Override
+	public String getAdminPageBar(int currentShowPageNo, int sizePerPage, int totalCount, String category) {
+	    String pageBar = "";
+	    int blockSize = 5;   
+	    int loop = 1;         
+	    int totalPage = (int) Math.ceil((double) totalCount / sizePerPage);
+	    int pageNo = ((currentShowPageNo - 1) / blockSize) * blockSize + 1;
+
+	    String catParam = (category == null) ? "" : category;
+
+	    // [이전]
+	    if (pageNo != 1) {
+	        pageBar += "<li class='page-item'>" +
+	                   "  <a class='page-link' href='allproductList.sp?category=" + catParam + "&currentShowPageNo=" + (pageNo - 1) + "'>&laquo;</a>" +
+	                   "</li>";
+	    }
+
+	    // 페이지 번호
+	    while (!(loop > blockSize || pageNo > totalPage)) {
+	        if (pageNo == currentShowPageNo) {
+	            pageBar += "<li class='page-item active'><span class='page-link'>" + pageNo + "</span></li>";
+	        } else {
+	            pageBar += "<li class='page-item'><a class='page-link' href='allproductList.sp?category=" + catParam + "&currentShowPageNo=" + pageNo + "'>" + pageNo + "</a></li>";
+	        }
+	        pageNo++;
+	        loop++;
+	    }
+
+	    // [다음]
+	    if (pageNo <= totalPage) {
+	        pageBar += "<li class='page-item'>" +
+	                   "  <a class='page-link' href='allproductList.sp?category=" + catParam + "&currentShowPageNo=" + pageNo + "'>&raquo;</a>" +
+	                   "</li>";
+	    }
+
+	    return pageBar;
+	}
+
+	// 장바구니 번호로 상품의 상태와 정보를 조회 (주문 전 검증용)
+	@Override
+	public ProductDTO getProductByCartId(String cart_id) throws SQLException {
+		
+		ProductDTO pdto = null;
+	    
+	    try {
+	        conn = ds.getConnection();
+	        
+	        // 장바구니(C)와 상품(P) 테이블을 조인하여 상품명과 판매상태를 가져옴
+	        String sql = " SELECT P.product_name, P.pstatus, P.product_id "
+	                   + " FROM tbl_cart C JOIN tbl_product P "
+	                   + " ON C.product_id = P.product_id "
+	                   + " WHERE C.cart_id = ? ";
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, cart_id);
+	        
+	        rs = pstmt.executeQuery();
+	        
+	        if(rs.next()) {
+	            pdto = new ProductDTO();
+	            pdto.setProduct_name(rs.getString("product_name"));
+	            pdto.setPstatus(rs.getInt("pstatus"));
+	            pdto.setProduct_id(rs.getInt("product_id"));
+	        }
+	        
+	    } finally {
+	        close();
+	    }
+	    
+	    return pdto;
+	}
+
+	
 }
