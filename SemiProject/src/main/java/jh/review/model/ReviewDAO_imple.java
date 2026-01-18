@@ -619,6 +619,7 @@ public class ReviewDAO_imple implements ReviewDAO {
               + "   r.review_title, r.rating, r.review_content, r.praise_keywords, "
               + "   to_char(r.review_date,'yyyy-mm-dd') as review_date, "
               + "   p.product_name, "
+              + "   p.pimage, "   // ✅ 추가 (상품 이미지 파일명)
               + "   substr(m.name,1,1) || '**' as writer, "
               + "   case when exists ( "
               + "       select 1 "
@@ -645,7 +646,7 @@ public class ReviewDAO_imple implements ReviewDAO {
 
             rs = pstmt.executeQuery();
 
-            if(rs.next()) {
+            if (rs.next()) {
                 dto = new ReviewDTO();
 
                 dto.setReview_id(rs.getLong("review_id"));
@@ -661,20 +662,22 @@ public class ReviewDAO_imple implements ReviewDAO {
                 dto.setProduct_name(rs.getString("product_name"));
                 dto.setProductCode(rs.getString("product_name"));
 
+                dto.setPimage(rs.getString("pimage")); // ✅ 추가
+
                 dto.setWriter(rs.getString("writer"));
                 dto.setVerified(rs.getInt("verified"));
 
                 dto.setAdminReply(rs.getString("admin_reply"));
 
-                // photos (전체)
+                // photos
                 String photoCsv = rs.getString("photo_csv");
-                if(photoCsv != null && !photoCsv.trim().isEmpty()) {
-                    dto.setPhotos(java.util.Arrays.asList(photoCsv.split(",")));
+                if (photoCsv != null && !photoCsv.trim().isEmpty()) {
+                    dto.setPhotos(java.util.Arrays.asList(photoCsv.split("\\s*,\\s*")));
                 }
 
                 // tags
                 String pk = rs.getString("praise_keywords");
-                if(pk != null && !pk.trim().isEmpty()) {
+                if (pk != null && !pk.trim().isEmpty()) {
                     dto.setTags(java.util.Arrays.asList(pk.split("\\s*,\\s*")));
                 }
             }
@@ -685,6 +688,7 @@ public class ReviewDAO_imple implements ReviewDAO {
 
         return dto;
     }
+
 
 
     // 마이페이지 최근 리뷰 n개 조회
@@ -938,39 +942,322 @@ public class ReviewDAO_imple implements ReviewDAO {
     
     
     // 제품 상세 페이지 리뷰 불러오기
+ // 제품 상세 페이지 리뷰 불러오기
     @Override
     public List<ReviewDTO> getReviewsByProductId(String product_id) throws SQLException {
-       List<ReviewDTO> list = new ArrayList<>();
-        
-       
+
+        List<ReviewDTO> list = new ArrayList<>();
+
         try {
-           conn = ds.getConnection();
-           
-           String sql = " SELECT * FROM tbl_product_review WHERE fk_product_id = ? ORDER BY review_date DESC ";
-           pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, product_id); // 특정 상품 ID만 필터링
+            conn = ds.getConnection();
+
+            String sql =
+                " SELECT r.review_id, r.fk_product_id, r.fk_member_id, " +
+                "        r.rating, r.review_title, r.review_content, " +
+                "        r.praise_keywords, r.review_date, " +
+                "        p.pimage, p.product_name " +
+                " FROM tbl_product_review r " +
+                " JOIN tbl_product p " +
+                "   ON p.product_id = r.fk_product_id " +
+                " WHERE r.fk_product_id = ? " +
+                " ORDER BY r.review_date DESC ";
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, product_id);
+
             rs = pstmt.executeQuery();
-            
-            while(rs.next()) {
-               ReviewDTO dto = new ReviewDTO();
-                
+
+            while (rs.next()) {
+                ReviewDTO dto = new ReviewDTO();
+
                 dto.setReview_id(rs.getLong("review_id"));
-                 dto.setFk_product_id(rs.getInt("fk_product_id"));
-                 dto.setFk_member_id(rs.getString("fk_member_id"));
-                 dto.setRating(rs.getInt("rating"));
-                 dto.setReview_title(rs.getString("review_title"));
-                 dto.setReview_content(rs.getString("review_content"));
-                 dto.setPraise_keywords(rs.getString("praise_keywords"));
-                 dto.setReview_date(rs.getString("review_date"));
-                 
-                 list.add(dto);
+                dto.setFk_product_id(rs.getInt("fk_product_id"));
+                dto.setFk_member_id(rs.getString("fk_member_id"));
+                dto.setRating(rs.getInt("rating"));
+                dto.setReview_title(rs.getString("review_title"));
+                dto.setReview_content(rs.getString("review_content"));
+                dto.setPraise_keywords(rs.getString("praise_keywords"));
+                dto.setReview_date(rs.getString("review_date"));
+
+                // ✅ 상품 JOIN에서 가져온 값
+                dto.setPimage(rs.getString("pimage"));
+                dto.setProduct_name(rs.getString("product_name"));
+
+                list.add(dto);
             }
+
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try { if(rs != null) rs.close(); } catch(Exception e) {}
+            try { if(pstmt != null) pstmt.close(); } catch(Exception e) {}
+            try { if(conn != null) conn.close(); } catch(Exception e) {}
         }
+
         return list;
     }
 
+    
+    
+    // 리뷰 신고(인서트)
+    @Override
+    public int insertReviewReport(long review_id, String member_id, String reportContent) throws SQLException {
+
+        int n = 0;
+
+        try {
+            conn = ds.getConnection();
+
+            String sql =
+                " insert into tbl_review_report(report_id, fk_review_id, fk_member_id, report_content, report_date) "
+              + " values(seq_review_report.nextval, ?, ?, ?, sysdate) ";
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, review_id);
+            pstmt.setString(2, member_id);
+            pstmt.setString(3, reportContent);
+
+            n = pstmt.executeUpdate();
+
+        } finally {
+            close();
+        }
+
+        return n;
+    }
+    
+    
+    
+    // 신고목록조회 
+    @Override
+    public List<Map<String, String>> selectReviewReports(long review_id) throws SQLException {
+
+        List<Map<String, String>> list = new ArrayList<>();
+
+        try {
+            conn = ds.getConnection();
+
+            String sql =
+                " select m.name as reporter_name, "
+              + "        rr.report_content, "
+              + "        to_char(rr.report_date,'yyyy-mm-dd hh24:mi') as report_date "
+              + "   from tbl_review_report rr "
+              + "   join tbl_member m "
+              + "     on rr.fk_member_id = m.member_id "
+              + "  where rr.fk_review_id = ? "
+              + "  order by rr.report_date desc ";
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, review_id);
+            rs = pstmt.executeQuery();
+
+            while(rs.next()) {
+                Map<String, String> map = new HashMap<>();
+                map.put("reporter_name", rs.getString("reporter_name"));
+                map.put("report_content", rs.getString("report_content"));
+                map.put("report_date", rs.getString("report_date"));
+                list.add(map);
+            }
+
+        } finally {
+            close();
+        }
+
+        return list;
+    }
+    
+    
+    // 미답변 총 개수
+    @Override
+    public int getTotalUnansweredReviewCount() throws Exception {
+
+        int totalCount = 0;
+
+        try {
+            conn = ds.getConnection();
+
+            String sql =
+                " select count(*) "
+              + "   from tbl_product_review r "
+              + "  where not exists ( "
+              + "        select 1 "
+              + "          from tbl_review_comment c "
+              + "         where c.fk_review_id = r.review_id "
+              + "           and c.status = 1 "
+              + "  ) ";
+
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+
+            if(rs.next()) totalCount = rs.getInt(1);
+
+        } finally {
+            close();
+        }
+
+        return totalCount;
+    }
+    
+    
+    // 미답변 페이징 목록
+    @Override
+    public List<ReviewDTO> selectUnansweredReviewPaging(Map<String, String> paraMap) throws Exception {
+
+        List<ReviewDTO> list = new ArrayList<>();
+
+        int currentShowPageNo = Integer.parseInt(paraMap.get("currentShowPageNo"));
+        int sizePerPage = Integer.parseInt(paraMap.get("sizePerPage"));
+
+        int startRno = (currentShowPageNo - 1) * sizePerPage + 1;
+        int endRno   = startRno + sizePerPage - 1;
+
+        try {
+            conn = ds.getConnection();
+
+            String sql =
+                " select * "
+              + "   from ( "
+              + "         select row_number() over(order by r.review_date desc) as rno, "
+              + "                r.review_id, r.fk_product_id, p.product_name, "
+              + "                r.fk_member_id, to_char(r.review_date,'yyyy-mm-dd') as review_date, "
+              + "                r.rating, substr(m.name,1,1) || '**' as writer, "
+              + "                r.review_content "
+              + "           from tbl_product_review r "
+              + "           join tbl_product p on r.fk_product_id = p.product_id "
+              + "           join tbl_member  m on r.fk_member_id = m.member_id "
+              + "          where not exists ( "
+              + "                select 1 "
+              + "                  from tbl_review_comment c "
+              + "                 where c.fk_review_id = r.review_id "
+              + "                   and c.status = 1 "
+              + "          ) "
+              + "        ) "
+              + "  where rno between ? and ? ";
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, startRno);
+            pstmt.setInt(2, endRno);
+
+            rs = pstmt.executeQuery();
+
+            while(rs.next()) {
+                ReviewDTO dto = new ReviewDTO();
+                dto.setReview_id(rs.getLong("review_id"));
+                dto.setFk_product_id(rs.getInt("fk_product_id"));
+                dto.setProduct_name(rs.getString("product_name"));
+                dto.setFk_member_id(rs.getString("fk_member_id"));
+                dto.setReview_date(rs.getString("review_date"));
+                dto.setRating(rs.getInt("rating"));
+                dto.setWriter(rs.getString("writer"));
+                dto.setReview_content(rs.getString("review_content"));
+                list.add(dto);
+            }
+
+        } finally {
+            close();
+        }
+
+        return list;
+    }
+    
+    
+    // 신고된 리뷰 총 개수 (리뷰 단위로 중복 제거)
+    @Override
+    public int getTotalReportedReviewCount() throws Exception {
+
+        int totalCount = 0;
+
+        try {
+            conn = ds.getConnection();
+
+            String sql =
+                " select count(*) "
+              + "   from ( "
+              + "         select fk_review_id "
+              + "           from tbl_review_report "
+              + "          group by fk_review_id "
+              + "        ) ";
+
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+
+            if(rs.next()) totalCount = rs.getInt(1);
+
+        } finally {
+            close();
+        }
+
+        return totalCount;
+    }
+    
+    
+    // 신고된 리뷰 페이징 목록 (최근 신고일 기준 정렬)
+    @Override
+    public List<Map<String, String>> selectReportedReviewPaging(Map<String, String> paraMap) throws Exception {
+
+        List<Map<String, String>> list = new ArrayList<>();
+
+        int currentShowPageNo = Integer.parseInt(paraMap.get("currentShowPageNo"));
+        int sizePerPage = Integer.parseInt(paraMap.get("sizePerPage"));
+
+        int startRno = (currentShowPageNo - 1) * sizePerPage + 1;
+        int endRno   = startRno + sizePerPage - 1;
+
+        try {
+            conn = ds.getConnection();
+
+            String sql =
+                " select * "
+              + "   from ( "
+              + "         select row_number() over(order by x.last_report_date desc) as rno, "
+              + "                r.review_id, "
+              + "                p.product_name, "
+              + "                substr(m.name,1,1) || '**' as writer, "
+              + "                to_char(r.review_date,'yyyy-mm-dd') as review_date, "
+              + "                to_char(x.last_report_date,'yyyy-mm-dd hh24:mi') as last_report_date, "
+              + "                x.report_count "
+              + "           from tbl_product_review r "
+              + "           join ( "
+              + "                 select fk_review_id, "
+              + "                        max(report_date) as last_report_date, "
+              + "                        count(*) as report_count "
+              + "                   from tbl_review_report "
+              + "                  group by fk_review_id "
+              + "           ) x on r.review_id = x.fk_review_id "
+              + "           join tbl_product p on r.fk_product_id = p.product_id "
+              + "           join tbl_member  m on r.fk_member_id = m.member_id "
+              + "        ) "
+              + "  where rno between ? and ? ";
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, startRno);
+            pstmt.setInt(2, endRno);
+
+            rs = pstmt.executeQuery();
+
+            while(rs.next()) {
+                Map<String, String> map = new HashMap<>();
+                map.put("review_id", String.valueOf(rs.getLong("review_id")));
+                map.put("product_name", rs.getString("product_name"));
+                map.put("writer", rs.getString("writer"));
+                map.put("review_date", rs.getString("review_date"));
+                map.put("last_report_date", rs.getString("last_report_date"));
+                map.put("report_count", String.valueOf(rs.getInt("report_count")));
+                list.add(map);
+            }
+
+        } finally {
+            close();
+        }
+
+        return list;
+    }
+
+
+
+
+
+    
 
 
 

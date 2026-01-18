@@ -60,6 +60,12 @@ public class ReviewViewController extends AbstractController {
         request.setAttribute("isAdmin", isAdmin);
         request.setAttribute("isOwner", isOwner);
         request.setAttribute("review", review);
+        
+        // ===== 5) 권한(관리자만 가능한 신고목록 보기) =====
+        if(isAdmin) {
+            request.setAttribute("reportList", rdao.selectReviewReports(review.getReview_id()));
+        }
+        request.setAttribute("isAdmin", isAdmin);
 
         super.setRedirect(false);
         super.setViewPage("/WEB-INF/jh_review/review_view.jsp");

@@ -145,9 +145,9 @@
       
       <select id="rsStoreId" class="rs-input">
 		  <option value="">선택하세요</option>
-		  <option value="1" <%= "1".equals(preStoreId) ? "selected" : "" %>>매장1</option>
-		  <option value="2" <%= "2".equals(preStoreId) ? "selected" : "" %>>매장2</option>
-		  <option value="3" <%= "3".equals(preStoreId) ? "selected" : "" %>>매장3</option>
+		  <option value="1" <%= "1".equals(preStoreId) ? "selected" : "" %>>SISEON 도산점</option>
+		  <option value="2" <%= "2".equals(preStoreId) ? "selected" : "" %>>SISEON 압구정점</option>
+		  <option value="3" <%= "3".equals(preStoreId) ? "selected" : "" %>>SISEON 홍대점</option>
 	  </select>
 
       <div class="rs-muted" style="margin-top:6px;">* 매장명은 나중에 DB(tbl_store)에서 불러오도록 바꿔도 됨</div>
