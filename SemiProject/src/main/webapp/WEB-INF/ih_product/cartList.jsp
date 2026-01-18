@@ -52,6 +52,7 @@
                                         </c:otherwise>
                                     </c:choose>
                                 </td>
+
                                 <td>
                                     <img src="${pageContext.request.contextPath}/img/${cart.pdto.pimage}" 
                                          class="cart-img ${cart.pdto.pstatus == 0 ? 'disabled' : ''}">
