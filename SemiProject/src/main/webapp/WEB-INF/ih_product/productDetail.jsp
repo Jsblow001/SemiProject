@@ -299,7 +299,7 @@
 				                <div class="divider-v"></div>
 				                
 				                <button type="button" class="btn-admin-del" 
-				                        onclick="delProduct('${pdto.product_id}', '${pdto.product_name}')"
+				                        onclick="delProduct('${pdto.product_id}', '${pdto.product_name}', '${requestScope.currentShowPageNo}')"
 				                        title="상품 삭제">
 				                    <i class="fas fa-trash-alt"></i>
 				                    <span>Delete</span>
@@ -396,11 +396,23 @@
 </div>
 
 <script>
-// 관리자 - 상품 삭제하기
-function delProduct(id, name) {
-    if(confirm("[" + name + "] 상품을 정말 삭제하시겠습니까?")) {
-        // 실제 삭제를 처리할 Controller 주소로 이동
-        location.href = "${pageContext.request.contextPath}/admin/productDelete.sp?product_id=" + id;
+//관리자 - 상품 삭제하기
+function delProduct(id, name, pageNo) {
+    const urlParams = new URLSearchParams(window.location.search);
+    let category = "${requestScope.category}";
+    
+    if(!category || category === "") {
+        category = "${pdto.fk_category_id}";
+    }
+    
+    if(confirm("[" + name + "] 상품을 삭제하시겠습니까?")) {
+
+        let url = "<%= ctxPath %>/admin/productDelete.sp?product_id=" + id + 
+                  "&currentShowPageNo=" + pageNo + 
+                  "&category=" + category;
+
+        console.log("전송 URL: " + url); 
+        location.href = url;
     }
 }
 
