@@ -266,30 +266,34 @@ public class ProductDAO_imple implements ProductDAO {
         try {
             conn = ds.getConnection();
 
-            // 해당 상품의 주문 이력이 있는지 확인
-            String checkSql = " SELECT count(*) FROM tbl_order_detail WHERE fk_product_id = ? ";
+            // 1. 주문내역(tbl_order_detail)과 리뷰(tbl_product_review) 존재 여부 합산 체크
+            // 주의: tbl_order_detail 테이블 이름이 실제 DB와 일치하는지 꼭 확인하세요!
+            String checkSql = " SELECT "
+                            + " (SELECT count(*) FROM tbl_order_detail WHERE FK_PRODUCT_ID = ?) + "
+                            + " (SELECT count(*) FROM tbl_product_review WHERE fk_product_id = ?) " 
+                            + " AS total_count FROM dual ";
+            
             pstmt = conn.prepareStatement(checkSql);
             pstmt.setString(1, productId);
+            pstmt.setString(2, productId);
             rs = pstmt.executeQuery();
 
-            int orderCount = 0;
+            int totalCount = 0;
             if (rs.next()) {
-                orderCount = rs.getInt(1);
+                totalCount = rs.getInt("total_count");
             }
 
-            // 주문 이력 유무에 따른 처리
             String sql = "";
-            if (orderCount == 0) {
-                // 주문 이력이 전혀 없으므로 실제 삭제 (Delete)
+            if (totalCount == 0) {
+                // 자식 레코드가 하나도 없으면 진짜 삭제 (DELETE)
                 sql = " DELETE FROM tbl_product WHERE product_id = ? ";
             } else {
-                // 주문 이력이 있으므로 상태만 변경 (Update)
+                // 자식 레코드가 있으면 무결성 제약조건 때문에 삭제 대신 상태만 변경 (UPDATE)
                 sql = " UPDATE tbl_product SET pstatus = 0 WHERE product_id = ? ";
             }
 
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, productId);
-            
             result = pstmt.executeUpdate();
 
         } finally {
@@ -365,7 +369,7 @@ public class ProductDAO_imple implements ProductDAO {
 	        conn = ds.getConnection();
 	        
 	        // tbl_wish, tbl_product -> JOIN
-	        String sql = " SELECT P.product_id, P.product_name, P.pimage, P.sale_price, P.stock " +
+	        String sql = " SELECT P.product_id, P.product_name, P.pimage, P.sale_price, P.stock, P.pstatus " +
 	                     " FROM tbl_wishlist W JOIN tbl_product P " +
 	                     " ON W.product_id = P.product_id " +
 	                     " WHERE W.member_id = ? " +
@@ -383,7 +387,7 @@ public class ProductDAO_imple implements ProductDAO {
 	            pdto.setPimage(rs.getString("pimage"));
 	            pdto.setSale_price(rs.getInt("sale_price"));
 	            pdto.setStock(rs.getInt("stock"));
-	            
+	            pdto.setPstatus(rs.getInt("pstatus"));
 	            wishList.add(pdto);
 	        }
 	        
@@ -462,7 +466,7 @@ public class ProductDAO_imple implements ProductDAO {
 	        
 	        // 장바구니 정보와 상품 정보를 JOIN하여 가져옵니다.
 	        String sql = " SELECT C.cart_id, C.fk_member_id, C.fk_product_id, C.cart_qty, " +
-	                     "        P.product_name, P.pimage, P.sale_price, P.stock " +
+	                     "        P.product_name, P.pimage, P.sale_price, P.pstatus, P.stock " +
 	                     " FROM tbl_cart C JOIN tbl_product P " +
 	                     " ON C.fk_product_id = P.product_id " +
 	                     " WHERE C.fk_member_id = ? " +
@@ -484,6 +488,7 @@ public class ProductDAO_imple implements ProductDAO {
 	            pdto.setProduct_name(rs.getString("product_name"));
 	            pdto.setPimage(rs.getString("pimage"));
 	            pdto.setSale_price(rs.getInt("sale_price"));
+	            pdto.setPstatus(rs.getInt("pstatus"));
 	            pdto.setStock(rs.getInt("stock"));
 	            
 	            // CartDTO에 ProductDTO를 꽂아줍니다.
