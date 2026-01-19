@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
 <%
     String ctxPath = request.getContextPath();
 %>
@@ -205,6 +207,62 @@ body {
 .pagination .page-item:last-child .page-link {
     font-weight: 600;
 }
+
+/* 반려 배지 클릭 가능하게 */
+.badge.reject{
+    cursor:pointer;
+}
+
+/* 모달 */
+.modal-overlay{
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background:rgba(0,0,0,.45);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+}
+
+.modal-box{
+    width:92%;
+    max-width:420px;
+    background:#fff;
+    border-radius:14px;
+    padding:22px 22px 18px;
+    box-shadow:0 12px 40px rgba(0,0,0,.2);
+}
+
+.modal-title{
+    font-size:16px;
+    font-weight:700;
+    margin-bottom:12px;
+    color:#3b2f2a;
+}
+
+.modal-content{
+    font-size:13px;
+    color:#555;
+    line-height:1.6;
+    background:#faf7f3;
+    border:1px solid #eee2d8;
+    border-radius:10px;
+    padding:14px;
+    white-space:pre-wrap; /* 줄바꿈 유지 */
+}
+
+.modal-close{
+    margin-top:14px;
+    width:100%;
+    height:44px;
+    border:none;
+    border-radius:10px;
+    background:#3b2f2a;
+    color:#fff;
+    font-weight:600;
+}
+
 </style>
 </head>
 <script type="text/javaScript">
@@ -223,6 +281,37 @@ body {
 	        "width=500,height=600,scrollbars=yes"
 	    );
 	}
+	
+	/* 반려사유 모달 열기 */
+	function openRejectModal(reason){
+	    if(!reason || reason.trim() === ""){
+	        reason = "반려 사유가 등록되지 않았습니다.";
+	    }
+
+	    document.getElementById("rejectReasonText").innerText = reason;
+	    document.getElementById("rejectModal").style.display = "flex";
+	}
+
+	/* 모달 닫기 */
+	function closeRejectModal(){
+	    document.getElementById("rejectModal").style.display = "none";
+	}
+
+	/* 오버레이 클릭시 닫기 */
+	window.addEventListener("click", function(e){
+	    const modal = document.getElementById("rejectModal");
+	    if(e.target === modal){
+	        closeRejectModal();
+	    }
+	});
+
+	/* ESC로 닫기 */
+	window.addEventListener("keydown", function(e){
+	    if(e.key === "Escape"){
+	        closeRejectModal();
+	    }
+	});
+
 </script>
 
 
@@ -344,12 +433,13 @@ body {
 						                <span class="badge complete">처리완료</span>
 						            </c:when>
 						
-						            <c:when test="${o.claimStatus == 'REJECTED'}">
-						                <span class="badge reject">반려</span>
-						                <div style="margin-top:6px;font-size:12px;color:#999;">
-						                    사유: ${o.rejectReason}
-						                </div>
-						            </c:when>
+						           <c:when test="${o.claimStatus == 'REJECTED'}">
+									    <span class="badge reject"
+									          onclick="openRejectModal('${fn:escapeXml(o.rejectReason)}')">
+									        반려
+									    </span>
+									</c:when>
+
 						
 						            <c:otherwise>
 						                -
@@ -406,6 +496,15 @@ body {
         </li>
 
     </ul>
+
+	<!-- 반려사유 모달 -->
+	<div class="modal-overlay" id="rejectModal">
+	    <div class="modal-box">
+	        <div class="modal-title">반려 사유</div>
+	        <div class="modal-content" id="rejectReasonText"></div>
+	        <button type="button" class="modal-close" onclick="closeRejectModal()">확인</button>
+	    </div>
+	</div>
 
 </div>
 
