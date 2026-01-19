@@ -1055,7 +1055,7 @@ public class MemberDAO_imple implements MemberDAO {
 	        conn = ds.getConnection();
 
 	        String sql = " update tbl_member "
-	                   + " set idle = 0 "
+	                   + " set idle = 0, "
 	                   + "     idle_changedate = sysdate "
 	                   + " where member_id = ? ";
 
