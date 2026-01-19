@@ -113,6 +113,46 @@
           $btn.data("sending", 0);
         });
       }); // end of $("#timeGrid")
+      
+      $("#timeGrid").off("click", ".cell").on("click", ".cell", function () {
+    	  // 이미 예약/막기 있는 칸이면 막기 X (비어있는 칸만 막기)
+    	  if ($(this).attr("data-empty") !== "1") return;
+
+    	  var storeId = $("#storeId").val();
+    	  var date = $("#date").val();
+    	  var startTime = $(this).attr("data-time");
+    	  var endTime = addMin(startTime, 30);
+
+    	  var memo = prompt(
+    	    date + " " + startTime + "~" + endTime + "\n막기 메모(선택)"
+    	  );
+    	  if (memo == null) return; // 취소
+
+    	  $.ajax({
+    	    url: "<%=ctxPath%>/admin/blockSlot.sp",   // ✅ 너 매핑에 맞게 수정
+    	    type: "POST",
+    	    dataType: "json",
+    	    data: {
+    	      storeId: storeId,
+    	      date: date,
+    	      startTime: startTime,
+    	      durationMin: 30,
+    	      memo: memo
+    	    }
+    	  })
+    	  .done(function (data) {
+    	    if (data.ok) {
+    	      fetchAndRender();
+    	    } else {
+    	      alert(data.message || "막기 실패");
+    	    }
+    	  })
+    	  .fail(function (xhr) {
+    	    console.log("BLOCK FAIL", xhr.status, xhr.responseText);
+    	    alert("막기 요청 실패: " + xhr.status);
+    	  });
+    	});
+
 
 
     // 막기 해제
@@ -159,6 +199,21 @@
       grid.append($row);
     }
   }
+  
+  function addMin(hhmm, add) {
+	  var p = String(hhmm).split(":");
+	  var h = Number(p[0]);
+	  var m = Number(p[1]);
+	  var total = h * 60 + m + add;
+
+	  total = (total % 1440 + 1440) % 1440;
+
+	  var nh = String(Math.floor(total / 60)).padStart(2, "0");
+	  var nm = String(total % 60).padStart(2, "0");
+
+	  return nh + ":" + nm;
+	}
+
 
   function fetchAndRender(){
     const storeId = $("#storeId").val();

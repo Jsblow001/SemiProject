@@ -8,7 +8,7 @@
 <head>
 <meta charset="UTF-8" />
 <title>내 방문예약</title>
-<jsp:include page="../header.jsp"/>
+
 <script src="<%=ctxPath%>/js/jquery-3.7.1.min.js"></script>
 <style>
   .wrap{max-width:1100px;margin:24px auto;padding:0 16px;}
@@ -22,13 +22,41 @@
   .btn:hover{background:#f6f6f6;}
   .muted{color:#666;font-size:13px;}
   .msg{white-space:pre-wrap;color:#333;}
+  
+
+
+/* ✅ 버튼 폭 확 줄이고, 높이도 살짝 줄임 */
+.btnres{
+  width: 120px;          /* ✅ 폭 줄임 */
+  height: 40px;          /* ✅ 살짝 줄임 */
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius: 12px;
+  color:#fff !important;
+  font-weight:900;
+  font-size: 13px;       /* ✅ 글씨 살짝 줄임 */
+  text-decoration:none;
+
+  box-shadow: 0 10px 20px rgba(0,0,0,.18);
+}
+.btnres:hover{
+  opacity:.92;
+  transform: translateY(-2px);
+  text-decoration:none;
+}
+.btn-wrap-right{
+  display:flex;
+  justify-content:flex-end; /* ✅ 오른쪽 */
+}
+
 </style>
 </head>
 <body>
-
+<jsp:include page="../header.jsp"/>
 <div class="wrap">
   <h2>내 방문예약</h2>
-  <p class="muted">비회원 예약은 취소가 불가하며, 회원 예약만 여기서 취소 가능합니다.</p>
 
   <table>
     <thead>
@@ -80,6 +108,11 @@
       </c:forEach>
     </tbody>
   </table>
+<div class="btn-wrap-right">
+  <a href="<%=request.getContextPath()%>/reservation.sp" class="btn btn-primary btnres">
+    예약하기
+  </a>
+</div>
 </div>
 
 <script>
@@ -103,6 +136,8 @@ $(function(){
       });
   });
 });
+
+
 </script>
 <jsp:include page="../footer.jsp"/>
 </body>

@@ -1,5 +1,6 @@
 package jh.reserve.model;
 
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
@@ -15,43 +16,48 @@ public interface ReservationDAO {
         }
     }
     // 예약확정 + 막은 구간 조회
-    List<TimeRange> selectBusyRanges(Map<String, String> paraMap) throws Exception;
+    List<TimeRange> selectBusyRanges(Map<String, String> paraMap) throws SQLException;
     // storeId, dayStart, dayEnd (yyyy-MM-dd HH:mm:ss)
 
     // 예약확정과 겹치는지
-    boolean existsOverlapReservation(Map<String, String> paraMap) throws Exception;
+    boolean existsOverlapReservation(Map<String, String> paraMap) throws SQLException;
     // storeId, startAt, endAt
 
     // 막기와 겹치는지
-    boolean existsOverlapBlock(Map<String, String> paraMap) throws Exception;
+    boolean existsOverlapBlock(Map<String, String> paraMap) throws SQLException;
     // storeId, startAt, endAt
 
     // 예약진행
-    int insertReservation(Map<String, String> paraMap) throws Exception;
+    int insertReservation(Map<String, String> paraMap) throws SQLException;
     // 공통: storeId, guestName, guestPhone, reason, durationMin, startAt, endAt, message
     // 선택: memberId (있으면 회원, 없으면 비회원)
     // return: 1 성공 / 0 실패(겹침) / 예외는 진짜 DB오류
     
     // 슬롯막기 넣기
-    int insertBlockSlot(Map<String, String> paraMap) throws Exception;
+    int insertBlockSlot(Map<String, String> paraMap) throws SQLException;
     
     // 슬롯막기 없애기
-    int deleteBlockSlot(Map<String, String> paraMap) throws Exception;
+    int deleteBlockSlot(Map<String, String> paraMap) throws SQLException;
     
     // 슬롯막기 목록 조회
-    List<Map<String, String>> selectBlockList(Map<String, String> paraMap) throws Exception;
+    List<Map<String, String>> selectBlockList(Map<String, String> paraMap) throws SQLException;
 
     // 관리자 화면에 뿌리는 하루치 이벤트 목록 싸그리
-    List<Map<String, String>> selectScheduleBoard(Map<String, String> paraMap) throws Exception;
+    List<Map<String, String>> selectScheduleBoard(Map<String, String> paraMap) throws SQLException;
 
     // 문자 로그 저장
-    int insertSmsLog(Map<String,String> paraMap) throws Exception;
+    int insertSmsLog(Map<String,String> paraMap) throws SQLException;
     
     // 회원예약취소
-    int cancelReservationByMember(Map<String,String> paraMap) throws Exception;
+    int cancelReservationByMember(Map<String,String> paraMap) throws SQLException;
 
 
     // 내 예약목록 조회
-    List<Map<String,String>> selectMyReservations(Map<String,String> paraMap) throws Exception;
+    List<Map<String,String>> selectMyReservations(Map<String,String> paraMap) throws SQLException;
+
+    
+    // 예약 확정 시 매장번호 조회해오는 메서드
+    String selectStoreTel(String storeId) throws SQLException;
+
 
 }
