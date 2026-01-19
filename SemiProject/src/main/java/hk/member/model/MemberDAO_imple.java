@@ -913,6 +913,7 @@ public class MemberDAO_imple implements MemberDAO {
 	
 	
 	// 관리자 페이지 內 회원 더미 50명 추가
+	// 관리자 페이지 內 회원 더미 count명 추가
 	@Override
 	public int createDummyMembers(int count) throws SQLException {
 
@@ -933,101 +934,114 @@ public class MemberDAO_imple implements MemberDAO {
 	    };
 	    String[] extras = {"(역삼동)", "(잠실동)", "(상암동)", "(행당동)", "(삼평동)", "(이의동)", "(송도동)", "(우동)", "(범어동)", "(연동)"};
 
-	    // === YYMM 기반 seed (예: 2601) ===
-	    java.time.LocalDate now = java.time.LocalDate.now();
-	    String seed = String.format("%02d%02d", now.getYear() % 100, now.getMonthValue());
+	    // === seed: 시간(밀리초) 기반 ===
+	    String seed = java.time.LocalDateTime.now()
+	            .format(java.time.format.DateTimeFormatter.ofPattern("yyMMddHHmmssSSS"));
 
 	    for (int i = 1; i <= count; i++) {
 
-	        // 1) 성별
-	        String gender = (Math.random() < 0.5) ? "1" : "2";
+	        try {
 
-	        // 2) 이름
-	        String name = lastNames[(int)(Math.random() * lastNames.length)]
-	                    + firstNames[(int)(Math.random() * firstNames.length)];
+	            // 1) 성별
+	            String gender = (Math.random() < 0.5) ? "1" : "2";
 
-	        // 3) 생년월일
-	        int year = 1975 + (int)(Math.random() * 32); // 1975~2006
-	        int month = 1 + (int)(Math.random() * 12);
-	        int day = 1 + (int)(Math.random() * 28);
-	        String birthday = year + "-" + String.format("%02d", month) + "-" + String.format("%02d", day);
+	            // 2) 이름
+	            String name = lastNames[(int)(Math.random() * lastNames.length)]
+	                        + firstNames[(int)(Math.random() * firstNames.length)];
 
-	        // 4) 주소
-	        int idx = (int)(Math.random() * roads.length);
-	        String postcode = postcodes[idx];
-	        String address = roads[idx] + " " + (10 + (int)(Math.random() * 250));
-	        String detailaddress = (1 + (int)(Math.random() * 120)) + "동 " + (1 + (int)(Math.random() * 2000)) + "호";
-	        String extraaddress = extras[idx];
+	            // 3) 생년월일
+	            int year = 1975 + (int)(Math.random() * 32); // 1975~2006
+	            int month = 1 + (int)(Math.random() * 12);
+	            int day = 1 + (int)(Math.random() * 28);
+	            String birthday = year + "-" + String.format("%02d", month) + "-" + String.format("%02d", day);
 
-	        // 5) 아이디 / 이메일 (짧고 깔끔)
-	        String userid = "u" + seed + "_" + String.format("%03d", i);
-	        String email  = "u" + seed + "_" + String.format("%03d", i) + "@test.com";
+	            // 4) 주소
+	            int idx = (int)(Math.random() * roads.length);
+	            String postcode = postcodes[idx];
+	            String address = roads[idx] + " " + (10 + (int)(Math.random() * 250));
+	            String detailaddress = (1 + (int)(Math.random() * 120)) + "동 " + (1 + (int)(Math.random() * 2000)) + "호";
+	            String extraaddress = extras[idx];
 
-	        // 6) 모바일
-	        String mobile = "010" + String.format("%08d", (int)(Math.random() * 100000000));
+	            // 5) 아이디 / 이메일 (★ 완전 유니크: seed + uuid + 순번)
+	            String uuid = java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+	            String userid = "u" + seed + "_" + uuid + "_" + String.format("%03d", i);
+	            String email  = userid + "@test.com";
 
-	        // 7) 포인트 / 등급 / 상태
-	        int point = (int)(Math.random() * 20001);
+	            // 6) 모바일
+	            String mobile = "010" + String.format("%08d", (int)(Math.random() * 100000000));
 
-	        String grade;
-	        double r = Math.random();
-	        if (r < 0.80) grade = "1";      // 일반
-	        else if (r < 0.95) grade = "2"; // 실버
-	        else grade = "3";              // 골드
+	            // 7) 포인트 / 등급 / 상태
+	            int point = (int)(Math.random() * 20001);
 
-	        int status = (Math.random() < 0.95) ? 1 : 0;
+	            String grade;
+	            double r = Math.random();
+	            if (r < 0.80) grade = "1";      // 일반
+	            else if (r < 0.95) grade = "2"; // 실버
+	            else grade = "3";               // 골드
 
-	        // 8) DTO 구성
-	        MemberDTO m = new MemberDTO();
-	        m.setUserid(userid);
-	        m.setName(name);
-	        m.setPasswd("1234");
-	        m.setEmail(email);
-	        m.setMobile(mobile);
-	        m.setPostcode(postcode);
-	        m.setAddress(address);
-	        m.setDetailaddress(detailaddress);
-	        m.setExtraaddress(extraaddress);
-	        m.setGender(gender);
-	        m.setBirthday(birthday);
+	            int status = (Math.random() < 0.95) ? 1 : 0;
 
-	        AddressDTO addr = new AddressDTO();
-	        addr.setPostcode(postcode);
-	        addr.setAddress(address);
-	        addr.setDetailaddress(detailaddress);
-	        addr.setExtraaddress(extraaddress);
+	            // 8) DTO 구성
+	            MemberDTO m = new MemberDTO();
+	            m.setUserid(userid);
+	            m.setName(name);
+	            m.setPasswd("1234");
+	            m.setEmail(email);
+	            m.setMobile(mobile);
+	            m.setPostcode(postcode);
+	            m.setAddress(address);
+	            m.setDetailaddress(detailaddress);
+	            m.setExtraaddress(extraaddress);
+	            m.setGender(gender);
+	            m.setBirthday(birthday);
 
-	        // 9) 회원가입 메서드 호출
-	        int n = registerMember(m, addr);
+	            AddressDTO addr = new AddressDTO();
+	            addr.setPostcode(postcode);
+	            addr.setAddress(address);
+	            addr.setDetailaddress(detailaddress);
+	            addr.setExtraaddress(extraaddress);
 
-	        if (n == 1) {
-	            success++;
+	            // 9) 회원가입 메서드 호출
+	            int n = registerMember(m, addr);
 
-	            // 10) 포인트 / 등급 / 상태 업데이트
-	            try {
-	                conn = ds.getConnection();
+	            // registerMember가 1이든 2든 성공이면 success 처리되게
+	            if (n > 0) {
+	                success++;
 
-	                String sqlUpdate =
-	                        " UPDATE tbl_member "
-	                      + " SET point = ?, status = ?, grade_code = ? "
-	                      + " WHERE member_id = ? ";
+	                // 10) 포인트 / 등급 / 상태 업데이트
+	                // ⚠️ 여기서 member_id가 userid인 구조면 그대로 써도 됨
+	                // 만약 tbl_member에 userid 컬럼이 따로 있으면 WHERE를 userid로 바꿔야 함
+	                try {
+	                    conn = ds.getConnection();
 
-	                pstmt = conn.prepareStatement(sqlUpdate);
-	                pstmt.setInt(1, point);
-	                pstmt.setInt(2, status);
-	                pstmt.setString(3, grade);
-	                pstmt.setString(4, userid);
+	                    String sqlUpdate =
+	                            " UPDATE tbl_member "
+	                          + " SET point = ?, status = ?, grade_code = ? "
+	                          + " WHERE member_id = ? ";
 
-	                pstmt.executeUpdate();
+	                    pstmt = conn.prepareStatement(sqlUpdate);
+	                    pstmt.setInt(1, point);
+	                    pstmt.setInt(2, status);
+	                    pstmt.setString(3, grade);
+	                    pstmt.setString(4, userid);
 
-	            } finally {
-	                close();
+	                    pstmt.executeUpdate();
+
+	                } finally {
+	                    close();
+	                }
 	            }
+
+	        } catch (SQLException e) {
+	            // 더미 생성 중 한 명 실패해도 다음 사람 계속 생성되게
+	            e.printStackTrace();
+	            continue;
 	        }
 	    }
 
 	    return success;
 	}
+
 
 	
 	
@@ -1187,5 +1201,202 @@ public class MemberDAO_imple implements MemberDAO {
 
 	    return n;
 	}
+	
+	
+	// 네이버/카카오 로그인 시 회원조회
+	@Override
+	public MemberDTO getMemberByUserid(String userid) throws SQLException {
+
+	    MemberDTO member = null;
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = " SELECT member_id, name, email, mobile, postcode, address, detailaddress, extraaddress, "
+	                   + "        gender, birthday, point, status, registerday, grade_code, idle "
+	                   + " FROM tbl_member "
+	                   + " WHERE member_id = ? ";
+
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, userid);
+
+	        rs = pstmt.executeQuery();
+
+	        if(rs.next()) {
+	            member = new MemberDTO();
+
+	            member.setUserid(rs.getString("member_id"));
+	            member.setName(rs.getString("name"));
+
+	            member.setEmail(aes.decrypt(rs.getString("email")));
+	            member.setMobile(aes.decrypt(rs.getString("mobile")));
+
+	            member.setPostcode(rs.getString("postcode"));
+	            member.setAddress(rs.getString("address"));
+	            member.setDetailaddress(rs.getString("detailaddress"));
+	            member.setExtraaddress(rs.getString("extraaddress"));
+
+	            member.setGender(rs.getString("gender"));
+	            member.setBirthday(rs.getString("birthday"));
+	            member.setPoint(rs.getInt("point"));
+
+	            member.setStatus(rs.getInt("status"));
+	            member.setRegisterday(rs.getString("registerday"));
+	            member.setGrade_code(rs.getString("grade_code"));
+	            member.setIdle(rs.getInt("idle"));
+	        }
+
+	    } catch(Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        close();
+	    }
+
+	    return member;
+	}
+
+	
+	// 네이버/카카오 로그인 시 기존 가입회원 이메일 중복 체크
+	@Override
+	public boolean isEmailExists(String email) throws SQLException {
+
+	    boolean isExists = false;
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = " SELECT 1 "
+	                   + " FROM tbl_member "
+	                   + " WHERE email = ? ";
+
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, aes.encrypt(email));
+
+	        rs = pstmt.executeQuery();
+
+	        isExists = rs.next();
+
+	    } catch(Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        close();
+	    }
+
+	    return isExists;
+	}
+
+
+	
+	// 네이버/카카오 로그인 시 임시 회원 생성
+	@Override
+	public int insertSocialTempMember(String userid, String name, String email, String mobile) throws SQLException {
+
+	    int n = 0;
+
+	    try {
+	        conn = ds.getConnection();
+
+	        // ★ 무조건 고유 이메일로 박기 (UQ_EMAIL 절대 안 터짐)
+	        String finalEmail = userid + "@social.local";
+
+	        String sql = " INSERT INTO tbl_member "
+	                   + " (member_id, name, passwd, email, mobile, postcode, address, detailaddress, extraaddress, "
+	                   + "   point, registerday, lastpwdchangedate, status, grade_code, idle) "
+	                   + " VALUES "
+	                   + " (?, ?, ?, ?, ?, ?, ?, ?, ?, "
+	                   + "   0, SYSDATE, SYSDATE, 1, '1', 0) ";
+
+	        pstmt = conn.prepareStatement(sql);
+
+	        pstmt.setString(1, userid);
+	        pstmt.setString(2, (name == null || name.trim().isEmpty()) ? "소셜회원" : name.trim());
+	        pstmt.setString(3, Sha256.encrypt("SOCIAL_LOGIN_" + userid));
+
+	        pstmt.setString(4, aes.encrypt(finalEmail)); // ★ 핵심
+	        pstmt.setString(5, aes.encrypt(mobile == null ? "" : mobile));
+
+	        pstmt.setString(6, "00000");
+	        pstmt.setString(7, "소셜로그인");
+	        pstmt.setString(8, "추가입력필요");
+	        pstmt.setString(9, "");
+
+	        n = pstmt.executeUpdate();
+
+	    } catch(Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        close();
+	    }
+
+	    return n;
+	}
+
+
+	
+	
+	// 네이버/카카오 로그인 시 임시 회원 생성 후 추가 정보 업데이트
+	@Override
+	public int updateSocialExtraInfo(String userid, String name, String gender, String birthday,
+	                                 String postcode, String address, String detailaddress, String extraaddress) throws SQLException {
+
+	    int n = 0;
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = " UPDATE tbl_member "
+	                   + " SET name = ?, "
+	                   + "     gender = ?, "
+	                   + "     birthday = ?, "
+	                   + "     postcode = ?, "
+	                   + "     address = ?, "
+	                   + "     detailaddress = ?, "
+	                   + "     extraaddress = ? "
+	                   + " WHERE member_id = ? ";
+
+	        pstmt = conn.prepareStatement(sql);
+
+	        // name (필수)
+	        pstmt.setString(1, name);
+
+	        // gender (M/F/NULL)
+	        if(gender == null || gender.trim().isEmpty()) {
+	            pstmt.setNull(2, java.sql.Types.VARCHAR);
+	        }
+	        else {
+	            pstmt.setString(2, gender);
+	        }
+
+	        // birthday (YYYY-MM-DD or NULL)
+	        if(birthday == null || birthday.trim().isEmpty()) {
+	            pstmt.setNull(3, java.sql.Types.VARCHAR);
+	        }
+	        else {
+	            pstmt.setString(3, birthday);
+	        }
+
+	        // 주소들
+	        pstmt.setString(4, postcode);
+	        pstmt.setString(5, address);
+	        pstmt.setString(6, detailaddress);
+	        pstmt.setString(7, extraaddress == null ? "" : extraaddress);
+
+	        // where
+	        pstmt.setString(8, userid);
+
+	        n = pstmt.executeUpdate();
+
+	    } catch(Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        close();
+	    }
+
+	    return n;
+	}
+
+	
+	
+
 
 }

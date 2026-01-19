@@ -85,6 +85,31 @@ a.reset-btn,
     color:#e53935;
 }
 
+table#memberTbl{
+    width:100%;
+    table-layout: fixed; /* ★ 컬럼 폭 고정 */
+}
+
+/* 아이디 / 이메일 칸 폭 지정 */
+table#memberTbl th:nth-child(2),
+table#memberTbl td:nth-child(2){
+    width: 170px;  /* 아이디 */
+}
+
+table#memberTbl th:nth-child(5),
+table#memberTbl td:nth-child(5){
+    width: 240px;  /* 이메일 */
+}
+
+/* 말줄임 처리 */
+table#memberTbl td:nth-child(2),
+table#memberTbl td:nth-child(5){
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
 </style>
 
 <script type="text/javascript">

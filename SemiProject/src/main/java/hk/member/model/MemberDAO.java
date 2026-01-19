@@ -94,6 +94,22 @@ public interface MemberDAO {
 	// 관리자 페이지 블랙리스트 등 메모 저장
 	int updateAdminMemo(String userid, String adminMemo) throws SQLException;
 
+	// 네이버/카카오 로그인 시 기존 db 회원조회
+	MemberDTO getMemberByUserid(String userid) throws SQLException;
+
+	// 네이버/카카오 로그인 시 기존 가입회원 이메일 중복 체크
+	boolean isEmailExists(String email) throws SQLException;
+	
+	// 네이버/카카오 로그인 시 임시 회원 생성
+	int insertSocialTempMember(String userid, String name, String email, String mobile) throws SQLException;
+
+	// 네이버/카카오 로그인 시 임시 회원 생성 후 추가 정보 업데이트
+	int updateSocialExtraInfo(String userid, String name, String gender, String birthday,
+            String postcode, String address, String detailaddress, String extraaddress) throws SQLException;
+
+
+
+
 	
 
 	

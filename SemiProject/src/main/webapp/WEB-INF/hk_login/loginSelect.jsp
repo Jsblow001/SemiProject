@@ -7,8 +7,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>Login Select | SISEON</title>
-
+<title>Login | SISEON</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- Google Font -->
@@ -21,59 +20,156 @@
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-/* ===============================
-   핵심: body 배경 통일
-   =============================== */
-body{background:#fbfaf8!important}
+:root{
+  --bg:#fbfaf8;
+  --card:#ffffff;
+  --text:#2f2b2a;
+  --muted:#7a6f6b;
+  --border:#e7e1dd;
+  --brand:#5d4037;
+  --brand-dark:#4a322b;
+}
 
-/* ===============================
-   콘텐츠 영역
-   =============================== */
-.login-select-bg{padding-top:80px!important;padding-bottom:40px!important}
+/* 전체 배경 */
+body{
+  background:var(--bg)!important;
+  font-family:'Poppins', sans-serif!important;
+  color:var(--text);
+}
 
-/* 로그인 카드 */
-.login-select-wrapper{max-width:420px!important;margin:0 auto!important;background:#fff!important;padding:40px 35px!important;border-radius:14px!important;box-shadow:0 8px 28px rgba(0,0,0,.07)!important;text-align:center!important}
-.login-title{font-size:1.8rem!important;font-weight:600!important;color:#5d4037!important;margin-bottom:10px!important}
-.login-desc{font-size:.9rem!important;color:#777!important;margin-bottom:30px!important}
+/* 가운데 정렬 */
+.login-page{
+  min-height:calc(100vh - 140px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:60px 16px;
+}
 
-/* 버튼 */
-.btn-login{width:100%!important;padding:12px!important;font-size:.95rem!important;border-radius:6px!important;margin-bottom:12px!important;font-weight:500!important}
-.btn-member{background:#5d4037!important;color:#fff!important}
-.btn-member:hover{background:#4a322b!important;color:#fff!important}
-.btn-admin{background:#fff!important;border:1px solid #5d4037!important;color:#5d4037!important}
-.btn-admin:hover{background:#5d4037!important;color:#fff!important}
+/* 카드 */
+.login-card{
+  width:100%;
+  max-width:440px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:42px 38px;
+  box-shadow:0 14px 40px rgba(0,0,0,.06);
+}
+
+/* 상단 타이틀 */
+.brand{
+  text-align:center;
+  margin-bottom:26px;
+}
+.brand .logo{
+  font-size:26px;
+  letter-spacing:6px;
+  font-weight:600;
+  color:var(--brand);
+}
+.brand .desc{
+  margin-top:10px;
+  font-size:13px;
+  color:var(--muted);
+}
+
+/* 버튼 공통 */
+.btn-block{
+  height:52px;
+  border-radius:12px!important;
+  font-weight:600;
+  font-size:15px;
+  
+   display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+
+/* 일반 로그인 버튼 */
+.btn-member{
+  background:var(--brand)!important;
+  border:1px solid var(--brand)!important;
+  color:#fff!important;
+}
+.btn-member:hover{
+  background:var(--brand-dark)!important;
+  border-color:var(--brand-dark)!important;
+}
+
+/* 관리자 로그인 버튼 */
+.btn-admin{
+  background:#fff!important;
+  border:1px solid var(--border)!important;
+  color:var(--brand)!important;
+}
+.btn-admin:hover{
+  background:#f6f1ee!important;
+}
 
 /* 구분선 */
-.divider{margin:25px 0!important;font-size:.85rem!important;color:#999!important;position:relative!important}
-.divider::before,.divider::after{content:""!important;position:absolute!important;top:50%!important;width:40%!important;height:1px!important;background:#ddd!important}
-.divider::before{left:0!important}
-.divider::after{right:0!important}
+.or{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:22px 0;
+  color:#9a8f8b;
+  font-size:12px;
+}
+.or:before,.or:after{
+  content:"";
+  flex:1;
+  height:1px;
+  background:#e7e1dd;
+}
 
-/* footer 흰 여백 제거 */
+/* 소셜 버튼 */
+.btn-social{
+  display:flex!important;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  border-radius:12px!important;
+  font-weight:700;
+}
+
+/* 네이버 */
+.btn-naver{
+  background:#03C75A!important;
+  border:1px solid #03C75A!important;
+  color:#fff!important;
+}
+.btn-naver:hover{
+  background:#02b152!important;
+  border-color:#02b152!important;
+}
+
+/* 카카오 */
+.btn-kakao{
+  background:#FEE500!important;
+  border:1px solid #FEE500!important;
+  color:#191919!important;
+}
+.btn-kakao:hover{
+  background:#f5dc00!important;
+  border-color:#f5dc00!important;
+}
+
+/* 회원가입 버튼 */
+.btn-register{
+  background:#f1ebe5!important;
+  border:1px solid #d2c4ba!important;
+  color:var(--brand)!important;
+}
+.btn-register:hover{
+  background:#e6dbd2!important;
+  border-color:var(--brand)!important;
+  color:var(--brand-dark)!important;
+}
+
+/* footer 여백 제거 */
 footer,.footer,#footer{margin-top:0!important;padding-top:0!important}
-
-/* ===============================
-   회원가입 버튼
-   =============================== */
-.btn-outline-secondary{
-    height:46px!important;
-    border-radius:0!important;
-    font-size:.95rem!important;
-    font-weight:500!important;
-    letter-spacing:-.2px!important;
-    background:#f1ebe5!important;
-    border:1px solid #d2c4ba!important;
-    color:#5d4037!important;
-    transition:all .2s ease!important
-}
-
-.btn-outline-secondary:hover{
-    background:#e6dbd2!important;
-    border-color:#5d4037!important;
-    color:#3e2723!important
-}
 </style>
-
 </head>
 
 <body>
@@ -81,30 +177,42 @@ footer,.footer,#footer{margin-top:0!important;padding-top:0!important}
 <!-- 고정 헤더 -->
 <jsp:include page="../header.jsp" />
 
-<!-- 콘텐츠 -->
-<div class="login-select-bg">
-    <div class="login-select-wrapper">
-        <div class="login-title">LOGIN</div>
-        <div class="login-desc">SISEON에 오신 것을 환영합니다</div>
+<div class="login-page">
+  <div class="login-card">
 
-        <a href="<%= ctxPath %>/login.sp" class="btn btn-login btn-member">
-            개인회원 로그인
-        </a>
-
-        <a href="<%= ctxPath %>/login.sp?mode=admin"
-           class="btn btn-login btn-admin">
-            관리자 로그인
-        </a>
-
-        <div class="divider">또는</div>
-        
-        <!--  회원가입 버튼  -->
-        <button type="button"
-                class="btn btn-outline-secondary btn-block btn-register"
-                onclick="location.href='<%= ctxPath %>/register.sp'">
-            회원가입
-        </button>
+    <div class="brand">
+      <div class="logo">SISEON</div>
+      <div class="desc">로그인 후 더 많은 서비스를 이용할 수 있어요</div>
     </div>
+
+    <a href="<%= ctxPath %>/login.sp" class="btn btn-member btn-block">
+      개인회원 로그인
+    </a>
+
+    <a href="<%= ctxPath %>/login.sp?mode=admin" class="btn btn-admin btn-block mt-2">
+      관리자 로그인
+    </a>
+
+    <div class="or">또는</div>
+
+    <button type="button" class="btn btn-social btn-naver btn-block"
+            onclick="location.href='<%=ctxPath%>/naverLoginStart.sp'">
+      <i class="fas fa-leaf"></i> 네이버로 로그인
+    </button>
+
+    <button type="button" class="btn btn-social btn-kakao btn-block mt-2"
+            onclick="location.href='<%=ctxPath%>/kakaoLoginStart.sp'">
+      <i class="fas fa-comment"></i> 카카오로 로그인
+    </button>
+
+    <div class="or">계정이 없으신가요?</div>
+
+    <button type="button" class="btn btn-register btn-block"
+            onclick="location.href='<%= ctxPath %>/register.sp'">
+      회원가입
+    </button>
+
+  </div>
 </div>
 
 <!-- 고정 푸터 -->
