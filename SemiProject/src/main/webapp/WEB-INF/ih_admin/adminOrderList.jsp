@@ -44,6 +44,29 @@
     .pay-success { color: #28a745; font-weight: 700; font-size: 13px; }
     .status-select { width: 95%; padding: 6px 5px; border: 1px solid #ddd; border-radius: 3px; font-size: 13px; background-color: #fff; cursor: default; }
     .btn-list { padding: 10px 18px; background-color: #3e3a39; color: #fff !important; text-decoration: none; border-radius: 3px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; }
+	
+	.pagination-wrapper {display: flex; justify-content: center; margin-top: 30px;}
+	.pagination-wrapper ul {
+	    display: flex;
+	    list-style: none;
+	    padding: 0;
+	}
+	.pagination-wrapper li {
+	    margin: 0 5px;
+	}
+	.pagination-wrapper a {
+	    display: block;
+	    padding: 8px 12px;
+	    border: 1px solid #ddd;
+	    color: #333;
+	    text-decoration: none;
+	    border-radius: 4px;
+	}
+	.pagination-wrapper li.active a {
+	    background-color: #3e3a39;
+	    color: #fff;
+	    border-color: #3e3a39;
+	}
 </style>
 </head>
 <body>
@@ -80,7 +103,7 @@
                 </div>
             </div>
             <div class="dash-card">
-                <div class="dash-icon bg-total"><i class="fa-solid fa-chart-simple"></i></div>
+                <div class="dash-icon bg-total"><i class="fa-solid fa-chart-line"></i></div>
                 <div class="dash-info">
                     <span class="label">총 주문량(누적)</span>
                     <span class="value">${totalOrderCount != null ? totalOrderCount : 0}<span class="unit">건</span></span>
@@ -92,7 +115,9 @@
             <div class="chart-header">
                 <i class="fa-solid fa-chart-line"></i> 최근 7일 주문량 추이
             </div>
-            <canvas id="orderChart" height="100"></canvas>
+            <div class="chart-container" style="position: relative; height:300px; width:100%;">
+			    <canvas id="orderChart"></canvas>
+			</div>
         </div>
     </div>
 
@@ -138,45 +163,72 @@
             </c:choose>
         </tbody>
     </table>
+    
+    <div id="pageBar" style="display: flex; justify-content: center; margin-top: 30px;">
+	    <nav>
+	        <ul style="list-style: none; display: flex; gap: 10px; padding: 0;">
+	            ${pageBar}
+	        </ul>
+	    </nav>
+	</div>
 </div>
 
 <script>
-    $(document).ready(function() {
+$(document).ready(function() {
+    const ctx = document.getElementById('orderChart').getContext('2d');
+    
+    const labels = [ ${chartLabels} ]; 
+    const orderData = [ ${chartData} ]; 
 
-        const ctx = document.getElementById('orderChart').getContext('2d');
-        
-        // 데이터 예시 (서버에서 넘겨받은 데이터를 배열 형태로)
-        const labels = ['01/07', '01/08', '01/09', '01/10', '01/11', '01/12', '오늘'];
-        const orderData = [5, 12, 8, 15, 20, 10, 18]; // 예시 수치
-
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: '주문건수',
-                    data: orderData,
-                    borderColor: '#4f46e5',
-                    backgroundColor: 'rgba(79, 70, 229, 0.05)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 3,
-                    pointBackgroundColor: '#4f46e5'
-                }]
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '주문건수',
+                data: orderData,
+                borderColor: '#4f46e5',
+                backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointBackgroundColor: '#4f46e5'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false, // 이 설정이 있어야 부모 div 크기에 고정됨
+            layout: {
+                padding: { top: 10, bottom: 10 }
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: '#f5f5f5' } },
-                    x: { grid: { display: false } }
+            plugins: { 
+                legend: { display: false } 
+            },
+            scales: {
+                y: { 
+                    beginAtZero: true, // 0부터 시작
+                    suggestedMax: Math.max(...orderData) + 2, // 데이터 최대값보다 조금 더 높게 자동 설정
+                    ticks: {
+                        stepSize: 1, // 주문건수이므로 1단위로 끊어서 표시
+                        precision: 0 // 소수점 표시 안함
+                    },
+                    grid: { color: '#f1f5f9' } 
+                },
+                x: { 
+                    grid: { display: false } 
                 }
             }
-        });
+        }
     });
+});
 
+    function goSearch(pageNo) {
+        const ctxPath = document.getElementById('ctxPath').value;
+
+        location.href = ctxPath + "/admin/orderList.sp?currentShowPageNo=" + pageNo;
+    }
+    
 </script>
 
 <script src="<%= ctxPath %>/js/ih_product/adminOrder.js"></script>

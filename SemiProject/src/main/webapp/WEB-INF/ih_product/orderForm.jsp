@@ -21,6 +21,8 @@
         <%-- 최종 결제 금액 전송용 hidden 필드 --%>
         <input type="hidden" name="total_price" id="total_price" value="${totalPrice}" />
 		
+		<input type="hidden" name="product_name" id="product_name" value="" />
+		
 		<c:if test="${orderType eq 'direct'}">
 	        <input type="hidden" name="product_id" value="${pdto.product_id}" />
 	        <input type="hidden" name="qty" value="${qty}" />
@@ -208,6 +210,8 @@
             pName = "장바구니 주문 상품 외"; 
         }
         
+        document.getElementById("product_name").value = pName;
+        
         // 결제할 금액 가져오기 (포인트 차감된 금액)
         const finalPayAmount = document.getElementById("total_price").value;
         
@@ -230,7 +234,7 @@
                 const btnPayment = document.getElementById("btnOrderPayment");
                 btnPayment.disabled = true;
                 btnPayment.innerText = "주문 처리 중...";
-                
+                // console.log("전송될 상품명: " + document.getElementById("product_name").value);
                 document.orderFrm.submit(); 
             } else {
                 alert("결제에 실패하였습니다. 사유: " + rsp.error_msg);

@@ -71,6 +71,46 @@
 	.btn-refresh i {transition: transform 0.6s ease;}
 	.btn-refresh:hover i {transform: rotate(180deg);
 	}
+    .admin-pagination-area {
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+    }
+
+    .pagination {
+        display: flex;
+        list-style: none;
+        padding: 0;
+        gap: 5px;
+    }
+
+    .pagination .page-link {
+        color: #777;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        padding: 6px 12px;
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: none;
+        border-radius: 2px;
+        transition: all 0.2s;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #f2f1ee;
+        color: #333;
+    }
+    .pagination .page-item.active .page-link {
+        background-color: #6d4c41 !important; /* 필터 버튼과 같은 계열 색상 */
+        border-color: #6d4c41 !important;
+        color: #fff !important;
+    }
+
+    .pagination .page-item:first-child .page-link,
+    .pagination .page-item:last-child .page-link {
+        font-weight: bold;
+        background-color: #faf9f7;
+    }
 </style>
 </head>
 <body>
@@ -192,6 +232,15 @@
                 </tbody>
             </table>
         </div>
+        
+        <div class="d-flex justify-content-center py-4 bg-light border-top">
+            <nav aria-label="Order navigation">
+                <ul class="pagination pagination-sm mb-0 custom-pagination">
+                    ${pageBar}
+                </ul>
+            </nav>
+        </div>
+        
     </div>
 </div>
 

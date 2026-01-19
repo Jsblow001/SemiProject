@@ -114,7 +114,7 @@
             <div id="noticeCarousel" class="carousel slide" data-ride="carousel" data-interval="4000">
                 <div class="carousel-inner">
                     <a href="<%= ctxPath %>/noticeView.sp?noticeId=5" class="carousel-item active announcement-item">
-                        <span class="announcement-text">[공지] 신규 회원 가입 시 3000 포인트 즉시 지급</span>
+                        <span class="announcement-text">[공지] 신규 회원 가입 시 5000 포인트 즉시 지급</span>
                     </a>
                     <a href="<%= ctxPath %>/noticeView.sp?noticeId=8" class="carousel-item announcement-item">
                         <span class="announcement-text">[이벤트] SISEON x Collaboration 컬렉션 무료 배송</span>

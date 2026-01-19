@@ -42,6 +42,9 @@ public class OrderAddController extends AbstractController {
         String totalPriceStr = request.getParameter("total_price"); 
         String salePrice = request.getParameter("sale_price");
         String usePointStr = request.getParameter("use_point");
+        String product_name = request.getParameter("product_name");
+        
+        // System.out.println("### [파라미터수신] 넘어온 product_name: " + product_name);
         
         if(usePointStr == null || usePointStr.isEmpty()) usePointStr = "0";
         if(totalPriceStr == null || totalPriceStr.isEmpty()) totalPriceStr = "0";
@@ -111,13 +114,28 @@ public class OrderAddController extends AbstractController {
         int n = pdao.orderAdd(paraMap);
 
         if (n == 1) {
+        	String odrcode = (String) paraMap.get("odrcode");
+        	
             int currentPoint = loginuser.getPoint();
             int used = Integer.parseInt(usePointStr);
             int earned = (int)paraMap.get("totalPoint");
             loginuser.setPoint(currentPoint - used + earned);
-
+            
+            String finalPName = ""; 
+            if(cartIds != null && !cartIds.isEmpty()) {
+                // 장바구니 주문일 때
+                finalPName = "장바구니 외 다수"; 
+            } else {
+                // 단건 주문일 때
+                if(product_name != null && !product_name.isEmpty()) {
+                    finalPName = product_name; 
+                } else {
+                    finalPName = "주문 상품"; 
+                }
+            }
+            
             super.setRedirect(true);
-            super.setViewPage(request.getContextPath() + "/product/orderComplete.sp");
+            super.setViewPage(request.getContextPath() + "/product/orderComplete.sp?odrcode=" + odrcode + "&pName=" + java.net.URLEncoder.encode(finalPName, "UTF-8"));
         } else {
             request.setAttribute("message", "주문 처리 중 오류가 발생했습니다.");
             request.setAttribute("loc", "javascript:history.back()");
