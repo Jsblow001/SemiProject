@@ -28,8 +28,12 @@ public class OrderListController extends AbstractController {
         MemberDTO loginuser = (MemberDTO) session.getAttribute("loginuser");
 
         if (loginuser == null) {
-            super.setRedirect(true);
-            super.setViewPage(request.getContextPath() + "/login.sp");
+        	
+        	request.setAttribute("message", "로그인 후 이용 가능합니다!");
+        	request.setAttribute("loc", request.getContextPath() + "/index.sp");
+        	
+            super.setRedirect(false);
+            super.setViewPage("/WEB-INF/msg.jsp");
             return;
         }
 
