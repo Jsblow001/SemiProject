@@ -329,4 +329,107 @@ public class AdminOrderDAO_imple implements AdminOrderDAO {
         }
         return detailList;
     }
+
+    // 페이징처리 - 관리자 주문 리스트
+    @Override
+    public List<AdminOrderDTO> selectPagingOrderList(Map<String, String> paraMap) throws SQLException {
+        List<AdminOrderDTO> orderList = new ArrayList<>();
+        try {
+            conn = ds.getConnection();
+            
+            String sql = " SELECT * " +
+                    " FROM ( " +
+                    "    SELECT rownum AS rno, T.* " +
+                    "    FROM ( " +
+                    "        SELECT A.odrcode, A.fk_member_id, M.name, A.odrtotalprice, A.odrdate, " +
+                    "               MAX(B.deliverystatus) as deliverystatus, " + 
+                    "               MIN(P.product_name) || " + 
+                    "               CASE WHEN COUNT(B.fk_odrcode) > 1 THEN ' 외 ' || (COUNT(B.fk_odrcode)-1) || '건' ELSE '' END as pName " +
+                    "        FROM tbl_order A " +
+                    "        JOIN tbl_order_detail B ON A.odrcode = B.fk_odrcode " +
+                    "        JOIN tbl_product P ON B.fk_product_id = P.product_id " + 
+                    "        JOIN tbl_member M ON A.fk_member_id = M.member_id " +
+                    "        GROUP BY A.odrcode, A.fk_member_id, M.name, A.odrtotalprice, A.odrdate " + 
+                    "        ORDER BY A.odrdate DESC " +
+                    "    ) T " +
+                    " ) " +
+                    " WHERE rno BETWEEN ? AND ? ";
+
+            pstmt = conn.prepareStatement(sql);
+            
+            int currentShowPageNo = Integer.parseInt(paraMap.get("currentShowPageNo"));
+            int sizePerPage = Integer.parseInt(paraMap.get("sizePerPage"));
+            
+            pstmt.setInt(1, (currentShowPageNo * sizePerPage) - (sizePerPage - 1));
+            pstmt.setInt(2, (currentShowPageNo * sizePerPage));
+
+            rs = pstmt.executeQuery();
+            
+            while(rs.next()) {
+                AdminOrderDTO dto = new AdminOrderDTO();
+
+                dto.setOdrcode(rs.getString("odrcode"));
+                dto.setFk_userid(rs.getString("fk_member_id"));
+                dto.setName(rs.getString("name"));
+                dto.setTotalprice(rs.getInt("odrtotalprice"));  
+                dto.setOdrdate(rs.getString("odrdate"));
+                dto.setpName(rs.getString("pName"));
+                dto.setDeliverystatus(rs.getInt("deliverystatus"));
+                
+                orderList.add(dto);
+            }
+        } finally {
+            close();
+        }
+        return orderList;
+    }
+    
+    // 최근 7일 데이터 조회
+    public List<Map<String, String>> getOrderTrend() throws SQLException {
+        List<Map<String, String>> trendList = new ArrayList<>();
+        try {
+            conn = ds.getConnection();
+            
+            String sql = " SELECT TO_CHAR(D.dt, 'MM/DD') AS ODRDATE, COUNT(O.odrcode) AS CNT " +
+                         " FROM (SELECT TRUNC(SYSDATE) - LEVEL + 1 AS dt " +
+                         "       FROM DUAL " +
+                         "       CONNECT BY LEVEL <= 7) D " +
+                         " LEFT JOIN tbl_order O ON TRUNC(O.odrdate) = D.dt " +
+                         " GROUP BY D.dt " +
+                         " ORDER BY D.dt ASC ";
+
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+            while(rs.next()) {
+                Map<String, String> map = new HashMap<>();
+                map.put("odrdate", rs.getString("ODRDATE"));
+                map.put("cnt", rs.getString("CNT"));
+                trendList.add(map);
+            }
+        } finally {
+            close();
+        }
+        return trendList;
+    }
+    
+    // 페이징 처리 - 관리자 배송 리스트
+    @Override
+    public int getTotalOrderCount() throws SQLException {
+        int totalCount = 0;
+        try {
+            conn = ds.getConnection();
+            
+            String sql = " SELECT COUNT(*) FROM tbl_order ";
+
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+            
+            if(rs.next()) {
+                totalCount = rs.getInt(1);
+            }
+        } finally {
+            close();
+        }
+        return totalCount;
+    }
 }
