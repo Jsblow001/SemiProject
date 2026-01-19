@@ -313,6 +313,11 @@ function addMemberPoint(userid, point) {
     <h4 style="font-size:15px; font-weight:700; margin-bottom:10px;">
         📝 관리자 메모 (최대 200자)
     </h4>
+    
+    <div style="margin:10px 0 12px; font-size:12px; color:#c0392b; font-weight:600;">
+    ⚠ 저장 시 기존 관리자 메모는 새 내용으로 덮어씌워집니다. (이전 내용은 저장되지 않습니다)
+	</div>
+    
 
     <form method="post" action="<%=ctxPath%>/admin/memberAdminMemoUpdate.sp">
         <input type="hidden" name="userid" value="${member.userid}" />
