@@ -31,5 +31,13 @@ public interface AdminOrderDAO {
 	
 	// 운송장 출력을 위한 주문 세부 정보 불러오기
 	List<AdminOrderDTO> getOrderDetailList(String odrcode) throws SQLException;
+
+	// 페이징처리 - 관리자 주문 리스트
+	List<AdminOrderDTO> selectPagingOrderList(Map<String, String> paraMap) throws SQLException;
 	
+	// 최근 7일 데이터 조회
+	List<Map<String, String>> getOrderTrend() throws SQLException;
+
+	// 페이징 처리 - 관리자 배송 리스트
+	int getTotalOrderCount() throws SQLException;
 }
