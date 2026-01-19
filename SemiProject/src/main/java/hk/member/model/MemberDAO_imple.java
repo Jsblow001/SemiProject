@@ -913,6 +913,7 @@ public class MemberDAO_imple implements MemberDAO {
 	
 	
 	// 관리자 페이지 內 회원 더미 50명 추가
+	// 관리자 페이지 內 회원 더미 count명 추가
 	@Override
 	public int createDummyMembers(int count) throws SQLException {
 
@@ -933,101 +934,114 @@ public class MemberDAO_imple implements MemberDAO {
 	    };
 	    String[] extras = {"(역삼동)", "(잠실동)", "(상암동)", "(행당동)", "(삼평동)", "(이의동)", "(송도동)", "(우동)", "(범어동)", "(연동)"};
 
-	    // === YYMM 기반 seed (예: 2601) ===
-	    java.time.LocalDate now = java.time.LocalDate.now();
-	    String seed = String.format("%02d%02d", now.getYear() % 100, now.getMonthValue());
+	    // === seed: 시간(밀리초) 기반 ===
+	    String seed = java.time.LocalDateTime.now()
+	            .format(java.time.format.DateTimeFormatter.ofPattern("yyMMddHHmmssSSS"));
 
 	    for (int i = 1; i <= count; i++) {
 
-	        // 1) 성별
-	        String gender = (Math.random() < 0.5) ? "1" : "2";
+	        try {
 
-	        // 2) 이름
-	        String name = lastNames[(int)(Math.random() * lastNames.length)]
-	                    + firstNames[(int)(Math.random() * firstNames.length)];
+	            // 1) 성별
+	            String gender = (Math.random() < 0.5) ? "1" : "2";
 
-	        // 3) 생년월일
-	        int year = 1975 + (int)(Math.random() * 32); // 1975~2006
-	        int month = 1 + (int)(Math.random() * 12);
-	        int day = 1 + (int)(Math.random() * 28);
-	        String birthday = year + "-" + String.format("%02d", month) + "-" + String.format("%02d", day);
+	            // 2) 이름
+	            String name = lastNames[(int)(Math.random() * lastNames.length)]
+	                        + firstNames[(int)(Math.random() * firstNames.length)];
 
-	        // 4) 주소
-	        int idx = (int)(Math.random() * roads.length);
-	        String postcode = postcodes[idx];
-	        String address = roads[idx] + " " + (10 + (int)(Math.random() * 250));
-	        String detailaddress = (1 + (int)(Math.random() * 120)) + "동 " + (1 + (int)(Math.random() * 2000)) + "호";
-	        String extraaddress = extras[idx];
+	            // 3) 생년월일
+	            int year = 1975 + (int)(Math.random() * 32); // 1975~2006
+	            int month = 1 + (int)(Math.random() * 12);
+	            int day = 1 + (int)(Math.random() * 28);
+	            String birthday = year + "-" + String.format("%02d", month) + "-" + String.format("%02d", day);
 
-	        // 5) 아이디 / 이메일 (짧고 깔끔)
-	        String userid = "u" + seed + "_" + String.format("%03d", i);
-	        String email  = "u" + seed + "_" + String.format("%03d", i) + "@test.com";
+	            // 4) 주소
+	            int idx = (int)(Math.random() * roads.length);
+	            String postcode = postcodes[idx];
+	            String address = roads[idx] + " " + (10 + (int)(Math.random() * 250));
+	            String detailaddress = (1 + (int)(Math.random() * 120)) + "동 " + (1 + (int)(Math.random() * 2000)) + "호";
+	            String extraaddress = extras[idx];
 
-	        // 6) 모바일
-	        String mobile = "010" + String.format("%08d", (int)(Math.random() * 100000000));
+	            // 5) 아이디 / 이메일 (★ 완전 유니크: seed + uuid + 순번)
+	            String uuid = java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+	            String userid = "u" + seed + "_" + uuid + "_" + String.format("%03d", i);
+	            String email  = userid + "@test.com";
 
-	        // 7) 포인트 / 등급 / 상태
-	        int point = (int)(Math.random() * 20001);
+	            // 6) 모바일
+	            String mobile = "010" + String.format("%08d", (int)(Math.random() * 100000000));
 
-	        String grade;
-	        double r = Math.random();
-	        if (r < 0.80) grade = "1";      // 일반
-	        else if (r < 0.95) grade = "2"; // 실버
-	        else grade = "3";              // 골드
+	            // 7) 포인트 / 등급 / 상태
+	            int point = (int)(Math.random() * 20001);
 
-	        int status = (Math.random() < 0.95) ? 1 : 0;
+	            String grade;
+	            double r = Math.random();
+	            if (r < 0.80) grade = "1";      // 일반
+	            else if (r < 0.95) grade = "2"; // 실버
+	            else grade = "3";               // 골드
 
-	        // 8) DTO 구성
-	        MemberDTO m = new MemberDTO();
-	        m.setUserid(userid);
-	        m.setName(name);
-	        m.setPasswd("1234");
-	        m.setEmail(email);
-	        m.setMobile(mobile);
-	        m.setPostcode(postcode);
-	        m.setAddress(address);
-	        m.setDetailaddress(detailaddress);
-	        m.setExtraaddress(extraaddress);
-	        m.setGender(gender);
-	        m.setBirthday(birthday);
+	            int status = (Math.random() < 0.95) ? 1 : 0;
 
-	        AddressDTO addr = new AddressDTO();
-	        addr.setPostcode(postcode);
-	        addr.setAddress(address);
-	        addr.setDetailaddress(detailaddress);
-	        addr.setExtraaddress(extraaddress);
+	            // 8) DTO 구성
+	            MemberDTO m = new MemberDTO();
+	            m.setUserid(userid);
+	            m.setName(name);
+	            m.setPasswd("1234");
+	            m.setEmail(email);
+	            m.setMobile(mobile);
+	            m.setPostcode(postcode);
+	            m.setAddress(address);
+	            m.setDetailaddress(detailaddress);
+	            m.setExtraaddress(extraaddress);
+	            m.setGender(gender);
+	            m.setBirthday(birthday);
 
-	        // 9) 회원가입 메서드 호출
-	        int n = registerMember(m, addr);
+	            AddressDTO addr = new AddressDTO();
+	            addr.setPostcode(postcode);
+	            addr.setAddress(address);
+	            addr.setDetailaddress(detailaddress);
+	            addr.setExtraaddress(extraaddress);
 
-	        if (n == 1) {
-	            success++;
+	            // 9) 회원가입 메서드 호출
+	            int n = registerMember(m, addr);
 
-	            // 10) 포인트 / 등급 / 상태 업데이트
-	            try {
-	                conn = ds.getConnection();
+	            // registerMember가 1이든 2든 성공이면 success 처리되게
+	            if (n > 0) {
+	                success++;
 
-	                String sqlUpdate =
-	                        " UPDATE tbl_member "
-	                      + " SET point = ?, status = ?, grade_code = ? "
-	                      + " WHERE member_id = ? ";
+	                // 10) 포인트 / 등급 / 상태 업데이트
+	                // ⚠️ 여기서 member_id가 userid인 구조면 그대로 써도 됨
+	                // 만약 tbl_member에 userid 컬럼이 따로 있으면 WHERE를 userid로 바꿔야 함
+	                try {
+	                    conn = ds.getConnection();
 
-	                pstmt = conn.prepareStatement(sqlUpdate);
-	                pstmt.setInt(1, point);
-	                pstmt.setInt(2, status);
-	                pstmt.setString(3, grade);
-	                pstmt.setString(4, userid);
+	                    String sqlUpdate =
+	                            " UPDATE tbl_member "
+	                          + " SET point = ?, status = ?, grade_code = ? "
+	                          + " WHERE member_id = ? ";
 
-	                pstmt.executeUpdate();
+	                    pstmt = conn.prepareStatement(sqlUpdate);
+	                    pstmt.setInt(1, point);
+	                    pstmt.setInt(2, status);
+	                    pstmt.setString(3, grade);
+	                    pstmt.setString(4, userid);
 
-	            } finally {
-	                close();
+	                    pstmt.executeUpdate();
+
+	                } finally {
+	                    close();
+	                }
 	            }
+
+	        } catch (SQLException e) {
+	            // 더미 생성 중 한 명 실패해도 다음 사람 계속 생성되게
+	            e.printStackTrace();
+	            continue;
 	        }
 	    }
 
 	    return success;
 	}
+
 
 	
 	
