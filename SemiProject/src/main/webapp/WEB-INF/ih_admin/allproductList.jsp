@@ -160,6 +160,7 @@
 
     a.prod-link { color: #333; text-decoration: none; font-weight: 600; }
     a.prod-link:hover { text-decoration: underline; }
+    
     .admin-pagination-area {
         margin-top: 40px;
         padding-top: 20px;
