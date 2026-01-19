@@ -1188,4 +1188,149 @@ public class MemberDAO_imple implements MemberDAO {
 	    return n;
 	}
 
+	
+	
+	@Override
+	public MemberDTO loginSocial(String userid, String name, String email, String mobile) throws SQLException {
+
+	    MemberDTO member = null;
+
+	    try {
+	        conn = ds.getConnection();
+
+	        // ==================================================
+	        // 1) member_id 로 먼저 조회 (naver_xxx)
+	        // ==================================================
+	        String sqlById = " SELECT member_id, name, email, mobile, postcode, address, detailaddress, extraaddress, "
+	                       + "        gender, birthday, point, status, registerday, grade_code, idle "
+	                       + " FROM tbl_member "
+	                       + " WHERE member_id = ? ";
+
+	        pstmt = conn.prepareStatement(sqlById);
+	        pstmt.setString(1, userid);
+	        rs = pstmt.executeQuery();
+
+	        if(rs.next()) {
+	            member = new MemberDTO();
+	            member.setUserid(rs.getString("member_id"));
+	            member.setName(rs.getString("name"));
+	            member.setEmail(aes.decrypt(rs.getString("email")));
+	            member.setMobile(aes.decrypt(rs.getString("mobile")));
+	            member.setPostcode(rs.getString("postcode"));
+	            member.setAddress(rs.getString("address"));
+	            member.setDetailaddress(rs.getString("detailaddress"));
+	            member.setExtraaddress(rs.getString("extraaddress"));
+	            member.setGender(rs.getString("gender"));
+	            member.setBirthday(rs.getString("birthday"));
+	            member.setPoint(rs.getInt("point"));
+	            member.setStatus(rs.getInt("status"));
+	            member.setRegisterday(rs.getString("registerday"));
+	            member.setGrade_code(rs.getString("grade_code"));
+	            member.setIdle(rs.getInt("idle"));
+	            return member;
+	        }
+
+	        if(rs != null) rs.close();
+	        if(pstmt != null) pstmt.close();
+
+	        // ==================================================
+	        // 2) member_id 없으면 email 로 기존회원 있는지 조회 (중복 방지)
+	        // ==================================================
+	        if(email != null && !email.trim().isEmpty()) {
+
+	            String sqlByEmail = " SELECT member_id, name, email, mobile, postcode, address, detailaddress, extraaddress, "
+	                              + "        gender, birthday, point, status, registerday, grade_code, idle "
+	                              + " FROM tbl_member "
+	                              + " WHERE email = ? ";
+
+	            pstmt = conn.prepareStatement(sqlByEmail);
+	            pstmt.setString(1, aes.encrypt(email));  // email은 암호화 저장이니까 encrypt해서 비교
+	            rs = pstmt.executeQuery();
+
+	            if(rs.next()) {
+	                member = new MemberDTO();
+	                member.setUserid(rs.getString("member_id"));
+	                member.setName(rs.getString("name"));
+	                member.setEmail(aes.decrypt(rs.getString("email")));
+	                member.setMobile(aes.decrypt(rs.getString("mobile")));
+	                member.setPostcode(rs.getString("postcode"));
+	                member.setAddress(rs.getString("address"));
+	                member.setDetailaddress(rs.getString("detailaddress"));
+	                member.setExtraaddress(rs.getString("extraaddress"));
+	                member.setGender(rs.getString("gender"));
+	                member.setBirthday(rs.getString("birthday"));
+	                member.setPoint(rs.getInt("point"));
+	                member.setStatus(rs.getInt("status"));
+	                member.setRegisterday(rs.getString("registerday"));
+	                member.setGrade_code(rs.getString("grade_code"));
+	                member.setIdle(rs.getInt("idle"));
+	                return member;
+	            }
+
+	            if(rs != null) rs.close();
+	            if(pstmt != null) pstmt.close();
+	        }
+
+	        // ==================================================
+	        // 3) member_id도 없고 email도 없으면 신규 INSERT
+	        // ==================================================
+	        String insertSql = " INSERT INTO tbl_member "
+	                         + " (member_id, name, passwd, email, mobile, postcode, address, detailaddress, extraaddress, "
+	                         + "   point, registerday, lastpwdchangedate, status, grade_code, idle) "
+	                         + " VALUES "
+	                         + " (?, ?, ?, ?, ?, ?, ?, ?, ?, "
+	                         + "   0, SYSDATE, SYSDATE, 1, '1', 0) ";
+
+	        pstmt = conn.prepareStatement(insertSql);
+	        pstmt.setString(1, userid);
+	        pstmt.setString(2, (name == null || name.trim().isEmpty()) ? "소셜회원" : name.trim());
+	        pstmt.setString(3, Sha256.encrypt("SOCIAL_LOGIN_" + userid));
+
+	        pstmt.setString(4, aes.encrypt(email == null ? "" : email));
+	        pstmt.setString(5, aes.encrypt(mobile == null ? "" : mobile));
+
+	        pstmt.setString(6, "00000");
+	        pstmt.setString(7, "소셜로그인");
+	        pstmt.setString(8, "추가입력필요");
+	        pstmt.setString(9, "");
+
+	        pstmt.executeUpdate();
+
+	        if(pstmt != null) pstmt.close();
+
+	        // ==================================================
+	        // 4) INSERT 후 다시 조회
+	        // ==================================================
+	        pstmt = conn.prepareStatement(sqlById);
+	        pstmt.setString(1, userid);
+	        rs = pstmt.executeQuery();
+
+	        if(rs.next()) {
+	            member = new MemberDTO();
+	            member.setUserid(rs.getString("member_id"));
+	            member.setName(rs.getString("name"));
+	            member.setEmail(aes.decrypt(rs.getString("email")));
+	            member.setMobile(aes.decrypt(rs.getString("mobile")));
+	            member.setPostcode(rs.getString("postcode"));
+	            member.setAddress(rs.getString("address"));
+	            member.setDetailaddress(rs.getString("detailaddress"));
+	            member.setExtraaddress(rs.getString("extraaddress"));
+	            member.setPoint(rs.getInt("point"));
+	            member.setStatus(rs.getInt("status"));
+	            member.setRegisterday(rs.getString("registerday"));
+	            member.setGrade_code(rs.getString("grade_code"));
+	            member.setIdle(rs.getInt("idle"));
+	        }
+
+	    } catch(Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        close();
+	    }
+
+	    return member;
+	}
+
+
+
 }

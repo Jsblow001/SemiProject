@@ -95,6 +95,19 @@ footer,.footer,#footer{margin-top:0!important;padding-top:0!important}
            class="btn btn-login btn-admin">
             관리자 로그인
         </a>
+        
+        <hr>
+
+		<button type="button" class="btn btn-success btn-block mt-2"
+		        onclick="location.href='<%=ctxPath%>/naverLoginStart.sp'">
+		    네이버로 로그인
+		</button>
+		
+		<button type="button" class="btn btn-warning btn-block mt-2"
+		        onclick="location.href='<%=ctxPath%>/kakaoLoginStart.sp'">
+		    카카오로 로그인
+		</button>
+        
 
         <div class="divider">또는</div>
         

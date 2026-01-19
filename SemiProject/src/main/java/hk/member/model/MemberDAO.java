@@ -94,6 +94,11 @@ public interface MemberDAO {
 	// 관리자 페이지 블랙리스트 등 메모 저장
 	int updateAdminMemo(String userid, String adminMemo) throws SQLException;
 
+	// 네이버 로그인
+	MemberDTO loginSocial(String userid, String name, String email, String mobile) throws SQLException;
+
+
+
 	
 
 	
