@@ -23,17 +23,19 @@ public class KakaoCallbackController extends AbstractController {
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
+        HttpSession session = request.getSession();
+
         String code = request.getParameter("code");
 
         if(code == null) {
             request.setAttribute("message", "카카오 로그인 실패(code 없음)");
-            request.setAttribute("loc", request.getContextPath() + "/login.sp");
+            request.setAttribute("loc", request.getContextPath() + "/loginSelect.sp");
             super.setRedirect(false);
             super.setViewPage("/WEB-INF/msg.jsp");
             return;
         }
 
-        String clientId = "b9bece0348ecbd39646aba63ecf1f7ea"; // 카카오REST_API_KEY
+        String clientId = "b9bece0348ecbd39646aba63ecf1f7ea"; // 카카오_REST_API_KEY
         String redirectURI = "http://localhost:9090/SemiProject/kakaoCallback.sp";
 
         // ==================================================
@@ -52,7 +54,7 @@ public class KakaoCallbackController extends AbstractController {
 
         if(!tokenJson.has("access_token")) {
             request.setAttribute("message", "카카오 토큰 발급 실패: " + tokenResult);
-            request.setAttribute("loc", request.getContextPath() + "/login.sp");
+            request.setAttribute("loc", request.getContextPath() + "/loginSelect.sp");
             super.setRedirect(false);
             super.setViewPage("/WEB-INF/msg.jsp");
             return;
@@ -70,7 +72,7 @@ public class KakaoCallbackController extends AbstractController {
 
         if(!userJson.has("id")) {
             request.setAttribute("message", "카카오 사용자정보 조회 실패: " + userResult);
-            request.setAttribute("loc", request.getContextPath() + "/login.sp");
+            request.setAttribute("loc", request.getContextPath() + "/loginSelect.sp");
             super.setRedirect(false);
             super.setViewPage("/WEB-INF/msg.jsp");
             return;
@@ -78,11 +80,12 @@ public class KakaoCallbackController extends AbstractController {
 
         String kakaoId = String.valueOf(userJson.getLong("id"));
 
-        // ★ 최소 변경 핵심: member_id에 prefix
+        // ★ 최소 변경 핵심: member_id = kakao_고유ID
         String userid = "kakao_" + kakaoId;
 
         String name = "카카오회원";
         String email = "";
+        String mobile = ""; // 카카오는 보통 mobile 안줌
 
         if(userJson.has("kakao_account")) {
             JSONObject kakaoAccount = userJson.getJSONObject("kakao_account");
@@ -95,28 +98,61 @@ public class KakaoCallbackController extends AbstractController {
         }
 
         // ==================================================
-        // 3) DB 처리 (없으면 insert / 있으면 select)
+        // 3) DB 처리
         // ==================================================
-        HttpSession session = request.getSession();
+        MemberDTO member = mdao.getMemberByUserid(userid);
 
-        MemberDTO loginuser = mdao.loginSocial(userid, name, email, "");
+        // 없으면 임시가입 insert
+        if(member == null) {
+            mdao.insertSocialTempMember(userid, name, email, mobile);
+            member = mdao.getMemberByUserid(userid);
+        }
 
-        if(loginuser == null) {
+        if(member == null) {
             request.setAttribute("message", "카카오 로그인 처리 중 DB 오류가 발생했습니다.");
-            request.setAttribute("loc", request.getContextPath() + "/login.sp");
+            request.setAttribute("loc", request.getContextPath() + "/loginSelect.sp");
             super.setRedirect(false);
             super.setViewPage("/WEB-INF/msg.jsp");
             return;
         }
 
-        session.setAttribute("loginuser", loginuser);
+        // 탈퇴회원/휴면회원 처리(기존 로직 유지)
+        if(member.getStatus() == 0) {
+            request.setAttribute("message", "탈퇴한 회원입니다.");
+            request.setAttribute("loc", request.getContextPath() + "/loginSelect.sp");
+            super.setRedirect(false);
+            super.setViewPage("/WEB-INF/msg.jsp");
+            return;
+        }
+
+        if(member.getIdle() == 1) {
+            request.setAttribute("userid", member.getUserid());
+            super.setRedirect(false);
+            super.setViewPage("/WEB-INF/hk_login/idleAccount.jsp");
+            return;
+        }
+
+        // ==================================================
+        // 4) 추가정보 입력 필요하면 socialJoin.jsp로 이동
+        // ==================================================
+        if("추가입력필요".equals(member.getDetailaddress())) {
+            request.setAttribute("userid", member.getUserid());
+            super.setRedirect(false);
+            super.setViewPage("/WEB-INF/hk_login/socialJoin.jsp");
+            return;
+        }
+
+        // ==================================================
+        // 5) 로그인 완료
+        // ==================================================
+        session.setAttribute("loginuser", member);
 
         super.setRedirect(true);
         super.setViewPage(request.getContextPath() + "/mypage.sp");
     }
 
     // ==================================================
-    // 유틸: POST 요청
+    // 유틸: POST 요청 (에러바디까지 읽음)
     // ==================================================
     private String requestPOST(String apiURL, String params) throws Exception {
 
@@ -135,7 +171,8 @@ public class KakaoCallbackController extends AbstractController {
         BufferedReader br = null;
         if(responseCode >= 200 && responseCode < 300) {
             br = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
-        } else {
+        }
+        else {
             br = new BufferedReader(new InputStreamReader(con.getErrorStream(), "UTF-8"));
         }
 
@@ -144,12 +181,8 @@ public class KakaoCallbackController extends AbstractController {
         while((line = br.readLine()) != null) sb.append(line);
         br.close();
 
-       // System.out.println("카카오 토큰 응답코드: " + responseCode);
-        //System.out.println("카카오 토큰 응답바디: " + sb.toString());
-
         return sb.toString();
     }
-
 
     // ==================================================
     // 유틸: GET + Bearer Token
@@ -161,7 +194,16 @@ public class KakaoCallbackController extends AbstractController {
         con.setRequestMethod("GET");
         con.setRequestProperty("Authorization", "Bearer " + accessToken);
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
+        int responseCode = con.getResponseCode();
+
+        BufferedReader br = null;
+        if(responseCode >= 200 && responseCode < 300) {
+            br = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
+        }
+        else {
+            br = new BufferedReader(new InputStreamReader(con.getErrorStream(), "UTF-8"));
+        }
+
         StringBuilder sb = new StringBuilder();
         String line;
         while((line = br.readLine()) != null) sb.append(line);

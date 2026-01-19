@@ -1187,135 +1187,45 @@ public class MemberDAO_imple implements MemberDAO {
 
 	    return n;
 	}
-
 	
-	// 네이버/카카오 로그인 처리
+	
+	// 네이버/카카오 로그인 시 회원조회
 	@Override
-	public MemberDTO loginSocial(String userid, String name, String email, String mobile) throws SQLException {
+	public MemberDTO getMemberByUserid(String userid) throws SQLException {
 
 	    MemberDTO member = null;
 
 	    try {
 	        conn = ds.getConnection();
 
-	        // ==================================================
-	        // 1) member_id 로 먼저 조회 (naver_xxx)
-	        // ==================================================
-	        String sqlById = " SELECT member_id, name, email, mobile, postcode, address, detailaddress, extraaddress, "
-	                       + "        gender, birthday, point, status, registerday, grade_code, idle "
-	                       + " FROM tbl_member "
-	                       + " WHERE member_id = ? ";
+	        String sql = " SELECT member_id, name, email, mobile, postcode, address, detailaddress, extraaddress, "
+	                   + "        gender, birthday, point, status, registerday, grade_code, idle "
+	                   + " FROM tbl_member "
+	                   + " WHERE member_id = ? ";
 
-	        pstmt = conn.prepareStatement(sqlById);
+	        pstmt = conn.prepareStatement(sql);
 	        pstmt.setString(1, userid);
+
 	        rs = pstmt.executeQuery();
 
 	        if(rs.next()) {
 	            member = new MemberDTO();
+
 	            member.setUserid(rs.getString("member_id"));
 	            member.setName(rs.getString("name"));
+
 	            member.setEmail(aes.decrypt(rs.getString("email")));
 	            member.setMobile(aes.decrypt(rs.getString("mobile")));
+
 	            member.setPostcode(rs.getString("postcode"));
 	            member.setAddress(rs.getString("address"));
 	            member.setDetailaddress(rs.getString("detailaddress"));
 	            member.setExtraaddress(rs.getString("extraaddress"));
+
 	            member.setGender(rs.getString("gender"));
 	            member.setBirthday(rs.getString("birthday"));
 	            member.setPoint(rs.getInt("point"));
-	            member.setStatus(rs.getInt("status"));
-	            member.setRegisterday(rs.getString("registerday"));
-	            member.setGrade_code(rs.getString("grade_code"));
-	            member.setIdle(rs.getInt("idle"));
-	            return member;
-	        }
 
-	        if(rs != null) rs.close();
-	        if(pstmt != null) pstmt.close();
-
-	        // ==================================================
-	        // 2) member_id 없으면 email 로 기존회원 있는지 조회 (중복 방지)
-	        // ==================================================
-	        if(email != null && !email.trim().isEmpty()) {
-
-	            String sqlByEmail = " SELECT member_id, name, email, mobile, postcode, address, detailaddress, extraaddress, "
-	                              + "        gender, birthday, point, status, registerday, grade_code, idle "
-	                              + " FROM tbl_member "
-	                              + " WHERE email = ? ";
-
-	            pstmt = conn.prepareStatement(sqlByEmail);
-	            pstmt.setString(1, aes.encrypt(email));  // email은 암호화 저장이니까 encrypt해서 비교
-	            rs = pstmt.executeQuery();
-
-	            if(rs.next()) {
-	                member = new MemberDTO();
-	                member.setUserid(rs.getString("member_id"));
-	                member.setName(rs.getString("name"));
-	                member.setEmail(aes.decrypt(rs.getString("email")));
-	                member.setMobile(aes.decrypt(rs.getString("mobile")));
-	                member.setPostcode(rs.getString("postcode"));
-	                member.setAddress(rs.getString("address"));
-	                member.setDetailaddress(rs.getString("detailaddress"));
-	                member.setExtraaddress(rs.getString("extraaddress"));
-	                member.setGender(rs.getString("gender"));
-	                member.setBirthday(rs.getString("birthday"));
-	                member.setPoint(rs.getInt("point"));
-	                member.setStatus(rs.getInt("status"));
-	                member.setRegisterday(rs.getString("registerday"));
-	                member.setGrade_code(rs.getString("grade_code"));
-	                member.setIdle(rs.getInt("idle"));
-	                return member;
-	            }
-
-	            if(rs != null) rs.close();
-	            if(pstmt != null) pstmt.close();
-	        }
-
-	        // ==================================================
-	        // 3) member_id도 없고 email도 없으면 신규 INSERT
-	        // ==================================================
-	        String insertSql = " INSERT INTO tbl_member "
-	                         + " (member_id, name, passwd, email, mobile, postcode, address, detailaddress, extraaddress, "
-	                         + "   point, registerday, lastpwdchangedate, status, grade_code, idle) "
-	                         + " VALUES "
-	                         + " (?, ?, ?, ?, ?, ?, ?, ?, ?, "
-	                         + "   0, SYSDATE, SYSDATE, 1, '1', 0) ";
-
-	        pstmt = conn.prepareStatement(insertSql);
-	        pstmt.setString(1, userid);
-	        pstmt.setString(2, (name == null || name.trim().isEmpty()) ? "소셜회원" : name.trim());
-	        pstmt.setString(3, Sha256.encrypt("SOCIAL_LOGIN_" + userid));
-
-	        pstmt.setString(4, aes.encrypt(email == null ? "" : email));
-	        pstmt.setString(5, aes.encrypt(mobile == null ? "" : mobile));
-
-	        pstmt.setString(6, "00000");
-	        pstmt.setString(7, "소셜로그인");
-	        pstmt.setString(8, "추가입력필요");
-	        pstmt.setString(9, "");
-
-	        pstmt.executeUpdate();
-
-	        if(pstmt != null) pstmt.close();
-
-	        // ==================================================
-	        // 4) INSERT 후 다시 조회
-	        // ==================================================
-	        pstmt = conn.prepareStatement(sqlById);
-	        pstmt.setString(1, userid);
-	        rs = pstmt.executeQuery();
-
-	        if(rs.next()) {
-	            member = new MemberDTO();
-	            member.setUserid(rs.getString("member_id"));
-	            member.setName(rs.getString("name"));
-	            member.setEmail(aes.decrypt(rs.getString("email")));
-	            member.setMobile(aes.decrypt(rs.getString("mobile")));
-	            member.setPostcode(rs.getString("postcode"));
-	            member.setAddress(rs.getString("address"));
-	            member.setDetailaddress(rs.getString("detailaddress"));
-	            member.setExtraaddress(rs.getString("extraaddress"));
-	            member.setPoint(rs.getInt("point"));
 	            member.setStatus(rs.getInt("status"));
 	            member.setRegisterday(rs.getString("registerday"));
 	            member.setGrade_code(rs.getString("grade_code"));
@@ -1331,6 +1241,148 @@ public class MemberDAO_imple implements MemberDAO {
 	    return member;
 	}
 
+	
+	// 네이버/카카오 로그인 시 기존 가입회원 이메일 중복 체크
+	@Override
+	public boolean isEmailExists(String email) throws SQLException {
+
+	    boolean isExists = false;
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = " SELECT 1 "
+	                   + " FROM tbl_member "
+	                   + " WHERE email = ? ";
+
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, aes.encrypt(email));
+
+	        rs = pstmt.executeQuery();
+
+	        isExists = rs.next();
+
+	    } catch(Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        close();
+	    }
+
+	    return isExists;
+	}
+
+
+	
+	// 네이버/카카오 로그인 시 임시 회원 생성
+	@Override
+	public int insertSocialTempMember(String userid, String name, String email, String mobile) throws SQLException {
+
+	    int n = 0;
+
+	    try {
+	        conn = ds.getConnection();
+
+	        // ★ 무조건 고유 이메일로 박기 (UQ_EMAIL 절대 안 터짐)
+	        String finalEmail = userid + "@social.local";
+
+	        String sql = " INSERT INTO tbl_member "
+	                   + " (member_id, name, passwd, email, mobile, postcode, address, detailaddress, extraaddress, "
+	                   + "   point, registerday, lastpwdchangedate, status, grade_code, idle) "
+	                   + " VALUES "
+	                   + " (?, ?, ?, ?, ?, ?, ?, ?, ?, "
+	                   + "   0, SYSDATE, SYSDATE, 1, '1', 0) ";
+
+	        pstmt = conn.prepareStatement(sql);
+
+	        pstmt.setString(1, userid);
+	        pstmt.setString(2, (name == null || name.trim().isEmpty()) ? "소셜회원" : name.trim());
+	        pstmt.setString(3, Sha256.encrypt("SOCIAL_LOGIN_" + userid));
+
+	        pstmt.setString(4, aes.encrypt(finalEmail)); // ★ 핵심
+	        pstmt.setString(5, aes.encrypt(mobile == null ? "" : mobile));
+
+	        pstmt.setString(6, "00000");
+	        pstmt.setString(7, "소셜로그인");
+	        pstmt.setString(8, "추가입력필요");
+	        pstmt.setString(9, "");
+
+	        n = pstmt.executeUpdate();
+
+	    } catch(Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        close();
+	    }
+
+	    return n;
+	}
+
+
+	
+	
+	// 네이버/카카오 로그인 시 임시 회원 생성 후 추가 정보 업데이트
+	@Override
+	public int updateSocialExtraInfo(String userid, String name, String gender, String birthday,
+	                                 String postcode, String address, String detailaddress, String extraaddress) throws SQLException {
+
+	    int n = 0;
+
+	    try {
+	        conn = ds.getConnection();
+
+	        String sql = " UPDATE tbl_member "
+	                   + " SET name = ?, "
+	                   + "     gender = ?, "
+	                   + "     birthday = ?, "
+	                   + "     postcode = ?, "
+	                   + "     address = ?, "
+	                   + "     detailaddress = ?, "
+	                   + "     extraaddress = ? "
+	                   + " WHERE member_id = ? ";
+
+	        pstmt = conn.prepareStatement(sql);
+
+	        // name (필수)
+	        pstmt.setString(1, name);
+
+	        // gender (M/F/NULL)
+	        if(gender == null || gender.trim().isEmpty()) {
+	            pstmt.setNull(2, java.sql.Types.VARCHAR);
+	        }
+	        else {
+	            pstmt.setString(2, gender);
+	        }
+
+	        // birthday (YYYY-MM-DD or NULL)
+	        if(birthday == null || birthday.trim().isEmpty()) {
+	            pstmt.setNull(3, java.sql.Types.VARCHAR);
+	        }
+	        else {
+	            pstmt.setString(3, birthday);
+	        }
+
+	        // 주소들
+	        pstmt.setString(4, postcode);
+	        pstmt.setString(5, address);
+	        pstmt.setString(6, detailaddress);
+	        pstmt.setString(7, extraaddress == null ? "" : extraaddress);
+
+	        // where
+	        pstmt.setString(8, userid);
+
+	        n = pstmt.executeUpdate();
+
+	    } catch(Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        close();
+	    }
+
+	    return n;
+	}
+
+	
+	
 
 
 }
