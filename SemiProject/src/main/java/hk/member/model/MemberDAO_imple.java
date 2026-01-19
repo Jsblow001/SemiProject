@@ -1189,7 +1189,7 @@ public class MemberDAO_imple implements MemberDAO {
 	}
 
 	
-	
+	// 네이버/카카오 로그인 처리
 	@Override
 	public MemberDTO loginSocial(String userid, String name, String email, String mobile) throws SQLException {
 
