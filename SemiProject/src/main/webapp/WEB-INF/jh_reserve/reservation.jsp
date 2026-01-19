@@ -150,7 +150,7 @@
 		  <option value="3" <%= "3".equals(preStoreId) ? "selected" : "" %>>SISEON 홍대점</option>
 	  </select>
 
-      <div class="rs-muted" style="margin-top:6px;">* 매장명은 나중에 DB(tbl_store)에서 불러오도록 바꿔도 됨</div>
+      
     </div>
 
     <div class="rs-btns">
@@ -165,7 +165,7 @@
       <label class="rs-label">예약 이유</label>
       <div style="display:flex; gap:12px; flex-wrap:wrap;">
         <label><input type="radio" name="rsReason" value="VISION" checked> 시력검사(30분)</label>
-        <label><input type="radio" name="rsReason" value="FITTING"> 안경맞춤(60분)</label>
+        <label><input type="radio" name="rsReason" value="FULLSERVICE"> 안경맞춤(60분)</label>
         <label><input type="radio" name="rsReason" value="AS"> A/S(30분)</label>
       </div>
     </div>
@@ -245,6 +245,7 @@
    ========================= */
 const rsState = {
   storeId: "",
+  storeTel: "",
   reason: "VISION",
   date: "",
   durationMin: 30,
@@ -265,6 +266,8 @@ $(function(){
   const preStoreId = "<%=preStoreId%>";
   if(preStoreId){
     rsState.storeId = preStoreId;
+ 	// ✅ 추가: 매장 전화번호 가져오기
+    rsFetchStoreTel(preStoreId);
     rsGoStep(2);
   }
 
@@ -280,6 +283,8 @@ $(function(){
       return;
     }
     rsState.storeId = storeId;
+ 	// ✅ 추가: 매장 전화번호 가져오기
+    rsFetchStoreTel(storeId);
     rsGoStep(2);
   });
 
@@ -287,7 +292,7 @@ $(function(){
 
   $("input[name='rsReason']").on("change", function(){
     rsState.reason = $("input[name='rsReason']:checked").val();
-    rsState.durationMin = (rsState.reason === "FITTING") ? 60 : 30;
+    rsState.durationMin = (rsState.reason === "FULLSERVICE") ? 60 : 30;
 
     rsClearSlotSelection();
     rsState.startTime = "";
@@ -327,14 +332,6 @@ $(function(){
   
   $("#rsGoMain").on("click", function(){
 	  const go = "<%=ctxPath%>/index.sp";
-	
-	  // ✅ iframe(모달)로 열린 경우: 부모에게 "닫고 메인 새로고침" 요청
-	  try{
-	    if(window.parent && window.parent !== window && window.parent.closeReservationModal){
-	      window.parent.closeReservationModal({ reloadMain:true, goUrl: go });
-	      return;
-	    }
-	  }catch(e){}
 	
 	  // ✅ 혹시 단독 페이지로 열렸다면 그냥 이동
 	  location.href = go + "?_=" + Date.now();
@@ -396,7 +393,7 @@ function rsStoreText(id){
 }
 
 function rsReasonText(r){
-  if(r==="FITTING") return "안경맞춤";
+  if(r==="FULLSERVICE") return "안경맞춤";
   if(r==="AS") return "A/S";
   return "시력검사";
 }
@@ -438,7 +435,7 @@ function rsFetchSlots(){
   rsHideErr();
 
   rsState.reason = $("input[name='rsReason']:checked").val();
-  rsState.durationMin = (rsState.reason === "FITTING") ? 60 : 30;
+  rsState.durationMin = (rsState.reason === "FULLSERVICE") ? 60 : 30;
   rsState.date = $("#rsDate").val();
 
   if(!rsState.date){
@@ -533,25 +530,18 @@ function rsSelectSlot(startHHMM){
   if(!$start.length) return;
 
 
-  if(rsState.durationMin === 60){
-    const nextHHMM = rsCalcEndTime(startHHMM, 30);
+  	if(rsState.durationMin === 60){
+	  const nextHHMM = rsCalcEndTime(startHHMM, 30);
+	
+	  $start.addClass("is-on");
+	
+	  // (선택사항) 화면에 19:30 슬롯이 존재하면 색만 칠해주기
+	  const $next = $(`#rsTimeGrid .rs-slot[data-time='${nextHHMM}']`);
+	  if($next.length) $next.addClass("is-next");
+	} else {
+	  $start.addClass("is-on");
+	}
 
-    // ✅ 연속 슬롯 가능 여부는 Set으로 판단 (버튼 DOM 존재 여부에 의존하지 않음)
-    if(!rsState.availableSet.has(nextHHMM)){
-      rsShowErr("#rsErr2", "안경맞춤(60분)은 연속 2슬롯이 필요합니다. 다른 시간을 선택해주세요.");
-      rsState.startTime = "";
-      rsUpdateSummary2();
-      return;
-    }
-
-    $start.addClass("is-on");
-
-    // 화면에 다음 슬롯이 렌더링되어 있으면 강조 표시도 해줌
-    const $next = $(`#rsTimeGrid .rs-slot[data-time='${nextHHMM}']`);
-    if($next.length) $next.addClass("is-next");
-  } else {
-    $start.addClass("is-on");
-  }
 
   rsState.startTime = startHHMM;
   rsUpdateSummary2();
@@ -596,6 +586,8 @@ function rsSubmitReservation(){
     rsShowErr("#rsErr3", "예약 정보가 올바르지 않습니다. 이전 단계로 돌아가 다시 선택해주세요.");
     return;
   }
+  
+  
 
   $("#rsSubmit").prop("disabled", true);
 
@@ -623,6 +615,8 @@ function rsSubmitReservation(){
         "</div>"
       );
       $("#rsFailBox").hide();
+      
+      
     } else {
       $("#rsFailBox").show().text(data.message || "예약 실패");
       $("#rsOkBox").hide();
@@ -636,6 +630,33 @@ function rsSubmitReservation(){
     $("#rsSubmit").prop("disabled", false);
   });
 }
+
+// storeId 확정될 때 매장 전화번호 조회하기
+function rsFetchStoreTel(storeId){
+	  if(!storeId) return;
+
+	  // 이미 받아놨으면 재요청 안함(선택)
+	  if(rsState.storeTel && rsState.storeId === storeId) return;
+
+	  $.get("<%=ctxPath%>/storeTel.sp", { storeId: storeId })
+	    .done(function(res){
+	      const data = (typeof res === "string") ? JSON.parse(res) : res;
+	      if(data.ok){
+	        rsState.storeTel = (data.tel || "").trim();
+	      } else {
+	        rsState.storeTel = "";
+	        console.log("storeTel fail:", data.message);
+	      }
+	    })
+	    .fail(function(){
+	      rsState.storeTel = "";
+	      console.log("storeTel 통신 실패");
+	    });
+	}
+
+
+
+
 </script>
 <jsp:include page="../footer.jsp"/>
 </body>
