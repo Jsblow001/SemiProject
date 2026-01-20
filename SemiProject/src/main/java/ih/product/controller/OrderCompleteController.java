@@ -1,5 +1,7 @@
 package ih.product.controller;
 
+import java.util.HashMap;
+
 import hk.member.domain.MemberDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,9 +37,10 @@ public class OrderCompleteController extends AbstractController {
             final String orderCode = odrcode;
             final String finalPName = pName;
             
-            Thread mailThread = new Thread(new Runnable() {
+            Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
+                	// 이메일 발송
                     GoogleMail mail = new GoogleMail();
                     try {
                         System.out.println("### [쓰레드] 메일 발송 메소드 호출 직전 ###");
@@ -47,9 +50,34 @@ public class OrderCompleteController extends AbstractController {
                         System.out.println("### [쓰레드] 에러 발생!!! ###");
                         e.printStackTrace();
                     }
+                    // 문자 발송
+                    try {
+                        String api_key = "NCSKSXJ1S7X4BSFB";
+                        String api_secret = "G6ZSVCJAAXIARC4EGOJM4D2HVKWKJKMG";
+                        
+                        // net.nurigo.java_sdk.api.Message 임포트 확인
+                        net.nurigo.java_sdk.api.Message coolsms = new net.nurigo.java_sdk.api.Message(api_key, api_secret);
+
+                        HashMap<String, String> paraMap = new HashMap<>();
+                        paraMap.put("to", loginuser.getMobile()); 
+                        paraMap.put("from", "01095994076");       
+                        paraMap.put("type", "SMS");
+                        paraMap.put("text", "[SISEON] " + name + "님, 주문번호[" + orderCode + "] 결제 및 주문이 완료되었습니다.");
+                        paraMap.put("app_version", "JAVA SDK v2.2");
+
+                        // 문자 전송
+                        coolsms.send(paraMap); 
+                        System.out.println("### [성공] SMS 발송 완료");
+                        
+                    } catch (Exception e) {
+                        System.out.println("### [실패] SMS 발송 오류");
+                        e.printStackTrace();
+                    }
+                    
+                    
                 }
             });
-            mailThread.start();
+            thread.start();
         } else {
             // System.out.println("### 조건 불만족: odrcode 혹은 loginuser가 null입니다. ###");
         }

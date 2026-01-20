@@ -260,9 +260,9 @@ public class ReservationCreateController extends AbstractController {
     // 하드코딩
     private SmsSender buildSmsSender() {
 
-        final String apiKey    = "NCSGFSK4H0FZ9X0F"; // ✅ 너 관리자 컨트롤러 값 그대로
-        final String apiSecret = "NEBBQQPYYD6X7LH3FCYEOV0WPCDNS03O";
-        final String fromPhone = "01042303159"; // ✅ 등록된 발신번호
+        final String apiKey    = "NCSKSXJ1S7X4BSFB"; // ✅ 너 관리자 컨트롤러 값 그대로
+        final String apiSecret = "G6ZSVCJAAXIARC4EGOJM4D2HVKWKJKMG";
+        final String fromPhone = "01095994076"; // ✅ 등록된 발신번호
 
         return new SmsSender(apiKey, apiSecret, fromPhone);
     }

@@ -200,7 +200,6 @@
   </style>
   
 
-<a class="dropdown-item text-info" href="${pageContext.request.contextPath}/adminReviewManage.sp">관리자-리뷰관리</a>
     
     <!-- Navbar Start -->
     <div class="container-fluid">

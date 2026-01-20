@@ -26,6 +26,7 @@ public class SmsSender {
         paraMap.put("to", toPhone);
         paraMap.put("from", fromPhone);
         paraMap.put("type", "LMS");
+        // 45포인트씩 차감
         paraMap.put("text", text);
         paraMap.put("app_version", "JAVA SDK v2.2");
 

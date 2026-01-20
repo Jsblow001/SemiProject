@@ -3,7 +3,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <jsp:include page="../header.jsp" />
-
+<script src="${pageContext.request.contextPath}/js/ih_product/product.js"></script>
 <style>
     .cart-img { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; }
     /* 판매 중지 상품 이미지 흑백 처리 */
