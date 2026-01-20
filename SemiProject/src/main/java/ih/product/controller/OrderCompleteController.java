@@ -52,15 +52,15 @@ public class OrderCompleteController extends AbstractController {
                     }
                     // 문자 발송
                     try {
-                        String api_key = "NCS2GJNKTVGQZFED";
-                        String api_secret = "HLB7Z7YXZDAFHHV4KJWQYDWVFBQWSKXC";
+                        String api_key = "NCSKSXJ1S7X4BSFB";
+                        String api_secret = "G6ZSVCJAAXIARC4EGOJM4D2HVKWKJKMG";
                         
                         // net.nurigo.java_sdk.api.Message 임포트 확인
                         net.nurigo.java_sdk.api.Message coolsms = new net.nurigo.java_sdk.api.Message(api_key, api_secret);
 
                         HashMap<String, String> paraMap = new HashMap<>();
                         paraMap.put("to", loginuser.getMobile()); 
-                        paraMap.put("from", "01089443776");       
+                        paraMap.put("from", "01095994076");       
                         paraMap.put("type", "SMS");
                         paraMap.put("text", "[SISEON] " + name + "님, 주문번호[" + orderCode + "] 결제 및 주문이 완료되었습니다.");
                         paraMap.put("app_version", "JAVA SDK v2.2");
