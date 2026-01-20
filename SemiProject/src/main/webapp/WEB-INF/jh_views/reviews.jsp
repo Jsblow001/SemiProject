@@ -91,6 +91,10 @@
   opacity:0.92;
 }
 
+#allReviews{
+  scroll-margin-top: 60px;
+}
+
 </style>
 
 <div class="wrap">
