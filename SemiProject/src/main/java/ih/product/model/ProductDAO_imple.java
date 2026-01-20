@@ -1059,5 +1059,43 @@ public class ProductDAO_imple implements ProductDAO {
 	    return pdto;
 	}
 
+	// DB 업데이트 (배송상태를 4:주문취소 로 변경하는 로직)
+	@Override
+	public int updateOrderCancel(String odrcode) throws SQLException {
+		
+		int result = 0;
+	    
+	    try {
+	        conn = ds.getConnection();
+	        
+	        conn.setAutoCommit(false);
+
+	        // 1. 주문 상세 테이블(tbl_order_detail)의 모든 상품 상태를 '4(주문취소)'로 변경
+	        String sql = " UPDATE tbl_order_detail SET deliverystatus = 4 "
+	                   + " WHERE fk_odrcode = ? ";
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, odrcode);
+	        
+	        int n1 = pstmt.executeUpdate();
+
+	        if(n1 > 0) {
+	            conn.commit();
+	            conn.setAutoCommit(true);
+	            result = 1;
+	        } else {
+	            conn.rollback();
+	        }
+
+	    } catch (SQLException e) {
+	        if(conn != null) conn.rollback(); 
+	        throw e;
+	    } finally {
+	        close();
+	    }
+	    
+	    return result;
+	}
+
 	
 }
