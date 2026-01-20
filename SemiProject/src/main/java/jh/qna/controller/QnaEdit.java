@@ -64,7 +64,6 @@ public class QnaEdit extends AbstractController {
             return;
         }
 
-        boolean isAdmin = "admin".equals(loginuser.getUserid());
         if(!loginuser.getUserid().equals(qdto.getFkMemberId())) {
             request.setAttribute("message", "본인 글만 수정할 수 있습니다.");
             request.setAttribute("loc", "javascript:history.back()");
