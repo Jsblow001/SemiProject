@@ -107,6 +107,17 @@ public interface MemberDAO {
 	int updateSocialExtraInfo(String userid, String name, String gender, String birthday,
             String postcode, String address, String detailaddress, String extraaddress) throws SQLException;
 
+	// 사용자의 추가 배송지 목록 가져오기 (마이페이지용)
+    List<AddressDTO> selectAddressList(String userid) throws SQLException;
+
+    // 새 배송지 추가하기 (Ajax)
+    int addAddress(AddressDTO adto) throws SQLException;
+
+    // 방금 추가된 배송지의 addr_id 가져오기 (Ajax 응답용)
+    int getLatestAddrId(String userid) throws SQLException;
+
+    // 배송지 삭제하기 (Ajax)
+    int deleteAddress(String addrId) throws SQLException;
 
 
 
