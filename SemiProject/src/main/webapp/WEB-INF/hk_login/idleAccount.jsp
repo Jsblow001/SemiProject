@@ -86,7 +86,7 @@ body{font-family:'Poppins',sans-serif!important;background:#fbfaf8!important}
 
                 <hr>
 
-                <form method="post" action="${pageContext.request.contextPath}/admin/idleRelease.sp">
+                <form method="post" action="${pageContext.request.contextPath}/idleRelease.sp">
                     <input type="hidden" name="userid" value="${requestScope.userid}" />
 
                     <button type="submit" class="btn btn-dark btn-block">

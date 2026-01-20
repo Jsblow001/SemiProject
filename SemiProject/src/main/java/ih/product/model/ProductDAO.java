@@ -84,4 +84,7 @@ public interface ProductDAO {
 	// 장바구니 번호로 상품의 상태와 정보 조회 (주문 전 검증용)
 	ProductDTO getProductByCartId(String cid) throws SQLException;
 
+	// DB 업데이트 (배송상태를 4:주문취소 로 변경하는 로직)
+	int updateOrderCancel(String odrcode) throws SQLException;
+
 }

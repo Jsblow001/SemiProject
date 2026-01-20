@@ -6,6 +6,10 @@
 
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" />
 
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css"/>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
 <style>
     :root {
         --dark-wood: #5D4037;
@@ -187,7 +191,9 @@
 	                <button class="btn btn-secondary mr-2 shadow-sm" onclick="openPrintInvoice('${orderInfo.odrcode}')">
 					    <i class="fas fa-print mr-1"></i>운송장 출력
 					</button>
-	                <button class="btn btn-danger shadow-sm"><i class="fas fa-times-circle mr-1"></i>주문 전체 취소</button>
+	                <button class="btn btn-danger shadow-sm" onclick="cancelAllOrder('${orderInfo.odrcode}')">
+					    <i class="fas fa-times-circle mr-1"></i>주문 전체 취소
+					</button>
 	            </div>
 	        </div>
 	    </div>
@@ -258,6 +264,40 @@
 	function openPrintInvoice(odrcode) {
 	    const url = `${ctxPath}/admin/printInvoice.sp?odrcode=` + odrcode;
 	    window.open(url, "invoicePrint", "width=450, height=700, left=200, top=100, scrollbars=yes");
+	}
+	
+	
+	function cancelAllOrder(odrcode) {
+	    swal({
+	        title: "주문을 취소하시겠습니까?",
+	        text: "취소 후에는 다시 되돌릴 수 없습니다.",
+	        icon: "warning",
+	        buttons: ["아니오", "예, 취소합니다"],
+	        dangerMode: true,
+	    })
+	    .then((willDelete) => {
+	        if (willDelete) {
+	            $.ajax({
+	                url: "${ctxPath}/admin/cancelOrder.sp",
+	                type: "POST",
+	                data: {"odrcode": odrcode},
+	                dataType: "json",
+	                success: function(json) {
+	                    if(json.result == 1) {
+	                        swal("취소 완료!", "주문이 정상적으로 취소되었습니다.", "success")
+	                        .then(() => {
+	                            location.reload(); // 상태 변경 확인을 위해 새로고침
+	                        });
+	                    } else {
+	                        swal("실패", "주문 취소 처리 중 오류가 발생했습니다.", "error");
+	                    }
+	                },
+	                error: function() {
+	                    swal("오류", "서버 통신에 실패했습니다.", "error");
+	                }
+	            });
+	        }
+	    });
 	}
 	</script>
 	
