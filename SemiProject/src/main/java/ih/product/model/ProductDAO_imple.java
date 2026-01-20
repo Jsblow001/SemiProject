@@ -510,16 +510,22 @@ public class ProductDAO_imple implements ProductDAO {
 	    int result = 0;
 	    try {
 	        conn = ds.getConnection();
-	        
+
 	        String sql = " UPDATE tbl_cart SET cart_qty = cart_qty + ? " +
-	                     " WHERE cart_id = ? AND (cart_qty + ?) >= 1 ";
+	                     " WHERE cart_id = ? " +
+	                     " AND (cart_qty + ?) >= 1 " +
+	                     " AND (cart_qty + ?) <= (SELECT stock FROM tbl_product WHERE product_id = " +
+	                     "                        (SELECT fk_product_id FROM tbl_cart WHERE cart_id = ?)) ";
 	        
 	        pstmt = conn.prepareStatement(sql);
 	        int change = Integer.parseInt(paraMap.get("change"));
+	        String cart_id = paraMap.get("cart_id");
 	        
-	        pstmt.setInt(1, change);
-	        pstmt.setString(2, paraMap.get("cart_id"));
-	        pstmt.setInt(3, change);
+	        pstmt.setInt(1, change);    
+	        pstmt.setString(2, cart_id); 
+	        pstmt.setInt(3, change);    
+	        pstmt.setInt(4, change);   
+	        pstmt.setString(5, cart_id); 
 	        
 	        result = pstmt.executeUpdate();
 	        
@@ -527,7 +533,7 @@ public class ProductDAO_imple implements ProductDAO {
 	        close();
 	    }
 	    return result;
-	} // end of public int updateCartQty(Map<String, String> paraMap) throws SQLException  ----
+	}
 	
 	// 장바구니 상품 삭제
 	@Override
@@ -772,7 +778,7 @@ public class ProductDAO_imple implements ProductDAO {
 	        
 	        String sql = " select addr_id, postcode, address, detailaddress, extraaddress "
 	                   + " from tbl_address "
-	                   + " where fk_member_id = ? "
+	                   + " where fk_member_id = ? and status = 1 "
 	                   + " order by addr_id desc "; 
 	        
 	        pstmt = conn.prepareStatement(sql);
