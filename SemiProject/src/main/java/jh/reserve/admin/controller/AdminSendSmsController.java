@@ -56,9 +56,9 @@ public class AdminSendSmsController extends AbstractController {
 
         try {
             
-        	final String apiKey = "NCSGFSK4H0FZ9X0F";
-        	final String apiSecret = "NEBBQQPYYD6X7LH3FCYEOV0WPCDNS03O";
-        	final String fromPhone = "01042303159";
+        	final String apiKey = "NCSKSXJ1S7X4BSFB";
+        	final String apiSecret = "G6ZSVCJAAXIARC4EGOJM4D2HVKWKJKMG";
+        	final String fromPhone = "01095994076";
 
             SmsSender sender = new SmsSender(apiKey, apiSecret, fromPhone);
             resultJson = sender.sendNow(toPhone, content);

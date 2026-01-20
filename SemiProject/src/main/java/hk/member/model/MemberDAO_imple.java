@@ -1055,7 +1055,7 @@ public class MemberDAO_imple implements MemberDAO {
 	        conn = ds.getConnection();
 
 	        String sql = " update tbl_member "
-	                   + " set idle = 0 "
+	                   + " set idle = 0, "
 	                   + "     idle_changedate = sysdate "
 	                   + " where member_id = ? ";
 
@@ -1396,6 +1396,126 @@ public class MemberDAO_imple implements MemberDAO {
 	}
 
 	
+	
+	// ======================================================
+    // 사용자의 추가 배송지 목록 조회
+    // ======================================================
+   @Override
+   public List<AddressDTO> selectAddressList(String userid) throws SQLException {
+       List<AddressDTO> addressList = new ArrayList<>();
+       try {
+           conn = ds.getConnection();
+           
+           // 수정: SQL 문에 fk_member_id 컬럼을 추가했습니다.
+           String sql = " select addr_id, fk_member_id, postcode, address, detailaddress, extraaddress "
+                      + " from tbl_address "
+                      + " where fk_member_id = ? and status = 1 "
+                      + " order by addr_id desc ";
+           
+           pstmt = conn.prepareStatement(sql);
+           pstmt.setString(1, userid);
+           rs = pstmt.executeQuery();
+           
+           while(rs.next()) {
+               AddressDTO adto = new AddressDTO();
+               adto.setAddrId(rs.getInt("ADDR_ID"));
+               adto.setFkMemberId(rs.getString("FK_MEMBER_ID")); // 이제 정상 작동합니다.
+               adto.setPostcode(rs.getString("POSTCODE"));
+               adto.setAddress(rs.getString("ADDRESS"));
+               adto.setDetailaddress(rs.getString("DETAILADDRESS"));
+               adto.setExtraaddress(rs.getString("EXTRAADDRESS"));
+               addressList.add(adto);
+           }
+       } finally {
+           close();
+       }
+       return addressList;
+   }
+
+    // ======================================================
+    // 새 배송지 추가 (Ajax)
+    // ======================================================
+    @Override
+    public int addAddress(AddressDTO adto) throws SQLException {
+        int result = 0;
+        try {
+            conn = ds.getConnection();
+            
+            // 1. 동일한 주소가 이미 존재하는지(숨겨진 상태 포함) 확인
+            String sql = " select addr_id from tbl_address "
+                       + " where fk_member_id = ? and postcode = ? and address = ? and detailaddress = ? ";
+            
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, adto.getFkMemberId());
+            pstmt.setString(2, adto.getPostcode());
+            pstmt.setString(3, adto.getAddress());
+            pstmt.setString(4, adto.getDetailaddress());
+            
+            rs = pstmt.executeQuery();
+            
+            if(rs.next()) {
+                // 2. 이미 존재한다면 status를 1(사용중)로 업데이트
+                int existingAddrId = rs.getInt(1);
+                sql = " update tbl_address set status = 1 where addr_id = ? ";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setInt(1, existingAddrId);
+                result = pstmt.executeUpdate();
+            } else {
+                // 3. 완전히 처음 등록하는 주소라면 새로 INSERT
+                sql = " INSERT INTO TBL_ADDRESS(ADDR_ID, FK_MEMBER_ID, POSTCODE, ADDRESS, DETAILADDRESS, EXTRAADDRESS, STATUS) "
+                    + " VALUES(SEQ_ADDR_ID.NEXTVAL, ?, ?, ?, ?, ?, 1) ";
+                
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, adto.getFkMemberId());
+                pstmt.setString(2, adto.getPostcode());
+                pstmt.setString(3, adto.getAddress());
+                pstmt.setString(4, adto.getDetailaddress());
+                pstmt.setString(5, adto.getExtraaddress());
+                
+                result = pstmt.executeUpdate();
+            }
+        } finally {
+            close();
+        }
+        return result;
+    }
+
+    // ======================================================
+    // 최근 추가된 배송지 ID 조회 (Ajax 삭제 버튼 생성용)
+    // ======================================================
+    @Override
+    public int getLatestAddrId(String userid) throws SQLException {
+        int addrId = 0;
+        try {
+            conn = ds.getConnection();
+            String sql = " SELECT MAX(ADDR_ID) FROM TBL_ADDRESS WHERE FK_MEMBER_ID = ? ";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, userid);
+            rs = pstmt.executeQuery();
+            if(rs.next()) addrId = rs.getInt(1);
+        } finally {
+            close();
+        }
+        return addrId;
+    }
+
+    // ======================================================
+    // 배송지 삭제 (Ajax)
+    // ======================================================
+    @Override
+    public int deleteAddress(String addrId) throws SQLException {
+        int result = 0;
+        try {
+            conn = ds.getConnection();
+            String sql = " update tbl_address set status = 0 where addr_id = ? ";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, addrId);
+            result = pstmt.executeUpdate();
+        } finally {
+            close();
+        }
+        return result;
+    }
 	
 
 

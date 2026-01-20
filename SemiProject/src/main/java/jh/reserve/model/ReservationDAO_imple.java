@@ -3,6 +3,7 @@ package jh.reserve.model;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +43,7 @@ public class ReservationDAO_imple implements ReservationDAO {
 
     // 예약 불가한 구간 반환
     @Override
-    public List<TimeRange> selectBusyRanges(Map<String, String> paraMap) throws Exception {
+    public List<TimeRange> selectBusyRanges(Map<String, String> paraMap) throws SQLException {
 
         List<TimeRange> list = new ArrayList<>();
 
@@ -90,7 +91,7 @@ public class ReservationDAO_imple implements ReservationDAO {
 
     // ---------- 2) overlap reservation ----------
     @Override
-    public boolean existsOverlapReservation(Map<String, String> paraMap) throws Exception {
+    public boolean existsOverlapReservation(Map<String, String> paraMap) throws SQLException {
 
         boolean exists = false;
 
@@ -127,7 +128,7 @@ public class ReservationDAO_imple implements ReservationDAO {
 
     // ---------- 3) overlap block ----------
     @Override
-    public boolean existsOverlapBlock(Map<String, String> paraMap) throws Exception {
+    public boolean existsOverlapBlock(Map<String, String> paraMap) throws SQLException {
 
         boolean exists = false;
 
@@ -165,7 +166,7 @@ public class ReservationDAO_imple implements ReservationDAO {
     // paraMap key 통일:
     // - 회원아이디(= tbl_member.member_id): "userid"
     @Override
-    public int insertReservation(Map<String, String> paraMap) throws Exception {
+    public int insertReservation(Map<String, String> paraMap) throws SQLException {
 
         int n = 0;
 
@@ -231,7 +232,7 @@ public class ReservationDAO_imple implements ReservationDAO {
 
     // 슬롯막기 넣기
     @Override
-    public int insertBlockSlot(Map<String, String> paraMap) throws Exception {
+    public int insertBlockSlot(Map<String, String> paraMap) throws SQLException {
 
         int n = 0;
 
@@ -289,7 +290,7 @@ public class ReservationDAO_imple implements ReservationDAO {
 
     // 슬롯막기 없애기
     @Override
-    public int deleteBlockSlot(Map<String, String> paraMap) throws Exception {
+    public int deleteBlockSlot(Map<String, String> paraMap) throws SQLException {
 
         int n = 0;
 
@@ -314,7 +315,7 @@ public class ReservationDAO_imple implements ReservationDAO {
 
     // 슬롯막기 목록 조회
     @Override
-    public List<Map<String, String>> selectBlockList(Map<String, String> paraMap) throws Exception {
+    public List<Map<String, String>> selectBlockList(Map<String, String> paraMap) throws SQLException {
 
         List<Map<String, String>> list = new ArrayList<>();
 
@@ -360,7 +361,7 @@ public class ReservationDAO_imple implements ReservationDAO {
 
     // 관리자 화면에 뿌리는 하루치 이벤트 목록 싸그리
     @Override
-    public List<Map<String, String>> selectScheduleBoard(Map<String, String> paraMap) throws Exception {
+    public List<Map<String, String>> selectScheduleBoard(Map<String, String> paraMap) throws SQLException {
 
         List<Map<String, String>> list = new ArrayList<>();
 
@@ -439,7 +440,7 @@ public class ReservationDAO_imple implements ReservationDAO {
 
  // 문자 로그 저장
     @Override
-    public int insertSmsLog(Map<String, String> paraMap) throws Exception {
+    public int insertSmsLog(Map<String, String> paraMap) throws SQLException {
 
         int n = 0;
 
@@ -517,7 +518,7 @@ public class ReservationDAO_imple implements ReservationDAO {
     // 회원예약취소기능
     // paraMap: reservationId, userid
     @Override
-    public int cancelReservationByMember(Map<String, String> paraMap) throws Exception {
+    public int cancelReservationByMember(Map<String, String> paraMap) throws SQLException {
 
         int n = 0;
 
@@ -550,7 +551,7 @@ public class ReservationDAO_imple implements ReservationDAO {
     // 내 예약목록 조회
     // paraMap: userid
     @Override
-    public List<Map<String, String>> selectMyReservations(Map<String, String> paraMap) throws Exception {
+    public List<Map<String, String>> selectMyReservations(Map<String, String> paraMap) throws SQLException {
 
         List<Map<String, String>> list = new ArrayList<>();
 
@@ -600,4 +601,34 @@ public class ReservationDAO_imple implements ReservationDAO {
 
         return list;
     }
+    
+    
+    @Override
+    public String selectStoreTel(String storeId) throws SQLException {
+
+        String tel = "";
+
+        try {
+            conn = ds.getConnection();
+
+            String sql = " select tel "
+                       + " from tbl_map "
+                       + " where storeid = ? ";
+
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, storeId);
+
+            rs = pstmt.executeQuery();
+
+            if(rs.next()) {
+                tel = rs.getString("tel");
+            }
+
+        } finally {
+            close();
+        }
+
+        return tel;
+    }
+
 }

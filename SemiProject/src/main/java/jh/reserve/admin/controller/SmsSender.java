@@ -25,7 +25,8 @@ public class SmsSender {
         HashMap<String, String> paraMap = new HashMap<>();
         paraMap.put("to", toPhone);
         paraMap.put("from", fromPhone);
-        paraMap.put("type", "SMS");
+        paraMap.put("type", "LMS");
+        // 45포인트씩 차감
         paraMap.put("text", text);
         paraMap.put("app_version", "JAVA SDK v2.2");
 

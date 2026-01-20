@@ -162,6 +162,41 @@
   margin-bottom: 18px;
 }
 
+
+.floating-quick{
+  position: fixed;
+  left: 16px;            /* ✅ 좌측으로 */
+  bottom: 110px;         /* ✅ 아래쪽에서 살짝 올림(필요시 조절) */
+  z-index: 900;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ✅ 버튼 폭 확 줄이고, 높이도 살짝 줄임 */
+.floating-btn{
+  width: 120px;          /* ✅ 폭 줄임 */
+  height: 40px;          /* ✅ 살짝 줄임 */
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius: 12px;
+  color:#fff !important;
+  font-weight:900;
+  font-size: 13px;       /* ✅ 글씨 살짝 줄임 */
+  text-decoration:none;
+
+  box-shadow: 0 10px 20px rgba(0,0,0,.18);
+}
+.floating-btn:hover{
+  opacity:.92;
+  transform: translateY(-2px);
+  text-decoration:none;
+}
+
+
   </style>
   
 
@@ -494,6 +529,16 @@
 	      더보기
 	    </a>
 	  </div>
+	  
+	  	<div id="floatButtons" class="floating-quick">
+		  <a href="<%=request.getContextPath()%>/myReservations.sp" class="btn btn-primary floating-btn">
+		    내 예약 확인
+		  </a>
+		
+		  <a href="<%=request.getContextPath()%>/storeLocation2.sp" class="btn btn-primary floating-btn">
+		    매장 소개 및 예약
+		  </a>
+		</div>
 	</div>
 	
 	<%-- ✅ 선글라스 제품 End --%>
@@ -510,6 +555,9 @@
 
     <!-- Back to Top -->
     <a href="/SemiProject/" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
+	
+	
+
 
 
 
@@ -524,6 +572,28 @@ $(document).ready(function(){
   });
 
 });
+
+(() => {
+  const btn = document.getElementById('floatButtons');
+  if (!btn) return;
+
+  const L = 40, B = 40, G = 10;
+  const footer = document.querySelector('footer, #footer, .container-fluid.border-top.mt-5');
+
+  const update = () => {
+    btn.style.left = L + "px";
+    if (!footer) return btn.style.bottom = B + "px";
+
+    const overlap = innerHeight - footer.getBoundingClientRect().top;
+    btn.style.bottom = (overlap > 0 ? B + overlap + G : B) + "px";
+  };
+
+  addEventListener("load", update);
+  addEventListener("scroll", update, { passive: true });
+  addEventListener("resize", update);
+})();
+
+
 </script>
 </body>
 
