@@ -23,14 +23,16 @@
     .btn-post { background:#f8f8f8; border:1px solid #ddd; border-radius:0; font-size:13px; padding:0 15px; }
     
     /* 추가 배송지 아이템 스타일 */
-    .addr-item { border: 1px solid #eee; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-    .addr-info { font-size: 13px; line-height: 1.6; }
+    .addr-item { border: 1px solid #eee; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.2s; }
+    .addr-item:hover { background-color: #f9f9f9; border-color: #333; }
+    .addr-info { font-size: 13px; line-height: 1.6; flex-grow: 1; }
     .btn-add-addr { border: 1px solid #000; background: #fff; font-size: 12px; font-weight: bold; padding: 5px 12px; cursor: pointer; }
 	
 	.section-title::after, 
     .section-title::before {
-        content: none !important; /* 내용 삭제 */
-        display: none !important; /* 공간 삭제 */
+        content: none !important;
+        display: none !important;
+    }
 </style>
 
 <div class="container">
@@ -75,25 +77,26 @@
                     </div>
                 </div>
                 <input type="text" name="address" id="address" class="form-control mb-2" value="${sessionScope.loginuser.address}" readonly>
-                <input type="text" name="detailaddress" class="form-control mb-2" value="${sessionScope.loginuser.detailaddress}" placeholder="상세주소">
-                <input type="text" name="extraaddress" class="form-control" value="${sessionScope.loginuser.extraaddress}" placeholder="참고항목">
+                <input type="text" name="detailaddress" id="detailaddress" class="form-control mb-2" value="${sessionScope.loginuser.detailaddress}" placeholder="상세주소">
+                <input type="text" name="extraaddress" id="extraaddress" class="form-control" value="${sessionScope.loginuser.extraaddress}" placeholder="참고항목">
             </div>
 
             <div class="section-title d-flex justify-content-between align-items-center">
                 <span>ADDITIONAL ADDRESSES</span>
-                <button type="button" class="btn-add-addr" onclick="openAddrModal()">+ ADD NEW</button>
+                <button type="button" class="btn-add-addr" onclick="saveCurrentAddress()">+ ADD NEW</button>
             </div>
             
             <div id="extraAddressList" class="mb-5">
                 <c:choose>
                     <c:when test="${not empty addressList}">
                         <c:forEach var="addr" items="${addressList}">
-                            <div class="addr-item">
+                            <div class="addr-item" onclick="selectAddress('${addr.postcode}', '${addr.address}', '${addr.detailaddress}', '${addr.extraaddress}')">
                                 <div class="addr-info">
                                     <strong>[${addr.postcode}]</strong> ${addr.address}<br>
                                     ${addr.detailaddress} ${addr.extraaddress}
                                 </div>
-                                <button type="button" class="btn btn-sm btn-outline-danger" style="border-radius:0;" onclick="deleteAddress(${addr.addr_id})">DEL</button>
+                                <button type="button" class="btn btn-sm btn-outline-danger" style="border-radius:0;" 
+                                        onclick="event.stopPropagation(); deleteAddress(${addr.addrId})">DEL</button>
                             </div>
                         </c:forEach>
                     </c:when>
@@ -132,35 +135,6 @@
     </div>
 </div>
 
-<div class="modal fade" id="addrModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border-radius:0;">
-            <div class="modal-header border-0">
-                <h6 class="modal-title font-weight-bold">새 배송지 추가</h6>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="addAddrFrm">
-                    <div class="form-group">
-                        <div class="input-group mb-2">
-                            <input type="text" id="new_postcode" class="form-control" placeholder="우편번호" readonly>
-                            <div class="input-group-append">
-                                <button type="button" class="btn btn-post" onclick="execDaumPostcode('new_postcode', 'new_address')">찾기</button>
-                            </div>
-                        </div>
-                        <input type="text" id="new_address" class="form-control mb-2" placeholder="기본주소" readonly>
-                        <input type="text" id="new_detailaddress" class="form-control mb-2" placeholder="상세주소">
-                        <input type="text" id="new_extraaddress" class="form-control" placeholder="참고항목">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer border-0">
-                <button type="button" class="btn btn-black" onclick="saveNewAddress()">저장</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <jsp:include page="../footer.jsp" />
 
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
@@ -168,27 +142,59 @@
 <script src="<%=ctxPath%>/bootstrap-4.6.2-dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-// 1. 주소 검색 (공통 사용)
+// 1. 카카오 주소 API 호출
 function execDaumPostcode(postid, addrid) {
     new daum.Postcode({
         oncomplete: function(data) {
             document.getElementById(postid).value = data.zonecode;
             document.getElementById(addrid).value = data.roadAddress;
-            if(postid === 'new_postcode') document.getElementById('new_detailaddress').focus();
+            document.getElementById('detailaddress').focus();
         }
     }).open();
 }
 
-// 2. 추가 배송지 저장 (Ajax)
-function saveNewAddress() {
+//2. 현재 상단 필드에 적힌 주소를 DB에 저장하고 목록에 추가
+function saveCurrentAddress() {
     const postData = {
-        postcode: $('#new_postcode').val(),
-        address: $('#new_address').val(),
-        detailaddress: $('#new_detailaddress').val(),
-        extraaddress: $('#new_extraaddress').val()
+        postcode: $('#postcode').val(),
+        address: $('#address').val(),
+        detailaddress: $('#detailaddress').val(),
+        extraaddress: $('#extraaddress').val()
     };
 
-    if(!postData.postcode) { alert("주소를 검색해주세요."); return; }
+    // [검증 1] 필수 입력 체크
+    if(!postData.postcode || !postData.address) {
+        alert("먼저 '주소검색'을 통해 주소를 입력해주세요.");
+        return;
+    }
+
+    // [검증 2] 중복 체크 (프론트엔드)
+    let isDuplicate = false;
+    $('.addr-item').each(function() {
+        const existingText = $(this).find('.addr-info').text();
+        // 목록에 있는 우편번호와 주소, 상세주소를 합쳐서 비교
+        if (existingText.includes(postData.postcode) && 
+            existingText.includes(postData.address) && 
+            existingText.includes(postData.detailaddress)) {
+            isDuplicate = true;
+            return false; // each 반복문 탈출
+        }
+    });
+
+    if (isDuplicate) {
+        alert("이미 추가 배송지 목록에 등록된 주소입니다.");
+        return;
+    }
+
+    // [검증 3] 기본 주소와 중복되는지 체크 (옵션: 필요 시 사용)
+    /*
+    if (postData.postcode === "${sessionScope.loginuser.postcode}" && 
+        postData.address === "${sessionScope.loginuser.address}" &&
+        postData.detailaddress === "${sessionScope.loginuser.detailaddress}") {
+        alert("현재 기본 배송지로 등록된 주소입니다.");
+        return;
+    }
+    */
 
     $.ajax({
         url: "<%=ctxPath%>/js_member/addAddress.sp",
@@ -197,66 +203,74 @@ function saveNewAddress() {
         dataType: "json",
         success: function(json) {
             if(json.success) {
-                // 1. 새로운 주소 아이템 HTML 생성
+                // 저장 성공 시 리스트에 동적으로 추가
                 let newAddrHtml = `
-                    <div class="addr-item">
+                    <div class="addr-item" onclick="selectAddress('\${postData.postcode}', '\${postData.address}', '\${postData.detailaddress}', '\${postData.extraaddress}')">
                         <div class="addr-info">
                             <strong>[\${postData.postcode}]</strong> \${postData.address}<br>
                             \${postData.detailaddress} \${postData.extraaddress}
                         </div>
                         <button type="button" class="btn btn-sm btn-outline-danger" 
-                                style="border-radius:0;" onclick="deleteAddress(\${json.new_addr_id})">DEL</button>
+                                style="border-radius:0;" onclick="event.stopPropagation(); deleteAddress(\${json.new_addr_id})">DEL</button>
                     </div>`;
 
-                // 2. 리스트 영역에 추가 (비어있을 때 나오던 안내 문구는 삭제)
                 if($('#extraAddressList p.guide-text').length > 0) {
                     $('#extraAddressList').empty();
                 }
+                
                 $('#extraAddressList').append(newAddrHtml);
-
-                // 3. 모달 닫기 및 초기화
-                $('#addrModal').modal('hide');
-                alert("배송지가 추가되었습니다.");
+                alert("현재 주소가 목록에 추가되었습니다.");
+            } else {
+                alert("저장 실패: " + (json.message || "이미 등록된 주소이거나 오류가 발생했습니다."));
             }
         },
-        error: function() { alert("저장 중 오류가 발생했습니다."); }
+        error: function() {
+            alert("서버 통신 중 오류가 발생했습니다.");
+        }
     });
 }
 
-// 3. 배송지 삭제 (Ajax)
+// 3. 목록의 주소를 클릭하면 다시 상단 입력칸으로 복사
+function selectAddress(postcode, address, detail, extra) {
+    $('#postcode').val(postcode);
+    $('#address').val(address);
+    $('#detailaddress').val(detail);
+    $('#extraaddress').val(extra);
+    
+    alert("선택한 주소가 상단 필드에 반영되었습니다.");
+    window.scrollTo({ top: 300, behavior: 'smooth' });
+}
+
+// 4. 배송지 삭제
 function deleteAddress(addr_id) {
     if(!confirm("해당 배송지를 삭제하시겠습니까?")) return;
 
     $.ajax({
         url: "<%=ctxPath%>/js_member/deleteAddress.sp",
         type: "POST",
-        data: { "addr_id": addr_id },
+        data: { "addr_id": addr_id }, 
         dataType: "json",
         success: function(json) {
             if(json.success) {
                 location.reload();
+            } else {
+                alert(json.errorMsg || "삭제할 수 없습니다. (이미 주문에 사용된 주소일 수 있습니다.)");
             }
+        },
+        error: function() {
+            alert("삭제 처리 중 오류가 발생했습니다.");
         }
     });
 }
 
-// 4. 모달 열기
-function openAddrModal() {
-    $('#addAddrFrm')[0].reset();
-    $('#addrModal').modal('show');
-}
-
-// 5. 프로필 수정 제출
+// 5. 전체 정보 수정 제출
 function goEdit() {
     const frm = document.editFrm;
+    if (frm.name.value.trim() === "") { alert("성함을 입력하세요."); return; }
+    
     const newPwd = frm.new_passwd.value.trim();
     const newPwdConfirm = frm.new_passwd_confirm.value.trim();
-
-    if (newPwd !== "" || newPwdConfirm !== "") {
-        if (newPwd !== newPwdConfirm) { alert("비밀번호가 일치하지 않습니다."); return; }
-        if (newPwd.length < 8) { alert("비밀번호는 8자 이상이어야 합니다."); return; }
-    }
-    if (frm.name.value.trim() === "") { alert("성함을 입력하세요."); return; }
+    if (newPwd !== "" && newPwd !== newPwdConfirm) { alert("비밀번호가 일치하지 않습니다."); return; }
 
     frm.submit();
 }
