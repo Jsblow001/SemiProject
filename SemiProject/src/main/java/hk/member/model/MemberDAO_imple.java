@@ -1304,7 +1304,7 @@ public class MemberDAO_imple implements MemberDAO {
 	                   + "   point, registerday, lastpwdchangedate, status, grade_code, idle) "
 	                   + " VALUES "
 	                   + " (?, ?, ?, ?, ?, ?, ?, ?, ?, "
-	                   + "   0, SYSDATE, SYSDATE, 1, '1', 0) ";
+	                   + "  5000, SYSDATE, SYSDATE, 1, '1', 0) ";
 
 	        pstmt = conn.prepareStatement(sql);
 
