@@ -44,7 +44,7 @@ public class ReservationSlotsController extends AbstractController {
         if(reason == null || reason.isBlank()) reason = "VISION";
         reason = reason.trim().toUpperCase();
 
-        int durationMin = ("FITTING".equals(reason)) ? 60 : 30;
+        int durationMin = ("FULLSERVICE".equals(reason)) ? 60 : 30;
 
         // 영업시간
         LocalTime open = LocalTime.of(11, 0);

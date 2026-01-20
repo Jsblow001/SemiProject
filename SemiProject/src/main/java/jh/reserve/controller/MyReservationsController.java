@@ -23,7 +23,7 @@ public class MyReservationsController extends AbstractController {
         MemberDTO loginuser = (MemberDTO) session.getAttribute("loginuser");
 
         if(loginuser == null) {
-            request.setAttribute("message", "로그인 후 이용 가능합니다.");
+            request.setAttribute("message", "로그인 후 이용 가능합니다. 비회원 예약확인/변경은 예약하신 매장에 문의 부탁드립니다!");
             request.setAttribute("loc", request.getContextPath() + "/loginSelect.sp");
             super.setRedirect(false);
             super.setViewPage("/WEB-INF/msg.jsp");
