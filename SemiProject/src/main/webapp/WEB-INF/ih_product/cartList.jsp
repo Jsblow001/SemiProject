@@ -72,7 +72,11 @@
                                             <div class="d-flex align-items-center">
                                                 <button class="btn btn-sm btn-light border" 
                                                         onclick="updateQty('${cart.cart_id}', -1, '${pageContext.request.contextPath}')">-</button>
-                                                <input type="text" class="qty-input mx-2" value="${cart.cart_qty}" readonly>
+                                                <input type="text" class="qty-input mx-2" 
+												       id="qty_${cart.cart_id}" 
+												       value="${cart.cart_qty}" 
+												       data-stock="${cart.pdto.stock}" 
+												       style="width: 40px; text-align: center;" readonly>
                                                 <button class="btn btn-sm btn-light border" 
                                                         onclick="updateQty('${cart.cart_id}', 1, '${pageContext.request.contextPath}')">+</button>
                                             </div>
