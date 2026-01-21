@@ -65,7 +65,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="card revenue-card p-4">
-                        <div class="revenue-label text-success font-weight-bold">인기 상품 (Best)</div>
+                        <div class="revenue-label text-success font-weight-bold">인기 상품(전체 기간)</div>
                         <div id="bestSellerName" class="revenue-value" style="font-size: 1.2rem; color: #28a745;">
                             데이터 로딩 중...
                         </div>
