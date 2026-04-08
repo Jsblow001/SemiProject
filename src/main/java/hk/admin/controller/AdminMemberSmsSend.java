@@ -18,10 +18,10 @@ public class AdminMemberSmsSend extends AbstractController {
 	    //   HashMap 에 받는사람번호, 보내는사람번호, 문자내용 등 을 저장한뒤 Coolsms 클래스의 send를 이용해 보냅니다.
 	         
 	    //   String api_key = "발급받은 본인의 API Key";  // 발급받은 본인 API Key
-		String api_key = "NCSKSXJ1S7X4BSFB";
+		String api_key = "NCSGFSK4H0FZ9X0F";
 		
 		// String api_secret = "발급받은 본인의 API Secret";  // 발급받은 본인 API Secret
-		String api_secret = "G6ZSVCJAAXIARC4EGOJM4D2HVKWKJKMG";
+		String api_secret = "NEBBQQPYYD6X7LH3FCYEOV0WPCDNS03O";
 		
 		Message coolsms = new Message(api_key, api_secret);
 	    // net.nurigo.java_sdk.api.Message 임.  (import)

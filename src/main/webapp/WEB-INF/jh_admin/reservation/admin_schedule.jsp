@@ -129,7 +129,7 @@
     	  if (memo == null) return; // 취소
 
     	  $.ajax({
-    	    url: "<%=ctxPath%>/admin/blockSlot.sp",   
+    	    url: "<%=ctxPath%>/admin/blockSlot.sp",   // ✅ 너 매핑에 맞게 수정
     	    type: "POST",
     	    dataType: "json",
     	    data: {

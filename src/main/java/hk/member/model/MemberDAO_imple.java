@@ -26,10 +26,6 @@ import sp.util.security.Sha256;
  * - Tomcat DBCP(DataSource) 사용
  * - 비밀번호 : SHA-256
  * - 이메일/휴대폰 : AES256
- *
- *   현재 상태
- *   - 로그인 : 정상
- *   - 회원가입 : 정상
  */
 public class MemberDAO_imple implements MemberDAO {
 
@@ -67,10 +63,8 @@ public class MemberDAO_imple implements MemberDAO {
         }
     }
 
-    
- // ======================================================
+     
  // 회원가입 (TBL_MEMBER + TBL_ADDRESS 동시 처리)
- // ======================================================
  @Override
  public int registerMember(MemberDTO member, AddressDTO address) throws SQLException {
 
@@ -145,12 +139,8 @@ public class MemberDAO_imple implements MemberDAO {
 
      return result;
  }
-
-
     
-    // ======================================================
-    // 이메일 중복검사 
-    // ======================================================
+    // 아이디 중복검사 
 	@Override
 	public boolean isUseridExists(String userid) throws SQLException {
 		  boolean result = false;
@@ -177,7 +167,9 @@ public class MemberDAO_imple implements MemberDAO {
 		    return result;
 	}
 
-    
+	
+	// -------------------------------------------------------------------- //  
+	// 로그인
 	@Override
 	public MemberDTO login(Map<String, String> paraMap) throws SQLException {
 
@@ -312,11 +304,169 @@ public class MemberDAO_imple implements MemberDAO {
 	    return member;
 	}
 
-    
-    
-    // ======================================================
+	
+	// 네이버/카카오 로그인 시 회원조회
+		@Override
+		public MemberDTO getMemberByUserid(String userid) throws SQLException {
+
+		    MemberDTO member = null;
+
+		    try {
+		        conn = ds.getConnection();
+
+		        String sql = " SELECT member_id, name, email, mobile, postcode, address, detailaddress, extraaddress, "
+		                   + "        gender, birthday, point, status, registerday, grade_code, idle "
+		                   + " FROM tbl_member "
+		                   + " WHERE member_id = ? ";
+
+		        pstmt = conn.prepareStatement(sql);
+		        pstmt.setString(1, userid);
+
+		        rs = pstmt.executeQuery();
+
+		        if(rs.next()) {
+		            member = new MemberDTO();
+
+		            member.setUserid(rs.getString("member_id"));
+		            member.setName(rs.getString("name"));
+
+		            member.setEmail(aes.decrypt(rs.getString("email")));
+		            member.setMobile(aes.decrypt(rs.getString("mobile")));
+
+		            member.setPostcode(rs.getString("postcode"));
+		            member.setAddress(rs.getString("address"));
+		            member.setDetailaddress(rs.getString("detailaddress"));
+		            member.setExtraaddress(rs.getString("extraaddress"));
+
+		            member.setGender(rs.getString("gender"));
+		            member.setBirthday(rs.getString("birthday"));
+		            member.setPoint(rs.getInt("point"));
+
+		            member.setStatus(rs.getInt("status"));
+		            member.setRegisterday(rs.getString("registerday"));
+		            member.setGrade_code(rs.getString("grade_code"));
+		            member.setIdle(rs.getInt("idle"));
+		        }
+
+		    } catch(Exception e) {
+		        e.printStackTrace();
+		    } finally {
+		        close();
+		    }
+
+		    return member;
+		}
+		
+		
+		// 네이버/카카오 로그인 시 임시 회원 생성
+		@Override
+		public int insertSocialTempMember(String userid, String name, String email, String mobile) throws SQLException {
+
+		    int n = 0;
+
+		    try {
+		        conn = ds.getConnection();
+
+		        // ★ 무조건 고유 이메일로 박기 (UQ_EMAIL 절대 안 터짐)
+		        String finalEmail = userid + "@social.local";
+
+		        String sql = " INSERT INTO tbl_member "
+		                   + " (member_id, name, passwd, email, mobile, postcode, address, detailaddress, extraaddress, "
+		                   + "   point, registerday, lastpwdchangedate, status, grade_code, idle) "
+		                   + " VALUES "
+		                   + " (?, ?, ?, ?, ?, ?, ?, ?, ?, "
+		                   + "  5000, SYSDATE, SYSDATE, 1, '1', 0) ";
+
+		        pstmt = conn.prepareStatement(sql);
+
+		        pstmt.setString(1, userid);
+		        pstmt.setString(2, (name == null || name.trim().isEmpty()) ? "소셜회원" : name.trim());
+		        pstmt.setString(3, Sha256.encrypt("SOCIAL_LOGIN_" + userid));
+
+		        pstmt.setString(4, aes.encrypt(finalEmail)); // ★ 핵심
+		        pstmt.setString(5, aes.encrypt(mobile == null ? "" : mobile));
+
+		        pstmt.setString(6, "00000");
+		        pstmt.setString(7, "소셜로그인");
+		        pstmt.setString(8, "추가입력필요");
+		        pstmt.setString(9, "");
+
+		        n = pstmt.executeUpdate();
+
+		    } catch(Exception e) {
+		        e.printStackTrace();
+		    } finally {
+		        close();
+		    }
+
+		    return n;
+		}
+
+			
+		// 네이버/카카오 로그인 시 임시 회원 생성 후 추가 정보 업데이트
+		@Override
+		public int updateSocialExtraInfo(String userid, String name, String gender, String birthday,
+		                                 String postcode, String address, String detailaddress, String extraaddress) throws SQLException {
+
+		    int n = 0;
+
+		    try {
+		        conn = ds.getConnection();
+
+		        String sql = " UPDATE tbl_member "
+		                   + " SET name = ?, "
+		                   + "     gender = ?, "
+		                   + "     birthday = ?, "
+		                   + "     postcode = ?, "
+		                   + "     address = ?, "
+		                   + "     detailaddress = ?, "
+		                   + "     extraaddress = ? "
+		                   + " WHERE member_id = ? ";
+
+		        pstmt = conn.prepareStatement(sql);
+
+		        // name (필수)
+		        pstmt.setString(1, name);
+
+		        // gender (M/F/NULL)
+		        if(gender == null || gender.trim().isEmpty()) {
+		            pstmt.setNull(2, java.sql.Types.VARCHAR);
+		        }
+		        else {
+		            pstmt.setString(2, gender);
+		        }
+
+		        // birthday (YYYY-MM-DD or NULL)
+		        if(birthday == null || birthday.trim().isEmpty()) {
+		            pstmt.setNull(3, java.sql.Types.VARCHAR);
+		        }
+		        else {
+		            pstmt.setString(3, birthday);
+		        }
+
+		        // 주소들
+		        pstmt.setString(4, postcode);
+		        pstmt.setString(5, address);
+		        pstmt.setString(6, detailaddress);
+		        pstmt.setString(7, extraaddress == null ? "" : extraaddress);
+
+		        // where
+		        pstmt.setString(8, userid);
+
+		        n = pstmt.executeUpdate();
+
+		    } catch(Exception e) {
+		        e.printStackTrace();
+		    } finally {
+		        close();
+		    }
+
+		    return n;
+		}
+
+		
+    // -------------------------------------------------------------------- //   
     // 아이디 찾기
-    // ======================================================
     @Override
     public String findUseridByNameEmail(String name, String email) {
 
@@ -349,10 +499,8 @@ public class MemberDAO_imple implements MemberDAO {
         return userid;
     }
 
-    
-    // ======================================================
+
     // 비밀번호 찾기 (회원 존재 여부)
-    // ======================================================
     @Override
     public boolean isUserExistsForPwd(String userid, String email) {
 
@@ -383,9 +531,7 @@ public class MemberDAO_imple implements MemberDAO {
     }
 
     
-    // ======================================================
     // 비밀번호 찾기 후 비밀번호 업데이트
-    // ======================================================
     @Override
     public boolean updatePassword(String userid, String passwd) {
 
@@ -399,7 +545,7 @@ public class MemberDAO_imple implements MemberDAO {
                        + " WHERE MEMBER_ID = ? ";
 
             pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, Sha256.encrypt(passwd)); //  암호화 통일
+            pstmt.setString(1, Sha256.encrypt(passwd)); //  단방향 암호화
             pstmt.setString(2, userid);
 
             int n = pstmt.executeUpdate();
@@ -414,11 +560,9 @@ public class MemberDAO_imple implements MemberDAO {
         return result;
     }
 
-    
-    
-    // ===============================
+      
+    // -------------------------------------------------------------------- //  
     // 회원정보 수정
-    // ===============================
     @Override
     public int updateMember(MemberDTO member) throws SQLException {
 
@@ -456,9 +600,8 @@ public class MemberDAO_imple implements MemberDAO {
 
     
     
-    // ===============================
+    // -------------------------------------------------------------------- //  
     // 회원 탈퇴 (status = 0)
-    // ===============================
     @Override
 	public int withdrawMember(String userid) throws SQLException {
     	
@@ -488,9 +631,11 @@ public class MemberDAO_imple implements MemberDAO {
 
     
     
-    // ===============================
+    // ==============================================================- //  
     // 관리자 페이지 內 회원 요약 데이터 조회 - 전체회원 수
     // ===============================
+    // 수동으로 자원을 열고 close()하는 기존 JDBC 방식과 달리  
+    // getTotalMemberCount는 try-with-resources로 자원을 자동 관리하는 최신/안전한 방식
     @Override
 	public int getTotalMemberCount() throws SQLException {
     	
@@ -565,9 +710,7 @@ public class MemberDAO_imple implements MemberDAO {
 	    }
 	}
 
-    
-    
-    
+       
     // ===============================
     // 관리자 페이지 內 회원 전체 목록 조회
     // ===============================
@@ -580,11 +723,12 @@ public class MemberDAO_imple implements MemberDAO {
 	         conn = ds.getConnection();
 	
 	         String sql =
-	                 " SELECT MEMBER_ID, name, gender, email, registerday, status, idle, admin_memo " +
-	                 " FROM tbl_member " +
-	                 " WHERE MEMBER_ID != 'admin' " +
-	                 " ORDER BY registerday DESC " +
-	                 " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY ";
+	        		    " SELECT MEMBER_ID, name, gender, email, registerday, status, idle, admin_memo " +
+	        		    " FROM tbl_member " +
+	        		    " WHERE MEMBER_ID != 'admin' " +
+	        		    " ORDER BY registerday DESC, member_id DESC " +  
+	        		    " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY ";
+
 	
 	         pstmt = conn.prepareStatement(sql);
 	         pstmt.setInt(1, startRno - 1);
@@ -621,110 +765,7 @@ public class MemberDAO_imple implements MemberDAO {
 	     return memberList;
 	 }
 
-	// ======================================================
-	// 관리자 페이지 內 메인 페이지 -  회원 요약 데이터 (오늘 회원가입 수)
-	// ======================================================
-	 @Override
-	 public int getTodayRegisterCount() throws SQLException {
-
-	     int count = 0;
-
- 	     try {
-	        conn = ds.getConnection();
-
-	        String sql = " SELECT COUNT(*) "
-	                   + " FROM tbl_member "
-	                   + " WHERE TRUNC(registerday) = TRUNC(SYSDATE) ";
-
-	        pstmt = conn.prepareStatement(sql);
-	        rs = pstmt.executeQuery();
-
-	        if (rs.next()) {
-	            count = rs.getInt(1);
-	        }
-	     }
-	     finally {
-	        close();
-	     }
-
-	     return count;
-	 }
-
-	 
-	 
-	// ======================================================
-	// 관리자 페이지 內 최근 7일 가입자 수 (합계)
-	// ======================================================
-	 @Override
-	 public int getLast7DaysRegisterCount() throws SQLException {
-		 
-		 int count = 0;
-
-		    try {
-		        conn = ds.getConnection();
-
-		        String sql = " SELECT COUNT(*) "
-		                   + " FROM tbl_member "
-		                   + " WHERE member_id != 'admin' "
-		                   + "   AND registerday >= TRUNC(SYSDATE) - 6 ";
-
-		        pstmt = conn.prepareStatement(sql);
-		        rs = pstmt.executeQuery();
-
-		        if (rs.next()) {
-		            count = rs.getInt(1);
-		        }
-		    }
-		    catch (Exception e) {
-		        e.printStackTrace();
-		    }
-		    finally {
-		        close();
-		    }
-
-		    return count;
-	}
-	 
-	 
-	 
-	// ======================================================
-	// 관리자 페이지 內 최근 7일 날짜별 가입자 수 (그래프)
-	// ======================================================
-	 @Override
-		public List<Map<String, Object>> getLast7DaysRegisterList() throws SQLException {
-		 List<Map<String, Object>> list = new ArrayList<>();
-
-		    try {
-		        conn = ds.getConnection();
-
-		        String sql =
-		              " SELECT TO_CHAR(registerday, 'MM-DD') AS reg_date "
-		            + "      , COUNT(*) AS cnt "
-		            + " FROM tbl_member "
-		            + " WHERE registerday >= TRUNC(SYSDATE) - 6 "
-		            + "   AND status = 1 "
-		            + " GROUP BY TO_CHAR(registerday, 'MM-DD') "
-		            + " ORDER BY reg_date ";
-
-		        pstmt = conn.prepareStatement(sql);
-		        rs = pstmt.executeQuery();
-
-		        while (rs.next()) {
-		            Map<String, Object> map = new HashMap<>();
-		            map.put("date", rs.getString("reg_date"));
-		            map.put("count", rs.getInt("cnt"));
-
-		            list.add(map);
-		        }
-		    }
-		    finally {
-		        close();
-		    }
-
-		    return list;
-		}
-	 
-	 
+	 	 
 	// ======================================================
 	// 관리자 페이지 內 회원 검색 조회
 	// ======================================================
@@ -782,8 +823,175 @@ public class MemberDAO_imple implements MemberDAO {
 
 		    return memberList;
 	}
-
 	
+	
+	// ======================================================
+		// 관리자 페이지 內 회원 상세 조회
+		// (입력받은 userid 를 가지고 한명의 회원정보를 가져오기)
+		// ======================================================
+		@Override
+		public MemberDTO selectOneMember(String userid) {
+
+		    MemberDTO member = null;
+
+		    try {
+		        conn = ds.getConnection();
+
+		        String sql = 
+		            " SELECT m.member_id, "
+		            + "       m.name, "
+		            + "       m.gender, "
+		            + "       m.email, "
+		            + "       m.mobile, "
+		            + "       m.registerday, "
+		            + "       m.status, "
+		            + "       m.point,  "
+		            + "       m.grade_code, "
+		            + "       m.admin_memo, "
+		            + "       TO_CHAR(m.memo_updatedate, 'yyyy-mm-dd hh24:mi:ss') AS memo_updatedate, "
+		            + "       g.grade_name "
+		            + " FROM tbl_member m "
+		            + " JOIN tbl_grade g ON m.grade_code = g.grade_code "
+		            + " WHERE m.member_id = ? ";
+
+		        pstmt = conn.prepareStatement(sql);
+		        pstmt.setString(1, userid);
+
+		        rs = pstmt.executeQuery();
+
+		        if (rs.next()) {
+
+		            member = new MemberDTO();
+
+		            member.setUserid(rs.getString("member_id"));
+		            member.setName(rs.getString("name"));
+		            member.setGender(rs.getString("gender"));             // 1 / 2 / null
+		            member.setEmail(aes.decrypt(rs.getString("email")));  // 이메일 복호화
+		            member.setMobile(aes.decrypt(rs.getString("mobile")));
+		            member.setRegisterday(rs.getString("registerday"));
+		            member.setStatus(rs.getInt("status"));               // 1:정상 / 0:탈퇴
+		        
+		            // 추가(등급)
+		            member.setGrade_code(rs.getString("grade_code"));
+		            member.setGrade_name(rs.getString("grade_name"));
+		            
+		            member.setAdmin_memo(rs.getString("admin_memo"));
+		            member.setMemo_updatedate(rs.getString("memo_updatedate"));
+		            
+		            member.setPoint(rs.getInt("Point"));
+
+		        }
+
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		    } finally {
+		        close();
+		    }
+
+		    return member;
+		} 
+	 
+	// ======================================================
+	// 관리자 페이지 內 메인 페이지 -  회원 요약 데이터 (오늘 회원가입 수)
+	// ======================================================
+	 @Override
+	 public int getTodayRegisterCount() throws SQLException {
+
+	     int count = 0;
+
+ 	     try {
+	        conn = ds.getConnection();
+
+	        String sql = " SELECT COUNT(*) "
+	                   + " FROM tbl_member "
+	                   + " WHERE TRUNC(registerday) = TRUNC(SYSDATE) ";
+
+	        pstmt = conn.prepareStatement(sql);
+	        rs = pstmt.executeQuery();
+
+	        if (rs.next()) {
+	            count = rs.getInt(1);
+	        }
+	     }
+	     finally {
+	        close();
+	     }
+
+	     return count;
+	 }
+
+	 
+	// ======================================================
+	// 관리자 페이지 內 최근 7일 가입자 수 (합계)
+	// ======================================================
+	 @Override
+	 public int getLast7DaysRegisterCount() throws SQLException {
+		 
+		 int count = 0;
+
+		    try {
+		        conn = ds.getConnection();
+
+		        String sql = " SELECT COUNT(*) "
+		                   + " FROM tbl_member "
+		                   + " WHERE member_id != 'admin' "
+		                   + "   AND registerday >= TRUNC(SYSDATE) - 6 ";
+
+		        pstmt = conn.prepareStatement(sql);
+		        rs = pstmt.executeQuery();
+
+		        if (rs.next()) {
+		            count = rs.getInt(1);
+		        }
+		    }
+		    catch (Exception e) {
+		        e.printStackTrace();
+		    }
+		    finally {
+		        close();
+		    }
+
+		    return count;
+	}
+	 
+	 	 
+	// ======================================================
+	// 관리자 페이지 內 최근 7일 날짜별 가입자 수 가져오기 (그래프)
+	// ======================================================
+	 @Override
+		public List<Map<String, Object>> getLast7DaysRegisterList() throws SQLException {
+		 List<Map<String, Object>> list = new ArrayList<>();
+
+		    try {
+		        conn = ds.getConnection();
+
+		        String sql =
+		              " SELECT TO_CHAR(registerday, 'MM-DD') AS reg_date "
+		            + "      , COUNT(*) AS cnt "
+		            + " FROM tbl_member "
+		            + " WHERE registerday >= TRUNC(SYSDATE) - 6 "
+		            + "   AND status = 1 "
+		            + " GROUP BY TO_CHAR(registerday, 'MM-DD') "
+		            + " ORDER BY reg_date ";
+
+		        pstmt = conn.prepareStatement(sql);
+		        rs = pstmt.executeQuery();
+
+		        while (rs.next()) {
+		            Map<String, Object> map = new HashMap<>();
+		            map.put("date", rs.getString("reg_date"));
+		            map.put("count", rs.getInt("cnt"));
+
+		            list.add(map);
+		        }
+		    }
+		    finally {
+		        close();
+		    }
+
+		    return list;
+		}
+		
 	
 	// ======================================================
 	// 관리자 페이지 內 최근 가입 회원 TOP N
@@ -825,7 +1033,6 @@ public class MemberDAO_imple implements MemberDAO {
 
 	    return memberList;
 	}
-
 	
 	
 	// ======================================================
@@ -863,10 +1070,9 @@ public class MemberDAO_imple implements MemberDAO {
 		    return list;
 	}
 
-	
-	
+		
 	// ======================================================
-	// 관리자 페이지 內 등급별 회원수
+	// 관리자 페이지 內 등급별 성별회원수
 	// ======================================================
 	@Override
 	public List<MemberCountDTO> getGenderCountList() throws SQLException {
@@ -899,76 +1105,6 @@ public class MemberDAO_imple implements MemberDAO {
 	    return list;
 	}
 
-	
-	
-	
-	// ======================================================
-	// 관리자 페이지 內 회원 상세 조회
-	// (입력받은 userid 를 가지고 한명의 회원정보를 가져오기)
-	// ======================================================
-	@Override
-	public MemberDTO selectOneMember(String userid) {
-
-	    MemberDTO member = null;
-
-	    try {
-	        conn = ds.getConnection();
-
-	        String sql = 
-	            " SELECT m.member_id, "
-	            + "       m.name, "
-	            + "       m.gender, "
-	            + "       m.email, "
-	            + "       m.mobile, "
-	            + "       m.registerday, "
-	            + "       m.status, "
-	            + "       m.point,  "
-	            + "       m.grade_code, "
-	            + "       m.admin_memo, "
-	            + "       TO_CHAR(m.memo_updatedate, 'yyyy-mm-dd hh24:mi:ss') AS memo_updatedate, "
-	            + "       g.grade_name "
-	            + " FROM tbl_member m "
-	            + " JOIN tbl_grade g ON m.grade_code = g.grade_code "
-	            + " WHERE m.member_id = ? ";
-
-	        pstmt = conn.prepareStatement(sql);
-	        pstmt.setString(1, userid);
-
-	        rs = pstmt.executeQuery();
-
-	        if (rs.next()) {
-
-	            member = new MemberDTO();
-
-	            member.setUserid(rs.getString("member_id"));
-	            member.setName(rs.getString("name"));
-	            member.setGender(rs.getString("gender"));             // 1 / 2 / null
-	            member.setEmail(aes.decrypt(rs.getString("email")));  // 이메일 복호화
-	            member.setMobile(aes.decrypt(rs.getString("mobile")));
-	            member.setRegisterday(rs.getString("registerday"));
-	            member.setStatus(rs.getInt("status"));               // 1:정상 / 0:탈퇴
-	        
-	            // 추가(등급)
-	            member.setGrade_code(rs.getString("grade_code"));
-	            member.setGrade_name(rs.getString("grade_name"));
-	            
-	            member.setAdmin_memo(rs.getString("admin_memo"));
-	            member.setMemo_updatedate(rs.getString("memo_updatedate"));
-	            
-	            member.setPoint(rs.getInt("Point"));
-
-	        }
-
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    } finally {
-	        close();
-	    }
-
-	    return member;
-	}
-
-	
 	
 	// 관리자 페이지 內 회원 더미 50명 추가
 	// 관리자 페이지 內 회원 더미 count명 추가
@@ -1029,8 +1165,9 @@ public class MemberDAO_imple implements MemberDAO {
 	            String mobile = "010" + String.format("%08d", (int)(Math.random() * 100000000));
 
 	            // 7) 포인트 / 등급 / 상태
-	            int point = (int)(Math.random() * 20001);
-
+	            //int point = (int)(Math.random() * 20001);
+	            int point = 5000;  // 5000포인트로 변경
+	            
 	            String grade;
 	            double r = Math.random();
 	            if (r < 0.80) grade = "1";      // 일반
@@ -1098,10 +1235,7 @@ public class MemberDAO_imple implements MemberDAO {
 	    }
 
 	    return success;
-	}
-
-
-	
+	}	
 	
 	// 휴면 회원 해제하기
 	@Override
@@ -1129,8 +1263,7 @@ public class MemberDAO_imple implements MemberDAO {
 	    return n;
 	}
 
-	
-	
+		
 	// 관리자 페이지 내 휴면회원 수 
 	@Override
 	public int getIdleMemberCount() throws SQLException {
@@ -1160,8 +1293,7 @@ public class MemberDAO_imple implements MemberDAO {
 	    return count;
 	}
 
-	
-	
+		
 	// 관리자 페이지 휴면회원 조회
 	@Override
 	public List<MemberDTO> selectIdleMemberListForAdmin() throws SQLException {
@@ -1196,8 +1328,7 @@ public class MemberDAO_imple implements MemberDAO {
 	    return list;
 	}
 
-	
-	
+		
 	// 관리자 페이지 휴면회원 해제
 	@Override
 	public int idleReleaseMany(String[] useridArr) throws SQLException {
@@ -1232,8 +1363,7 @@ public class MemberDAO_imple implements MemberDAO {
 	    return totalCnt;
 	}
 
-	
-	
+		
 	// 관리자 페이지 블랙리스트 등 메모 저장
 	@Override
 	public int updateAdminMemo(String userid, String adminMemo) throws SQLException {
@@ -1259,200 +1389,6 @@ public class MemberDAO_imple implements MemberDAO {
 
 	    return n;
 	}
-	
-	
-	// 네이버/카카오 로그인 시 회원조회
-	@Override
-	public MemberDTO getMemberByUserid(String userid) throws SQLException {
-
-	    MemberDTO member = null;
-
-	    try {
-	        conn = ds.getConnection();
-
-	        String sql = " SELECT member_id, name, email, mobile, postcode, address, detailaddress, extraaddress, "
-	                   + "        gender, birthday, point, status, registerday, grade_code, idle "
-	                   + " FROM tbl_member "
-	                   + " WHERE member_id = ? ";
-
-	        pstmt = conn.prepareStatement(sql);
-	        pstmt.setString(1, userid);
-
-	        rs = pstmt.executeQuery();
-
-	        if(rs.next()) {
-	            member = new MemberDTO();
-
-	            member.setUserid(rs.getString("member_id"));
-	            member.setName(rs.getString("name"));
-
-	            member.setEmail(aes.decrypt(rs.getString("email")));
-	            member.setMobile(aes.decrypt(rs.getString("mobile")));
-
-	            member.setPostcode(rs.getString("postcode"));
-	            member.setAddress(rs.getString("address"));
-	            member.setDetailaddress(rs.getString("detailaddress"));
-	            member.setExtraaddress(rs.getString("extraaddress"));
-
-	            member.setGender(rs.getString("gender"));
-	            member.setBirthday(rs.getString("birthday"));
-	            member.setPoint(rs.getInt("point"));
-
-	            member.setStatus(rs.getInt("status"));
-	            member.setRegisterday(rs.getString("registerday"));
-	            member.setGrade_code(rs.getString("grade_code"));
-	            member.setIdle(rs.getInt("idle"));
-	        }
-
-	    } catch(Exception e) {
-	        e.printStackTrace();
-	    } finally {
-	        close();
-	    }
-
-	    return member;
-	}
-
-	
-	// 네이버/카카오 로그인 시 기존 가입회원 이메일 중복 체크
-	@Override
-	public boolean isEmailExists(String email) throws SQLException {
-
-	    boolean isExists = false;
-
-	    try {
-	        conn = ds.getConnection();
-
-	        String sql = " SELECT 1 "
-	                   + " FROM tbl_member "
-	                   + " WHERE email = ? ";
-
-	        pstmt = conn.prepareStatement(sql);
-	        pstmt.setString(1, aes.encrypt(email));
-
-	        rs = pstmt.executeQuery();
-
-	        isExists = rs.next();
-
-	    } catch(Exception e) {
-	        e.printStackTrace();
-	    } finally {
-	        close();
-	    }
-
-	    return isExists;
-	}
-
-
-	
-	// 네이버/카카오 로그인 시 임시 회원 생성
-	@Override
-	public int insertSocialTempMember(String userid, String name, String email, String mobile) throws SQLException {
-
-	    int n = 0;
-
-	    try {
-	        conn = ds.getConnection();
-
-	        // ★ 무조건 고유 이메일로 박기 (UQ_EMAIL 절대 안 터짐)
-	        String finalEmail = userid + "@social.local";
-
-	        String sql = " INSERT INTO tbl_member "
-	                   + " (member_id, name, passwd, email, mobile, postcode, address, detailaddress, extraaddress, "
-	                   + "   point, registerday, lastpwdchangedate, status, grade_code, idle) "
-	                   + " VALUES "
-	                   + " (?, ?, ?, ?, ?, ?, ?, ?, ?, "
-	                   + "  5000, SYSDATE, SYSDATE, 1, '1', 0) ";
-
-	        pstmt = conn.prepareStatement(sql);
-
-	        pstmt.setString(1, userid);
-	        pstmt.setString(2, (name == null || name.trim().isEmpty()) ? "소셜회원" : name.trim());
-	        pstmt.setString(3, Sha256.encrypt("SOCIAL_LOGIN_" + userid));
-
-	        pstmt.setString(4, aes.encrypt(finalEmail)); // ★ 핵심
-	        pstmt.setString(5, aes.encrypt(mobile == null ? "" : mobile));
-
-	        pstmt.setString(6, "00000");
-	        pstmt.setString(7, "소셜로그인");
-	        pstmt.setString(8, "추가입력필요");
-	        pstmt.setString(9, "");
-
-	        n = pstmt.executeUpdate();
-
-	    } catch(Exception e) {
-	        e.printStackTrace();
-	    } finally {
-	        close();
-	    }
-
-	    return n;
-	}
-
-
-	
-	
-	// 네이버/카카오 로그인 시 임시 회원 생성 후 추가 정보 업데이트
-	@Override
-	public int updateSocialExtraInfo(String userid, String name, String gender, String birthday,
-	                                 String postcode, String address, String detailaddress, String extraaddress) throws SQLException {
-
-	    int n = 0;
-
-	    try {
-	        conn = ds.getConnection();
-
-	        String sql = " UPDATE tbl_member "
-	                   + " SET name = ?, "
-	                   + "     gender = ?, "
-	                   + "     birthday = ?, "
-	                   + "     postcode = ?, "
-	                   + "     address = ?, "
-	                   + "     detailaddress = ?, "
-	                   + "     extraaddress = ? "
-	                   + " WHERE member_id = ? ";
-
-	        pstmt = conn.prepareStatement(sql);
-
-	        // name (필수)
-	        pstmt.setString(1, name);
-
-	        // gender (M/F/NULL)
-	        if(gender == null || gender.trim().isEmpty()) {
-	            pstmt.setNull(2, java.sql.Types.VARCHAR);
-	        }
-	        else {
-	            pstmt.setString(2, gender);
-	        }
-
-	        // birthday (YYYY-MM-DD or NULL)
-	        if(birthday == null || birthday.trim().isEmpty()) {
-	            pstmt.setNull(3, java.sql.Types.VARCHAR);
-	        }
-	        else {
-	            pstmt.setString(3, birthday);
-	        }
-
-	        // 주소들
-	        pstmt.setString(4, postcode);
-	        pstmt.setString(5, address);
-	        pstmt.setString(6, detailaddress);
-	        pstmt.setString(7, extraaddress == null ? "" : extraaddress);
-
-	        // where
-	        pstmt.setString(8, userid);
-
-	        n = pstmt.executeUpdate();
-
-	    } catch(Exception e) {
-	        e.printStackTrace();
-	    } finally {
-	        close();
-	    }
-
-	    return n;
-	}
-
 	
 	
 	// ======================================================
@@ -1575,6 +1511,4 @@ public class MemberDAO_imple implements MemberDAO {
         return result;
     }
 	
-
-
 }

@@ -33,7 +33,7 @@ public class AdminMemberListController extends AbstractController {
         }
 
         /* ===============================
-         * 2. 검색 파라미터 (기존 그대로)
+         * 2. 검색 파라미터 
          * =============================== */
         String searchType = request.getParameter("searchType");
         String searchWord = request.getParameter("searchWord");
@@ -45,32 +45,66 @@ public class AdminMemberListController extends AbstractController {
          * =============================== */
         if (searchType != null && searchWord != null && !"".equals(searchWord.trim())) {
 
-            // 검색 → 기존 로직 그대로
+            // 검색
             memberList = mdao.selectMemberBySearch(searchType, searchWord.trim());
 
         }
         else {
             // 전체 목록 → 페이징
-
+            // ===============================
+            // 1️⃣ 현재 페이지 번호 먼저 구하기
+            // ===============================
             int currentPage = 1;
+
             String pageNo = request.getParameter("pageNo");
             if (pageNo != null) {
                 currentPage = Integer.parseInt(pageNo);
             }
 
-            int sizePerPage = 20; // ⭐ 한 페이지당 20명
+            // 한 페이지에 보여줄 회원수
+            int sizePerPage = 20;
 
+            // 전체 회원수
             int totalCount = mdao.getTotalMemberCount();
             int totalPage = (int)Math.ceil((double)totalCount / sizePerPage);
 
+            // 페이지 번호 보정 (안전처리)
+            if (currentPage < 1) {
+                currentPage = 1;
+            }
+            if (currentPage > totalPage) {
+                currentPage = totalPage;
+            }
+
+            // ===============================
+            // 2️⃣ DB 조회용 행번호 계산
+            // ===============================
             int startRno = (currentPage - 1) * sizePerPage + 1;
             int endRno   = startRno + sizePerPage - 1;
 
+            // ===============================
+            // 3️⃣ 페이지 블럭 계산 (★ 여기 위치 중요)
+            // ===============================
+            int blockSize = 10;
+
+            int startPage =
+                ((currentPage - 1) / blockSize) * blockSize + 1;
+
+            int endPage =
+                startPage + blockSize - 1;
+
+            if (endPage > totalPage) {
+                endPage = totalPage;
+            }	
+            
+            // 회원목록 조회
             memberList = mdao.selectAllMemberForAdmin(startRno, endRno);
 
             // 페이지바용
             request.setAttribute("currentPage", currentPage);
             request.setAttribute("totalPage", totalPage);
+            request.setAttribute("startPage", startPage);
+            request.setAttribute("endPage", endPage);
         }
 
         /* ===============================

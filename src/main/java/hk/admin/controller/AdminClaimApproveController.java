@@ -12,15 +12,15 @@ public class AdminClaimApproveController extends AbstractController {
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         int odrDetailNo = Integer.parseInt(request.getParameter("odrdetailno"));
-        String action = request.getParameter("action"); // APPROVE / REJECT
 
-        System.out.println("odrdetailno = " + odrDetailNo);
-        System.out.println("action = " + action);
-        
-        odao.approveClaim(odrDetailNo, action);
+        odao.approveClaim(odrDetailNo);
+
+        // redirect용 메시지는 session에 저장
+        HttpSession session = request.getSession();
+        session.setAttribute("alertMsg", "클레임이 승인되었습니다.");
 
         super.setRedirect(true);
         super.setViewPage(request.getContextPath() + "/admin/claimList.sp");
-              
     }
+
 }
