@@ -22,11 +22,14 @@
 <br>
 
 ## 👤 3. 담당 역할 및 기여도 (My Role)
-- **파트:** 관리자 대시보드 총괄 및 상품 조회 시스템 구축
+- **파트:** - **관리자 :** 매출 통계 대시보드 및 수익 관리 시스템 총괄
+            - **사용자 :** 마이페이지 구축 및 회원 정보 수정 로직 구현
 - **기여도:** 25% (4인 협업)
-- **주요 업무:** - 관리자 전용 매출 통계 대시보드 구현 (`Chart.js` 연동)
-  - Mybatis 동적 SQL을 활용한 상품 검색 및 카테고리 필터링 API 설계
-  - 프로젝트 공통 DB 커넥션 및 Mybatis 환경 설정
+- **주요 업무:**
+  - **데이터 시각화:** `Chart.js`를 연동하여 지점별/기간별 매출 데이터를 한눈에 파악할 수 있는 관리자 대시보드 구현
+  - **수익 관리 로직:** Mybatis 집계 함수를 활용하여 복잡한 주문 데이터를 정제하고 실시간 수익 분석 기능 설계
+  - **회원 정보 관리:** 사용자 보안을 고려한 회원 정보 수정 로직 및 개인별 주문 이력 조회가 가능한 마이페이지 구축
+  - **백엔드 인프라:** 프로젝트 공통 DB 커넥션 풀 설정 및 Mybatis XML/Interface 환경 구성 주도
 
 <br>
 
@@ -56,19 +59,21 @@
 ## 📺 6. 실행 화면
 | 메인 쇼핑몰 UI | 상품 상세 및 필터 | 관리자 통계 페이지 |
 | :---: | :---: | :---: |
-| <img src="https://via.placeholder.com/300x200.png?text=Main+Shop" width="300"/> | <img src="https://via.placeholder.com/300x200.png?text=Product+Filter" width="300"/> | <img src="https://via.placeholder.com/300x200.png?text=Admin+Stat" width="300"/> |
+| <img src="https://via.placeholder.com/300x200.png?text=Main+Shop" width="300"/> 
+| <img src="https://via.placeholder.com/300x200.png?text=Product+Filter" width="300"/>
+| <img src="https://via.placeholder.com/300x200.png?text=Admin+Stat" width="300"/> |
 | 브랜드 아이덴티티 적용 메인 | Mybatis 기반 다중 필터링 | Chart.js 기반 매출 시각화 |
 
 <br>
 
 ## 📂 7. 프로젝트 구조
-```text
+```예시)
 src/main/java
   ├── com.siseon.admin      # 상품 등록 및 매출 대시보드 관리 (담당 파트)
   ├── com.siseon.product    # 카테고리별 상품 조회 및 필터링 로직 (담당 파트)
   ├── com.siseon.order      # 장바구니 및 결제 주문 처리
-
-
-
-
   └── com.siseon.config     # Mybatis 및 DB 환경 설정 (담당 파트)
+
+
+
+
