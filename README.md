@@ -90,7 +90,3 @@ src/main/webapp/WEB-INF/views/js
   └── member (사용자 UI)
        ├── mypage.jsp                       # 개인 활동 및 주문 내역 조회
        └── edit_profile.jsp                 # 비밀번호 확인 및 회원 정보 수정
-
-
-
-
