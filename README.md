@@ -1,7 +1,7 @@
 # 👓 SISEON (가상 안경 쇼핑몰)
 > **세미프로젝트 1팀 (팀 프로젝트 - 4인)**
 > 
-> 안경 브랜드 'CARIN'을 모델로 한 쇼핑몰 서비스로, 본 프로젝트에서 저는 **관리자 운영 시스템**과 **사용자 정보 관리**의 백엔드 로직 전반을 담당하였습니다.
+> 안경 브랜드 **'CARIN'**을 모델로 한 쇼핑몰 서비스입니다. 본 프로젝트에서 저는 **관리자 운영 시스템**과 **사용자 정보 관리**의 백엔드 로직 전반을 담당하여 데이터 기반의 관리 환경을 구축했습니다.
 
 <br>
 
@@ -19,7 +19,7 @@
 <img src="https://img.shields.io/badge/Oracle-F80000?style=for-the-badge&logo=oracle&logoColor=white"/>
 
 ### 🌐 Frontend
-<img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black"/> <img src="https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white"/> <img src="https://img.shields.io/badge/JSP-007396?style=for-the-badge&logo=java&logoColor=white"/> <img src="https://img.shields.io/badge/Chart.js-FF6384?style=for-the-badge&logo=chartdotjs&logoColor=white"/>
+<img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black"/> <img src="https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white"/> <img src="https://img.shields.io/badge/Bootstrap%204-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white"/> <img src="https://img.shields.io/badge/JSP-007396?style=for-the-badge&logo=java&logoColor=white"/> <img src="https://img.shields.io/badge/Chart.js-FF6384?style=for-the-badge&logo=chartdotjs&logoColor=white"/>
 
 ### 🔧 Tools
 <img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white"/> <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white"/>
@@ -33,7 +33,7 @@
   - **회원 등급 관리:** 구매 실적 기반 등급 자동 업데이트 및 권한 관리 시스템 설계
 - **사용자 시스템 (Back-end/Front-end)**
   - **마이페이지:** 개인별 주문 현황, 활동 내역 조회 기능 구현
-  - **회원 정보 수정:** 보안을 고려한 비밀번호 변경 및 개인정보 수정 API 개발
+  - **회원 정보 수정:** 보안을 고려한 세션 기반 본인 인증 및 개인정보 수정 API 개발
 - **시스템 연동:** 대시보드와 마이페이지 간 데이터 정합성을 위한 공통 DAO/Service 로직 최적화
 
 <br>
@@ -55,9 +55,9 @@
 - **결과:** 서버 부하를 줄이고, 관리자가 실시간으로 수익 현황을 파악할 수 있는 대시보드 구현.
 
 ### ✅ 사용자 데이터 보안 및 정보 수정 로직 (사용자)
-- **문제 상황:** 회원 수정 시 기존 데이터와 충돌하거나, 잘못된 접근으로 인한 정보 유출 방지 필요.
-- **해결 방안:** 세션(Session) 정보를 기반으로 한 본인 인증 로직을 강화하고, Mybatis 동적 쿼리를 사용해 변경된 항목만 선택적으로 업데이트하는 로직 구현.
-- **결과:** 데이터 수정의 안정성을 확보하고 불필요한 DB 반영을 차단함.
+- **문제 상황:** 회원 수정 시 잘못된 접근으로 인한 정보 유출 방지 및 변경된 항목만 효율적으로 업데이트해야 하는 과제 발생.
+- **해결 방안:** 세션(Session) 정보를 기반으로 한 본인 인증 로직을 강화하고, MyBatis 동적 쿼리를 사용하여 변경된 필드만 선택적으로 업데이트하도록 구현.
+- **결과:** 데이터 수정의 안정성을 확보하고 불필요한 DB 트랜잭션 발생을 차단함.
 
 <br>
 
@@ -72,6 +72,11 @@
 ## 📂 7. 프로젝트 구조 (My Part)
 ```text
 src/main/java
-  ├── com.siseon.admin      # 관리자 대시보드, 수익/방문자/등급 관리 로직
-  ├── com.siseon.member     # 사용자 마이페이지 및 회원 수정 기능
-  └── com.siseon.common     # 시스템 연동 및 공통 데이터 처리
+  └── com.siseon
+       ├── admin      # 관리자 대시보드, 수익/방문자/등급 관리 (Controller, Service, Mapper)
+       ├── member     # 사용자 마이페이지 및 회원 정보 수정 로직
+       └── common     # 시스템 연동을 위한 공통 인터페이스 및 유틸리티
+src/main/resources
+  └── mapper
+       ├── admin      # 매출 집계 및 통계용 Mybatis XML 쿼리
+       └── member     # 회원 정보 처리용 Mybatis XML 쿼리
