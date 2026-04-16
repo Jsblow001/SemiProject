@@ -71,12 +71,26 @@
 
 ## 📂 7. 프로젝트 구조 (My Part)
 ```text
-src/main/java
-  └── com.siseon
-       ├── admin      # 관리자 대시보드, 수익/방문자/등급 관리 (Controller, Service, Mapper)
-       ├── member     # 사용자 마이페이지 및 회원 정보 수정 로직
-       └── common     # 시스템 연동을 위한 공통 인터페이스 및 유틸리티
-src/main/resources
-  └── mapper
-       ├── admin      # 매출 집계 및 통계용 Mybatis XML 쿼리
-       └── member     # 회원 정보 처리용 Mybatis XML 쿼리
+/* 백엔드: 담당 모듈별 독립 패키지 구성 */
+src/main/java/js
+  ├── admin (관리자 시스템)
+  │    ├── controller/AdminController.java  # 매출/방문자 통계 API 제어
+  │    ├── service/AdminService.java        # 통계 데이터 가공 로직
+  │    └── model/ (dao, vo)                 # MyBatis 인터페이스 및 객체 정의
+  └── member (사용자 시스템)
+       ├── controller/MemberController.java # 마이페이지/회원수정 API 제어
+       └── service/MemberService.java        # 회원 정보 유효성 검사 및 처리 로직
+
+/* 프론트엔드: MVC 패턴에 따른 View 분리 */
+src/main/webapp/WEB-INF/views/js
+  ├── admin (관리자 UI)
+  │    ├── admin_main.jsp                   # 매출 시각화 대시보드 메인
+  │    ├── admin_revenue.jsp                # 상세 수익 관리 페이지
+  │    └── admin_member.jsp                 # 회원 등급 및 권한 관리
+  └── member (사용자 UI)
+       ├── mypage.jsp                       # 개인 활동 및 주문 내역 조회
+       └── edit_profile.jsp                 # 비밀번호 확인 및 회원 정보 수정
+
+
+
+
