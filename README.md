@@ -42,7 +42,7 @@
 - **설계 포인트:** 통계 데이터 추출을 위해 `VISIT_LOG`, `SALES_DATA`, `MEMBER_GRADE` 등의 테이블을 설계했으며, **정규화**를 통해 데이터 중복을 방지하고 무결성을 확보했습니다.
 
 <div align="center">
-  <img src="https://via.placeholder.com/800x400.png?text=SISEON+Project+ERD" width="800" alt="SISEON ERD"/>
+  <img width="1320" height="695" alt="스크린샷 2026-05-06 133238" src="https://github.com/user-attachments/assets/18fa1cdf-4e94-4718-92f9-5bd0a421e5f2" />
 </div>
 
 <br>
